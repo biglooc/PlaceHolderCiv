@@ -281,6 +281,14 @@ public class BuildAsyncTask extends CivAsyncTask {
 					sb.getType() == CivData.JUNGLE_DOOR || 
 					sb.getType() == CivData.ACACIA_DOOR || 
 					sb.getType() == CivData.DARK_OAK_DOOR ||
+					sb.getType() == CivData.SIGN ||
+					sb.getType() == CivData.TORCH ||
+					sb.getType() == CivData.REDSTONE_TORCH ||
+					sb.getType() == CivData.TRAP_DOOR ||
+					sb.getType() == CivData.RAILROAD ||
+					sb.getType() == CivData.OAK_BUTTON ||
+					sb.getType() == CivData.STONE_BUTTON ||
+					sb.getType() == CivData.LEVER ||
 					Template.isAttachable(sb.getType())) {
 					// dont build doors, save it for post sync build.
 				}

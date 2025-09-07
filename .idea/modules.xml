@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/civcraft/civcraft-monorepo.civcraft.main.iml" filepath="$PROJECT_DIR$/.idea/modules/civcraft/civcraft-monorepo.civcraft.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/civcraft/civcraft-monorepo.civcraft.test.iml" filepath="$PROJECT_DIR$/.idea/modules/civcraft/civcraft-monorepo.civcraft.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/civcraft_dynmap/civcraft-monorepo.civcraft_dynmap.main.iml" filepath="$PROJECT_DIR$/.idea/modules/civcraft_dynmap/civcraft-monorepo.civcraft_dynmap.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/civcraft_dynmap/civcraft-monorepo.civcraft_dynmap.test.iml" filepath="$PROJECT_DIR$/.idea/modules/civcraft_dynmap/civcraft-monorepo.civcraft_dynmap.test.iml" />
     </modules>
   </component>
 </project>

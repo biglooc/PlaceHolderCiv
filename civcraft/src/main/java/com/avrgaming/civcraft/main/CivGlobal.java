@@ -70,7 +70,6 @@ import com.avrgaming.civcraft.exception.InvalidObjectException;
 import com.avrgaming.civcraft.items.BonusGoodie;
 import com.avrgaming.civcraft.object.Relation.Status;
 import com.avrgaming.civcraft.permission.PermissionGroup;
-import com.avrgaming.civcraft.populators.MobSpawnerPreGenerate;
 import com.avrgaming.civcraft.populators.TradeGoodPreGenerate;
 import com.avrgaming.civcraft.questions.QuestionBaseTask;
 import com.avrgaming.civcraft.questions.QuestionResponseInterface;
@@ -134,7 +133,6 @@ public class CivGlobal {
 	private static Map<BlockCoord, CampBlock> campBlocks = new ConcurrentHashMap<BlockCoord, CampBlock>();
 	private static Map<BlockCoord, StructureSign> structureSigns = new ConcurrentHashMap<BlockCoord, StructureSign>();
 	private static Map<BlockCoord, StructureChest> structureChests = new ConcurrentHashMap<BlockCoord, StructureChest>();
-	private static Map<BlockCoord, MobSpawner> mobSpawners = new ConcurrentHashMap<BlockCoord, MobSpawner>();
 	private static Map<BlockCoord, TradeGood> tradeGoods = new ConcurrentHashMap<BlockCoord, TradeGood>();
 	private static Map<BlockCoord, ProtectedBlock> protectedBlocks = new ConcurrentHashMap<BlockCoord, ProtectedBlock>();
 	private static Map<ChunkCoord, FarmChunk> farmChunks = new ConcurrentHashMap<ChunkCoord, FarmChunk>();
@@ -156,7 +154,6 @@ public class CivGlobal {
 	
 	public static Map<Integer, Boolean> CivColorInUse = new ConcurrentHashMap<Integer, Boolean>();
 	public static TradeGoodPreGenerate tradeGoodPreGenerator = new TradeGoodPreGenerate();
-	public static MobSpawnerPreGenerate mobSpawnerPreGenerator = new MobSpawnerPreGenerate();
 	
 	//TODO fix the duplicate score issue...
 	public static TreeMap<Integer, Civilization> civilizationScores = new TreeMap<Integer, Civilization>();
@@ -220,9 +217,6 @@ public class CivGlobal {
 		loadPermissionGroups();
 		loadTownChunks();
 		loadWonders();
-		if (CivSettings.hasMobIntergration) {
-			loadMobSpawners();
-		}
 		loadStructures();
 		loadWallBlocks();
 		loadRoadBlocks();
@@ -339,32 +333,6 @@ public class CivGlobal {
 			Collections.reverse(ArenaTeam.teamRankings); //Lazy method.
 			
 			CivLog.info("Loaded "+ArenaTeam.arenaTeams.size()+" Arena Teams");
-		} finally {
-			SQL.close(rs, ps, context);
-		}
-	}
-	
-	private static void loadMobSpawners() throws SQLException {
-		Connection context = null;
-		ResultSet rs = null;
-		PreparedStatement ps = null;
-		
-		try {
-			context = SQL.getGameConnection();		
-			ps = context.prepareStatement("SELECT * FROM "+SQL.tb_prefix+MobSpawner.TABLE_NAME);
-			rs = ps.executeQuery();
-	
-			while(rs.next()) {
-				MobSpawner spawner;
-				try {
-					spawner = new MobSpawner(rs);
-					mobSpawners.put(spawner.getCoord(), spawner);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-	
-			CivLog.info("Loaded "+mobSpawners.size()+" Mob Spawners");
 		} finally {
 			SQL.close(rs, ps, context);
 		}
@@ -1175,18 +1143,6 @@ public class CivGlobal {
 		return structures.entrySet().iterator();
 	}
 	
-	public static void addMobSpawner(MobSpawner spawner) {
-        mobSpawners.put(spawner.getCoord(), spawner);
-    }
-    
-    public static MobSpawner getMobSpawner(BlockCoord coord) {
-        return mobSpawners.get(coord);
-    }
-    
-    public static Collection<MobSpawner> getMobSpawners() {
-        return mobSpawners.values();
-    }
-	
 	public static void addTradeGood(TradeGood good) {
 		tradeGoods.put(good.getCoord(), good);
 	}
@@ -1765,18 +1721,6 @@ public class CivGlobal {
 		}	
 		
 		return color+namedPlayer.getName();		
-	}
-	
-	public static boolean mobSpawnerTooCloseToAnother(Location spawnerLoc, double radius) {
-		for (MobSpawner ms : mobSpawners.values()) {
-			Location msLoc = ms.getCoord().getLocation();
-			
-			if (msLoc.distance(spawnerLoc) < radius) {
-				return true;
-			}
-			
-		}
-		return false;
 	}
 
 	public static boolean tradeGoodTooCloseToAnother(Location goodLoc, double radius) {

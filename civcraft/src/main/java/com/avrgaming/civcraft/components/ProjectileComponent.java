@@ -20,6 +20,7 @@ package com.avrgaming.civcraft.components;
 
 import java.util.HashSet;
 
+import com.avrgaming.civcraft.main.CivLog;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -216,6 +217,7 @@ public abstract class ProjectileComponent extends Component {
 			try {
 				player = CivGlobal.getPlayer(pc.getName());
 			} catch (CivException e) {
+				CivLog.error("Exception while collecting player:" + e.getMessage());
 				return;
 			}
 			

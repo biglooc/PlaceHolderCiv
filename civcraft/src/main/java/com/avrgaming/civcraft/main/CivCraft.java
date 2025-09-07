@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.avrgaming.civcraft.listener.*;
+import com.avrgaming.civcraft.listener.PreviewAutoCancelListener;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -68,7 +69,6 @@ import com.avrgaming.civcraft.loreenhancements.LoreEnhancementArenaItem;
 import com.avrgaming.civcraft.lorestorage.LoreCraftableMaterialListener;
 import com.avrgaming.civcraft.lorestorage.LoreGuiItemListener;
 import com.avrgaming.civcraft.nocheat.NoCheatPlusSurvialFlyHandler;
-import com.avrgaming.civcraft.populators.MobSpawnerPopulator;
 import com.avrgaming.civcraft.populators.TradeGoodPopulator;
 import com.avrgaming.civcraft.randomevents.RandomEventSweeper;
 import com.avrgaming.civcraft.sessiondb.SessionDBAsyncTimer;
@@ -109,7 +109,8 @@ import com.avrgaming.sls.SLSManager;
 
 public final class CivCraft extends JavaPlugin {
 
-	private boolean isError = false;	
+	public static Plugin getInstance;
+	private boolean isError = false;
 	private static JavaPlugin plugin;	
 	public static boolean isDisable = false;
 	
@@ -194,6 +195,10 @@ public final class CivCraft extends JavaPlugin {
 		TaskMaster.syncTimer("ArenaTimeoutTimer", new ArenaTimer(), TimeTools.toTicks(1));
 
 	}
+
+	public static CivCraft getInstance() {
+		return CivCraft.getInstance();
+	}
 	
 	private void registerEvents() {
 		final PluginManager pluginManager = getServer().getPluginManager();
@@ -227,12 +232,7 @@ public final class CivCraft extends JavaPlugin {
 		pluginManager.registerEvents(new FishingListener(), this);	
 		pluginManager.registerEvents(new PvPListener(), this);
 		pluginManager.registerEvents(new LoreEnhancementArenaItem(), this);
-		
-		if (hasPlugin("HeroChat")) {
-			pluginManager.registerEvents(new HeroChatListener(), this);
-		}
 
-		pluginManager.registerEvents(new ArmorListener(getConfig().getStringList("blocked")), this);
 	}
 	
 	private void registerNPCHooks() {
@@ -241,6 +241,7 @@ public final class CivCraft extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		getServer().getPluginManager().registerEvents(new PreviewAutoCancelListener(), this);
 		saveDefaultConfig();
 		new com.avrgaming.civcraft.util.DiskSpaceMonitor(this).start();
 		setPlugin(this);
@@ -252,7 +253,6 @@ public final class CivCraft extends JavaPlugin {
 		
 		//Load World Populators
 		BukkitObjects.getWorlds().get(0).getPopulators().add(new TradeGoodPopulator());
-		BukkitObjects.getWorlds().get(0).getPopulators().add(new MobSpawnerPopulator());
 				
 		try {
 			CivSettings.init(this);
