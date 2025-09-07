@@ -452,7 +452,9 @@ public class Civilization extends SQLObject {
 		if (this.adviserGroup != null) {
 			this.adviserGroup.delete();
 		}
-		
+
+        TagUtil.removeTeam(this.getName());
+
 		/* Delete all of our towns. */
 		for (Town t : getTowns()) {
 			t.delete();
