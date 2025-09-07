@@ -102,7 +102,6 @@ import com.wimbli.WorldBorder.Config;
 
 public abstract class Buildable extends SQLObject {
 
-	protected BlockCoord mobSpawnerCoord;
 	private Town town;
 	protected BlockCoord corner;
 	public ConfigBuildableInfo info = new ConfigBuildableInfo(); //Blank buildable info for buildables which do not have configs.

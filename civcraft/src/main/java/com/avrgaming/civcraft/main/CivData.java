@@ -18,7 +18,6 @@
  */
 package com.avrgaming.civcraft.main;
 
-import net.minecraft.server.v1_12_R1.BlockStationary;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
