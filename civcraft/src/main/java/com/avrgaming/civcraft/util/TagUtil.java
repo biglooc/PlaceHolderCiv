@@ -29,7 +29,7 @@ public final class TagUtil {
             team = scoreboard.registerNewTeam(teamName);
         }
 
-        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "]";
+        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "] ";
         team.setPrefix(prefix);
     }
 
