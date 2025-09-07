@@ -435,73 +435,73 @@ public class SQL {
 	public static void insert(HashMap<String, Object> hashmap, String tablename) {
 		TaskMaster.asyncTask(new SQLInsertTask(hashmap, tablename), 0);
 	}
-	
+
 	public static int insertNow(HashMap<String, Object> hashmap, String tablename) throws SQLException {
 		Connection context = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 
 		try {
-			String sql = "INSERT INTO " + SQL.tb_prefix + tablename + " ";
-			String keycodes = "(";
-			String valuecodes = " VALUES ( ";
-			ArrayList<Object> values = new ArrayList<Object>();
-			
+			// Quote de tabelnaam
+			String sql = "INSERT INTO `" + SQL.tb_prefix + tablename + "` ";
+
+			StringBuilder keycodes = new StringBuilder("(");
+			StringBuilder valuecodes = new StringBuilder(" VALUES ( ");
+			ArrayList<Object> values = new ArrayList<>();
+
 			Iterator<String> keyIter = hashmap.keySet().iterator();
 			while (keyIter.hasNext()) {
 				String key = keyIter.next();
-				
-				keycodes += key;
-				keycodes += "" + (keyIter.hasNext() ? "," : ")");
-				
-				valuecodes += "?";
-				valuecodes += "" + (keyIter.hasNext() ? "," : ")");
-				
+
+				// Kolomnaam quoten met backticks
+				keycodes.append("`").append(key).append("`");
+				keycodes.append(keyIter.hasNext() ? "," : ")");
+
+				valuecodes.append("?");
+				valuecodes.append(keyIter.hasNext() ? "," : ")");
+
 				values.add(hashmap.get(key));
 			}
-			
-			sql += keycodes;
-			sql += valuecodes;
-			
-			context = SQL.getGameConnection();		
+
+			sql += keycodes.toString();
+			sql += valuecodes.toString();
+
+			context = SQL.getGameConnection();
 			ps = context.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			
+
 			int i = 1;
 			for (Object value : values) {
 				if (value instanceof String) {
 					ps.setString(i, (String) value);
 				} else if (value instanceof Integer) {
-					ps.setInt(i, (Integer)value);
+					ps.setInt(i, (Integer) value);
 				} else if (value instanceof Boolean) {
-					ps.setBoolean(i, (Boolean)value);
+					ps.setBoolean(i, (Boolean) value);
 				} else if (value instanceof Double) {
-					ps.setDouble(i, (Double)value);
+					ps.setDouble(i, (Double) value);
 				} else if (value instanceof Float) {
-					ps.setFloat(i, (Float)value);
+					ps.setFloat(i, (Float) value);
 				} else if (value instanceof Long) {
-					ps.setLong(i, (Long)value);
+					ps.setLong(i, (Long) value);
 				} else {
 					ps.setObject(i, value);
 				}
 				i++;
 			}
-			
+
 			ps.execute();
 			int id = 0;
 			rs = ps.getGeneratedKeys();
-	
+
 			while (rs.next()) {
 				id = rs.getInt(1);
 				break;
 			}
-				
+
 			if (id == 0) {
-				String name = (String)hashmap.get("name");
-				if (name == null) {
-					name = "Unknown";
-				}
-				
-				CivLog.error("SQL ERROR: Saving an SQLObject returned a 0 ID! Name:"+name+" Table:"+tablename);
+				String name = (String) hashmap.get("name");
+				if (name == null) name = "Unknown";
+				CivLog.error("SQL ERROR: Saving an SQLObject returned a 0 ID! Name:" + name + " Table:" + tablename);
 			}
 			return id;
 
@@ -514,10 +514,10 @@ public class SQL {
 	public static void deleteNamedObject(SQLObject obj, String tablename) throws SQLException {
 		Connection context = null;
 		PreparedStatement ps = null;
-		
+
 		try {
-			String sql = "DELETE FROM " + SQL.tb_prefix + tablename + " WHERE `id` = ?";
-			context = SQL.getGameConnection();		
+			String sql = "DELETE FROM `" + SQL.tb_prefix + tablename + "` WHERE `id` = ?";
+			context = SQL.getGameConnection();
 			ps = context.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, obj.getId());
 			ps.execute();
@@ -525,16 +525,16 @@ public class SQL {
 			obj.setDeleted(true);
 		} finally {
 			SQL.close(null, ps, context);
-		}	
+		}
 	}
-	
+
 	public static void deleteByName(String name, String tablename) throws SQLException {
 		Connection context = null;
 		PreparedStatement ps = null;
-		
+
 		try {
-			String sql = "DELETE FROM " + SQL.tb_prefix + tablename + " WHERE `name` = ?";
-			context = SQL.getGameConnection();		
+			String sql = "DELETE FROM `" + SQL.tb_prefix + tablename + "` WHERE `name` = ?";
+			context = SQL.getGameConnection();
 			ps = context.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, name);
 			ps.execute();
@@ -543,6 +543,7 @@ public class SQL {
 			SQL.close(null, ps, context);
 		}
 	}
+
 	public static void makeCol(String colname, String type, String TABLE_NAME) throws SQLException {
 		if (!SQL.hasColumn(TABLE_NAME, colname)) {
 			CivLog.info("\tCouldn't find "+colname+" column for "+TABLE_NAME);

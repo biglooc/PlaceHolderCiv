@@ -22,13 +22,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avrgaming.civcraft.util.*;
@@ -1656,98 +1650,105 @@ public class Town extends SQLObject {
 
 	public void buildStructure(Player player, String id, Location center, Template tpl) throws CivException {
 
-//		if (!center.getWorld().getName().equals("world")) {
-//			throw new CivException("Cannot build structures in the overworld ... for now.");
-//		}
+		// Alleen in bepaalde werelden bouwen
+		final Set<String> ALLOWED_WORLDS = new HashSet<>(Arrays.asList("world"));
+		if (!ALLOWED_WORLDS.contains(center.getWorld().getName())) {
+			throw new CivException(CivSettings.localize.localizedString("town_buildwonder_errorWorldNotAllowed"));
+		}
+
+		CivLog.info(String.format("[BUILD] %s requested build of '%s' at %s (%d,%d,%d)",
+				player.getName(), id, center.getWorld().getName(), center.getBlockX(), center.getBlockY(), center.getBlockZ()));
 
 		Structure struct = Structure.newStructure(center, id, this);
 
+		// Gates
 		if (!this.hasUpgrade(struct.getRequiredUpgrade())) {
 			throw new CivException(CivSettings.localize.localizedString("town_buildwonder_errorMissingUpgrade"));
 		}
-
 		if (!this.hasTechnology(struct.getRequiredTechnology())) {
 			throw new CivException(CivSettings.localize.localizedString("town_buildwonder_errorMissingTech"));
 		}
-
 		if (!struct.isAvailable()) {
 			throw new CivException(CivSettings.localize.localizedString("town_structure_errorNotAvaliable"));
 		}
 
 		struct.canBuildHere(center, Structure.MIN_DISTANCE);
 
-		if (struct.getLimit() != 0) {
-			if (getStructureTypeCount(id) >= struct.getLimit()) {
-				throw new CivException(CivSettings.localize.localizedString("var_town_structure_errorLimitMet",struct.getLimit(),struct.getDisplayName()));
-			}
+		if (struct.getLimit() != 0 && getStructureTypeCount(id) >= struct.getLimit()) {
+			throw new CivException(CivSettings.localize.localizedString(
+					"var_town_structure_errorLimitMet", struct.getLimit(), struct.getDisplayName()));
 		}
 
-		double cost = struct.getCost();
+		final double cost = struct.getCost();
 		if (!this.getTreasury().hasEnough(cost)) {
-			throw new CivException(CivSettings.localize.localizedString("var_town_buildwonder_errorTooPoor",struct.getDisplayName(),cost,CivSettings.CURRENCY_NAME));
+			throw new CivException(CivSettings.localize.localizedString(
+					"var_town_buildwonder_errorTooPoor", struct.getDisplayName(), cost, CivSettings.CURRENCY_NAME));
 		}
 
-		struct.runCheck(center); //Throws exception if we can't build here.	
-
-		Buildable inProgress  = getCurrentStructureInProgress();
+		Buildable inProgress = getCurrentStructureInProgress();
 		if (inProgress != null) {
-			throw new CivException(CivSettings.localize.localizedString("var_town_buildwonder_errorCurrentlyBuilding",inProgress.getDisplayName())+". "+CivSettings.localize.localizedString("town_buildwonder_errorOneAtATime"));
+			throw new CivException(CivSettings.localize.localizedString(
+					"var_town_buildwonder_errorCurrentlyBuilding", inProgress.getDisplayName()) + ". " +
+					CivSettings.localize.localizedString("town_buildwonder_errorOneAtATime"));
 		}
+
+		// Laatste preflight
+		struct.runCheck(center);
+
+		boolean paid = false;
 
 		try {
-			/*
-			 * XXX if the template is null we need to just get the template first.
-			 * This should only happen for capitols and town halls since we need to
-			 * Make them use the structure preview code and they don't yet
-			 */
+			// Template klaarzetten indien nodig
 			if (tpl == null) {
-				try {
-					tpl = new Template();
-					tpl.initTemplate(center, struct);
-				} catch (Exception e) {
-					throw e;
-				}
+				tpl = new Template();
+				tpl.initTemplate(center, struct);
 			}
 
+			CivLog.debug(String.format("[BUILD] Constructing '%s' ...", struct.getDisplayName()));
 			struct.build(player, center, tpl);
-			struct.save();
 
-			// Go through and add any town chunks that were claimed to this list
-			// of saved objects.
+			struct.save();
 			for (TownChunk tc : struct.townChunksToSave) {
 				tc.save();
 			}
 			struct.townChunksToSave.clear();
 
+			this.getTreasury().withdraw(cost);
+			paid = true;
+
 			if (this.getExtraHammers() > 0) {
 				this.giveExtraHammers(this.getExtraHammers());
 			}
+
+			if (struct instanceof TradeOutpost) {
+				TradeOutpost outpost = (TradeOutpost) struct;
+				if (outpost.getGood() != null) {
+					outpost.getGood().save();
+				}
+			}
+
+			CivMessage.sendTown(this, CivColor.Yellow +
+					CivSettings.localize.localizedString("var_town_buildwonder_success", struct.getDisplayName()));
+			CivLog.info(String.format("[BUILD] '%s' completed and paid (%.2f %s).",
+					struct.getDisplayName(), cost, CivSettings.CURRENCY_NAME));
+
 		} catch (CivException e) {
-			throw new CivException(CivSettings.localize.localizedString("var_town_buildwonder_errorGeneric",e.getMessage()));
+			if (paid) {
+				try { this.getTreasury().deposit(cost); }
+				catch (Throwable ignore) { CivLog.warning("[BUILD] Refund failed after CivException: " + ignore.getMessage()); }
+			}
+			CivLog.warning("[BUILD] CivException during build: " + e.getMessage());
+			throw new CivException(CivSettings.localize.localizedString("var_town_buildwonder_errorGeneric", e.getMessage()));
+
 		} catch (Exception e) {
+			if (paid) {
+				try { this.getTreasury().deposit(cost); }
+				catch (Throwable ignore) { CivLog.warning("[BUILD] Refund failed after Exception: " + ignore.getMessage()); }
+			}
 			e.printStackTrace();
+			CivLog.error("[BUILD] Unexpected error during build of '" + id + "': " + e.getMessage());
 			throw new CivException(CivSettings.localize.localizedString("internalCommandException"));
 		}
-
-		this.getTreasury().withdraw(cost);
-		CivMessage.sendTown(this, CivColor.Yellow+CivSettings.localize.localizedString("var_town_buildwonder_success",struct.getDisplayName()));
-
-		//	try {
-		//this.save();
-
-		/* Good needs to be saved after structure to get proper structure id.*/
-		if (struct instanceof TradeOutpost) {
-			TradeOutpost outpost = (TradeOutpost)struct;
-			if (outpost.getGood() != null) {
-				outpost.getGood().save();
-			}
-		}
-
-		//TODO fix this dependency nightmare! (the center is moved in build and needs to be resaved)
-		//	} catch (SQLException e) {
-		//		e.printStackTrace();
-		//		throw new CivException("Internal database error");
-		//	}
 	}
 
 	public boolean isStructureAddable(Structure struct) {
