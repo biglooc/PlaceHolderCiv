@@ -67,7 +67,6 @@ import com.avrgaming.civcraft.object.Buff;
 import com.avrgaming.civcraft.object.BuildableDamageBlock;
 import com.avrgaming.civcraft.object.Civilization;
 import com.avrgaming.civcraft.object.CultureChunk;
-import com.avrgaming.civcraft.object.MobSpawner;
 import com.avrgaming.civcraft.object.ProtectedBlock;
 import com.avrgaming.civcraft.object.Resident;
 import com.avrgaming.civcraft.object.SQLObject;
@@ -104,7 +103,6 @@ import com.wimbli.WorldBorder.Config;
 public abstract class Buildable extends SQLObject {
 
 	protected BlockCoord mobSpawnerCoord;
-	protected MobSpawner mobSpawner = null;
 	private Town town;
 	protected BlockCoord corner;
 	public ConfigBuildableInfo info = new ConfigBuildableInfo(); //Blank buildable info for buildables which do not have configs.
@@ -148,80 +146,7 @@ public abstract class Buildable extends SQLObject {
 	public static final double DEFAULT_HAMMERRATE = 1.0;
 	public AABB templateBoundingBox = null;
 	public String invalidLayerMessage = "";
-	
-	public MobSpawner getMobSpawner() {
-		try {
-			Template tpl = new Template();
-			Block centerBlock = this.getCorner().getBlock();
-			tpl.initTemplate(this.getCenterLocation().getLocation(), this);
-			for (int x = 0; x < tpl.size_x; x++) {
-				for (int y = 0; y < tpl.size_y; y++) {
-					for (int z = 0; z < tpl.size_z; z++) {
-						Block b = centerBlock.getRelative(x, y, z);
-						BlockCoord coord = new BlockCoord(b);
-						ProtectedBlock pb = CivGlobal.getProtectedBlock(coord);
-						if (pb != null && pb.getType() == ProtectedBlock.Type.MOB_SPAWNER_MARKER) {
-							MobSpawner spawner = CivGlobal.getMobSpawner(coord);
-							if (spawner != null)
-							{
-								return spawner;
-							}
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			return null;
-		}
-		return null;
-	}
-	
-	public BlockCoord getMobSpawnerCoord() {
-	
-		
-		return mobSpawnerCoord;
-	}
 
-	public void setMobSpawnerCoord(BlockCoord mobSpawnerCoord) {
-		this.mobSpawnerCoord = mobSpawnerCoord;
-	}
-	
-	public void disableMobSpawner() {
-		/* Disable Mob Spawner When structure is built. */
-		MobSpawner spawner = getMobSpawner();
-		if (spawner == null) {
-			return;
-		}
-		spawner.setActive(false);
-		spawner.setBuildable(this.getId());
-		spawner.setCiv(this.getTown().getCiv());
-		
-		/* Save the spawner *afterwards* so the structure id is properly set. */
-		try {
-			spawner.saveNow();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void enableMobSpawner() {
-		/* Enable Mob Spawner When structure is removed. */
-		MobSpawner spawner = getMobSpawner();
-		if (spawner == null) {
-			return;
-		}
-		spawner.setActive(true);
-		spawner.setBuildable(0);
-		spawner.setCiv(null);
-		/* Save the spawner *afterwards* so the structure id is properly set. */
-		try {
-			spawner.saveNow();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
 	/* True when the corner has been repositioned during the build process. */
 	public Town getTown() {
@@ -465,7 +390,6 @@ public abstract class Buildable extends SQLObject {
 			}
 		}
 
-		this.disableMobSpawner();
 		this.save();
 	}
 	
@@ -545,10 +469,20 @@ public abstract class Buildable extends SQLObject {
 		CivMessage.send(player, CivColor.Yellow+ChatColor.BOLD+CivSettings.localize.localizedString("buildable_preview_prompt1"));
 		CivMessage.send(player, CivColor.LightGreen+ChatColor.BOLD+CivSettings.localize.localizedString("buildable_preview_prompt2"));
 		Resident resident = CivGlobal.getResident(player);
+
+		resident.cancelPreviewIfAny(player);
+
+		tpl.buildPreviewScaffolding(centerLoc, player);
 		
-		if (!War.isWarTime() && CivSettings.showPreview)
+		if (!War.isWarTime() && CivSettings.showPreview) {
+			if (this instanceof com.avrgaming.civcraft.structure.wonders.Wonder) {
+				resident.startPreviewTask(tpl, centerLoc.getBlock(), player.getUniqueId(),60, 1);
+			} else {
+				resident.startPreviewTask(tpl, centerLoc.getBlock(), player.getUniqueId(), 60, 1);
+			}
+		}
 		{
-			resident.startPreviewTask(tpl, centerLoc.getBlock(), player.getUniqueId());
+			resident.startPreviewTask(tpl, centerLoc.getBlock(), player.getUniqueId(), 60,1);
 		}
 		
 		/* Run validation on position. */
@@ -634,7 +568,6 @@ public abstract class Buildable extends SQLObject {
 			CivGlobal.removeStructureBlock(coord);
 		}
 
-		this.enableMobSpawner();
 	}
 	
 	/*
@@ -950,27 +883,7 @@ public abstract class Buildable extends SQLObject {
 					if (tradeOutpost == null) {
 						//not building a trade outpost, prevent protected blocks from being destroyed.
 						ProtectedBlock pb = CivGlobal.getProtectedBlock(coord);
-						if (pb != null) {
-							if (pb.getType() == ProtectedBlock.Type.MOB_SPAWNER_MARKER) {
-						
-							
-//							MOB_SPAWNER_MARKER\
-							MobSpawner spawner = CivGlobal.getMobSpawner(coord);
-							if (spawner != null) {
-								this.setMobSpawnerCoord(coord);
-								spawner.setActive(false);
-								spawner.setBuildable(this.getId());
-								spawner.setCiv(this.getTown().getCiv());
-								
-								/* Save the spawner *afterwards* so the structure id is properly set. */
-								spawner.save();
-							}
-						} else {
-							CivLog.debug("Type: " + pb.getType());
-							throw new CivException(CivSettings.localize.localizedString("cannotBuild_protectedInWay"));
-						}
-						}
-					} else {
+                    } else {
 						if (CivGlobal.getTradeGood(coord) != null) {
 							// Make sure we encompass entire trade good.
 							if ((y+3) < regionY) {
@@ -1069,7 +982,7 @@ public abstract class Buildable extends SQLObject {
 			}
 		}
 	}
-	
+
 	protected void startBuildTask(Template tpl, Location center) {
 		//CivBuildTask task = new CivBuildTask(TownyUniverse.getPlugin(), this, tpl, 
 			//	this.getBuildSpeed(), this.getBlocksPerTick(), center.getBlock());

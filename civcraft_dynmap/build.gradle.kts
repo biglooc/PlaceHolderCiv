@@ -1,37 +1,37 @@
-plugins { `java-library` }
-
-repositories {
-    mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
-}
-
-dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
-    // Als je later de Dynmap API nodig hebt, voegen we die hier compileOnly toe.
-}
-dependencies {
-    constraints {
-        implementation("org.apache.commons:commons-lang3:3.18.0") {
-            because("CVE-2025-48924")
-        }
-    }
-}
-dependencies {
-    implementation("org.apache.commons:commons-lang3:3.18.0")
-}
-
-
-
-tasks {
-    processResources {
-        filesMatching("plugin.yml") {
-            expand("name" to project.name, "version" to project.version)
-        }
-    }
-    jar { archiveBaseName.set(project.name) }
+plugins {
+    java
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-    withSourcesJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
+
+repositories {
+    mavenCentral()
+
+    // Dynmap API mirrors (niet altijd op Central):
+    maven(url = "https://maven.elmakers.com/repository/")
+    maven(url = "https://repo.minebench.de/")
+    maven(url = "https://mvn.lumine.io/repository/maven-public/")
+    maven(url = "https://www.iani.de/nexus/content/repositories/releases/")
+}
+
+dependencies {
+    testImplementation("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
+    // Verwijder deze als je 'm had (conflicteert met Paper):
+    // compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+
+    // Dynmap API – exclude de oude Bukkit/Spigot om capability-conflict te voorkomen
+    compileOnly("org.dynmap:dynmap-api:1.9") {
+    }
+
+    // Jouw CivCraft core als compileOnly (server levert 'm runtime mee)
+    compileOnly(project(":civcraft"))
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+

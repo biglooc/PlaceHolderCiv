@@ -234,7 +234,13 @@ public class CivData {
 	public static final int DATA_WOOL_WHITE = 0;
 	public static final int GOLDEN_APPLE = 322;
 	public static final int TNT = 46;
-	
+	public static final int REDSTONE_TORCH = 64;
+	public static final int TRAP_DOOR = 96;
+	public static final int IRON_TRAPDOOR = 167;
+	public static final int OAK_BUTTON = 143;
+	public static final int STONE_BUTTON = 77;
+	public static final int LEVER = 69;
+
 	public static String getDisplayName(int id) {
 		
 		if (id == GOLD_ORE)

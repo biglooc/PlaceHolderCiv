@@ -42,13 +42,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 //import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 //import org.bukkit.potion.PotionEffect;
 //import org.bukkit.potion.PotionEffectType;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -105,11 +107,14 @@ public class Resident extends SQLObject {
 	private boolean adminChat = false;
 	private boolean combatInfo = false;
 	private boolean titleAPI = true;
-	
+
+	private volatile long previewLastActivityAt = 0L;
+	private BukkitTask previewTimeoutTask = null;
+
 	private boolean usesAntiCheat = false;
-	
+
 	public static HashSet<String> allchatters = new HashSet<String>();
-	
+
 	/* Town or civ to chat in besides your own. */
 	private Town townChatOverride = null;
 	private Civilization civChatOverride = null;
@@ -120,9 +125,9 @@ public class Resident extends SQLObject {
 	private int campID = 0;
 	private boolean dontSaveTown = false;
 	private String timezone;
-	
+
 	private boolean banned = false;
-	
+
 	private long registered;
 	private long lastOnline;
 	private int daysTilEvict;
@@ -131,28 +136,28 @@ public class Resident extends SQLObject {
 	private EconObject treasury;
 	private boolean muted;
 	private Date muteExpires = null;
-	
+
 	private boolean interactiveMode = false;
 	private InteractiveResponse interactiveResponse = null;
 	private BuildPreviewAsyncTask previewTask = null;
-	
+
 	private double spyExposure = 0.0;
 	public static int MAX_SPY_EXPOSURE = 1000;
 	private boolean performingMission = false;
-	
+
 	private Town selectedTown = null;
-	
+
 	private Scoreboard scoreboard = null;
 	public String desiredCivName;
 	public String desiredCapitolName;
 	public String desiredTownName;
 	public Location desiredTownLocation = null;
 	public Template desiredTemplate = null;
-	
-	public boolean allchat = false; 
-	
-	/* XXX 
-	 * This buildable is used as place to store which buildable we're working on when interacting 
+
+	public boolean allchat = false;
+
+	/* XXX
+	 * This buildable is used as place to store which buildable we're working on when interacting
 	 * with GUI items. We want to be able to pass the buildable object to the GUI's action function,
 	 * but there isn't a good way to do this ATM. If we had a way to send arbitary objects it would
 	 * be better. Could we store it here on the resident object?
@@ -160,7 +165,7 @@ public class Resident extends SQLObject {
 	public Buildable pendingBuildable;
 	public ConfigBuildableInfo pendingBuildableInfo;
 	public CallbackInterface pendingCallback;
-	
+
 	private boolean showScout = true;
 	private boolean showTown = true;
 	private boolean showCiv = true;
@@ -170,7 +175,7 @@ public class Resident extends SQLObject {
 	private String savedInventory = null;
 	private boolean insideArena = false;
 	private boolean isProtected = false;
-	
+
 	public ConcurrentHashMap<BlockCoord, SimpleBlock> previewUndo = null;
 	public LinkedHashMap<String, Perk> perks = new LinkedHashMap<String, Perk>();
 	private Date lastKilledTime = null;
@@ -179,109 +184,118 @@ public class Resident extends SQLObject {
 	private double walkingModifier = CivSettings.normal_speed;
 	private boolean onRoad = false;
 	public String debugTown;
-	
+
 	public Resident(UUID uid, String name) throws InvalidNameException {
 		this.setName(name);
-		this.uid = uid;		
+		this.uid = uid;
 		this.treasury = CivGlobal.createEconObject(this);
 		setTimezoneToServerDefault();
 		loadSettings();
 	}
-	
+
 	public Resident(ResultSet rs) throws SQLException, InvalidNameException {
 		this.load(rs);
 		loadSettings();
 	}
-	
+
+	public boolean isTitleAPI() {
+		return titleAPI;
+	}
+
+	public void setTitleAPI(boolean enabled) {
+		this.titleAPI = enabled;
+	}
+
 	public void loadSettings() {
 		this.spyExposure = 0.0;
 	}
-	
+
 	public static final String TABLE_NAME = "RESIDENTS";
+
 	public static void init() throws SQLException {
 		if (!SQL.hasTable(TABLE_NAME)) {
-			String table_create = "CREATE TABLE " + SQL.tb_prefix + TABLE_NAME+" (" + 
+			String table_create = "CREATE TABLE " + SQL.tb_prefix + TABLE_NAME + " (" +
 					"`id` int(11) unsigned NOT NULL auto_increment," +
 					"`name` VARCHAR(64) NOT NULL," +
-					"`uuid` VARCHAR(256) NOT NULL DEFAULT 'UNKNOWN',"+
-					"`currentName` VARCHAR(64) DEFAULT NULL,"+
-					"`town_id` int(11)," + 
+					"`uuid` VARCHAR(256) NOT NULL DEFAULT 'UNKNOWN'," +
+					"`currentName` VARCHAR(64) DEFAULT NULL," +
+					"`town_id` int(11)," +
 					"`lastOnline` BIGINT NOT NULL," +
-					"`registered` BIGINT NOT NULL," + 
-					"`friends` mediumtext," + 
+					"`registered` BIGINT NOT NULL," +
+					"`friends` mediumtext," +
 					"`debt` double DEFAULT 0," +
 					"`coins` double DEFAULT 0," +
 					"`daysTilEvict` mediumint DEFAULT NULL," +
 					"`givenKit` bool NOT NULL DEFAULT '0'," +
 					"`camp_id` int(11)," +
-					"`timezone` mediumtext,"+
+					"`timezone` mediumtext," +
 					"`banned` bool NOT NULL DEFAULT '0'," +
-					"`bannedMessage` mediumtext DEFAULT NULL,"+
-					"`savedInventory` mediumtext DEFAULT NULL,"+
-					"`insideArena` bool NOT NULL DEFAULT '0',"+
-					"`isProtected` bool NOT NULL DEFAULT '0',"+
-					"`flags` mediumtext DEFAULT NULL,"+
-					"`last_ip` mediumtext DEFAULT NULL,"+
-					"`debug_town` mediumtext DEFAULT NULL,"+
-					"`debug_civ` mediumtext DEFAULT NuLL,"+
+					"`bannedMessage` mediumtext DEFAULT NULL," +
+					"`savedInventory` mediumtext DEFAULT NULL," +
+					"`insideArena` bool NOT NULL DEFAULT '0'," +
+					"`isProtected` bool NOT NULL DEFAULT '0'," +
+					"`flags` mediumtext DEFAULT NULL," +
+					"`last_ip` mediumtext DEFAULT NULL," +
+					"`debug_town` mediumtext DEFAULT NULL," +
+					"`debug_civ` mediumtext DEFAULT NuLL," +
 					"UNIQUE KEY (`name`), " +
 					"PRIMARY KEY (`id`)" + ")";
-			
+
 			SQL.makeTable(table_create);
-			CivLog.info("Created "+TABLE_NAME+" table");
+			CivLog.info("Created " + TABLE_NAME + " table");
 		} else {
-			CivLog.info(TABLE_NAME+" table OK!");
-			
+			CivLog.info(TABLE_NAME + " table OK!");
+
 			if (!SQL.hasColumn(TABLE_NAME, "uuid")) {
 				CivLog.info("\tCouldn't find `uuid` for resident.");
 				SQL.addColumn(TABLE_NAME, "`uuid` VARCHAR(256) NOT NULL DEFAULT 'UNKNOWN'");
-			}	
-			
+			}
+
 			if (!SQL.hasColumn(TABLE_NAME, "currentName")) {
 				CivLog.info("\tCouldn't find `currentName` for resident.");
 				SQL.addColumn(TABLE_NAME, "`currentName` VARCHAR(64) DEFAULT NULL");
-			}	
-			
+			}
+
 			if (!SQL.hasColumn(TABLE_NAME, "banned")) {
 				CivLog.info("\tCouldn't find `banned` for resident.");
 				SQL.addColumn(TABLE_NAME, "`banned` bool default 0");
-			}			
-			
+			}
+
 			if (!SQL.hasColumn(TABLE_NAME, "bannedMessage")) {
 				CivLog.info("\tCouldn't find `bannedMessage` for resident.");
 				SQL.addColumn(TABLE_NAME, "`bannedMessage` mediumtext default null");
 			}
-			
+
 			if (!SQL.hasColumn(TABLE_NAME, "last_ip")) {
 				CivLog.info("\tCouldn't find `last_ip` for resident.");
 				SQL.addColumn(TABLE_NAME, "`last_ip` mediumtext default null");
 			}
-			
+
 			if (!SQL.hasColumn(TABLE_NAME, "camp_id")) {
 				CivLog.info("\tCouldn't find `camp_id` for resident.");
 				SQL.addColumn(TABLE_NAME, "`camp_id` int(11) default 0");
 			}
-			
+
 			if (!SQL.hasColumn(TABLE_NAME, "timezone")) {
 				CivLog.info("\tCouldn't find `timezone` for resident.");
-				SQL.addColumn(TABLE_NAME, "`timezone` mediumtext default null");			
+				SQL.addColumn(TABLE_NAME, "`timezone` mediumtext default null");
 			}
-			
+
 			if (!SQL.hasColumn(TABLE_NAME, "debug_civ")) {
 				CivLog.info("\tCouldn't find `debug_civ` for resident.");
 				SQL.addColumn(TABLE_NAME, "`debug_civ` mediumtext default null");
 			}
-		
+
 			if (!SQL.hasColumn(TABLE_NAME, "debug_town")) {
 				CivLog.info("\tCouldn't find `debug_town` for resident.");
 				SQL.addColumn(TABLE_NAME, "`debug_town` mediumtext default null");
 			}
-			
+
 			SQL.makeCol("flags", "mediumtext", TABLE_NAME);
 			SQL.makeCol("savedInventory", "mediumtext", TABLE_NAME);
 			SQL.makeCol("insideArena", "bool NOT NULL DEFAULT '0'", TABLE_NAME);
 			SQL.makeCol("isProtected", "bool NOT NULL DEFAULT '0'", TABLE_NAME);
-		}		
+		}
 	}
 
 	@Override
@@ -298,7 +312,7 @@ public class Resident extends SQLObject {
 		} else {
 			this.uid = UUID.fromString(rs.getString("uuid"));
 		}
-		
+
 		this.treasury = CivGlobal.createEconObject(this);
 		this.getTreasury().setBalance(rs.getDouble("coins"), false);
 		this.setGivenKit(rs.getBoolean("givenKit"));
@@ -307,15 +321,15 @@ public class Resident extends SQLObject {
 		this.savedInventory = rs.getString("savedInventory");
 		this.insideArena = rs.getBoolean("insideArena");
 		this.isProtected = rs.getBoolean("isProtected");
-		
+
 		if (this.getTimezone() == null) {
 			this.setTimezoneToServerDefault();
 		}
-		
+
 		if (this.townID != 0) {
 			this.setTown(CivGlobal.getTownFromId(this.townID));
 			if (this.town == null) {
-				CivLog.error("COULD NOT FIND TOWN("+this.townID+") FOR RESIDENT("+this.getId()+") Name:"+this.getName());
+				CivLog.error("COULD NOT FIND TOWN(" + this.townID + ") FOR RESIDENT(" + this.getId() + ") Name:" + this.getName());
 				/*
 				 * When a town fails to load, we wont be able to find it above.
 				 * However this can cause a cascade effect where because we couldn't find
@@ -323,7 +337,7 @@ public class Resident extends SQLObject {
 				 * their town information from the database when the resident gets saved.
 				 * Just to make sure this doesn't happen the boolean below guards resident saves.
 				 * There ought to be a better way...
-				 */	
+				 */
 				if (CivGlobal.testFileFlag("cleanupDatabase")) {
 					this.saveNow();
 				} else {
@@ -332,16 +346,16 @@ public class Resident extends SQLObject {
 				return;
 			}
 		}
-		
+
 		if (this.campID != 0) {
 			this.setCamp(CivGlobal.getCampFromId(this.campID));
 			if (this.camp == null) {
-				CivLog.error("COULD NOT FIND CAMP("+this.campID+") FOR RESIDENT("+this.getId()+") Name:"+this.getName());
+				CivLog.error("COULD NOT FIND CAMP(" + this.campID + ") FOR RESIDENT(" + this.getId() + ") Name:" + this.getName());
 			} else {
 				camp.addMember(this);
 			}
 		}
-		
+
 		if (this.getTown() != null) {
 			try {
 				this.getTown().addResident(this);
@@ -349,13 +363,13 @@ public class Resident extends SQLObject {
 				e.printStackTrace();
 			}
 		}
-		
+
 		this.setLastOnline(rs.getLong("lastOnline"));
 		this.setRegistered(rs.getLong("registered"));
 		this.setDaysTilEvict(rs.getInt("daysTilEvict"));
 		this.getTreasury().setDebt(rs.getDouble("debt"));
 		this.loadFriendsFromSaveString(rs.getString("friends"));
-		
+
 	}
 
 	private void setTimezoneToServerDefault() {
@@ -364,98 +378,87 @@ public class Resident extends SQLObject {
 
 	public String getFlagSaveString() {
 		String flagString = "";
-		
+
 		if (this.isShowMap()) {
 			flagString += "map,";
 		}
-		
+
 		if (this.isShowTown()) {
 			flagString += "showtown,";
 		}
-		
+
 		if (this.isShowCiv()) {
 			flagString += "showciv,";
 		}
-		
+
 		if (this.isShowScout()) {
 			flagString += "showscout,";
 		}
-		
+
 		if (this.isShowInfo()) {
 			flagString += "info,";
 		}
-		
+
 		if (this.combatInfo) {
 			flagString += "combatinfo,";
 		}
-		if (this.isTitleAPI()) {
-			flagString += "titleapi,";
-		}
-		
+
 		if (this.itemMode.equals("rare")) {
 			flagString += "itemModeRare,";
 		} else if (this.itemMode.equals("none")) {
 			flagString += "itemModeNone,";
 		}
-		
+
 		return flagString;
 	}
-	
+
 	public void loadFlagSaveString(String str) {
 		if (str == null) {
 			return;
 		}
-		
+
 		String[] split = str.split(",");
-		
+
 		for (String s : split) {
 			switch (s.toLowerCase()) {
-			case "map":
-				this.setShowMap(true);
-				break;
-			case "showtown":
-				this.setShowTown(true);
-				break;
-			case "showciv":
-				this.setShowCiv(true);
-				break;
-			case "showscout":
-				this.setShowScout(true);
-				break;
-			case "info":
-				this.setShowInfo(true);
-				break;
-			case "combatinfo":
-				this.setCombatInfo(true);
-				break;
-			case "titleapi":
-				if (CivSettings.hasTitleAPI)
-				{
-				this.setTitleAPI(true);
-				} else {
-					this.setTitleAPI(false);
-				}
-				break;
-			case "itemmoderare":
-				this.itemMode = "rare";
-				break;
-			case "itemmodenone":
-				this.itemMode = "none";
-				break;
+				case "map":
+					this.setShowMap(true);
+					break;
+				case "showtown":
+					this.setShowTown(true);
+					break;
+				case "showciv":
+					this.setShowCiv(true);
+					break;
+				case "showscout":
+					this.setShowScout(true);
+					break;
+				case "info":
+					this.setShowInfo(true);
+					break;
+				case "combatinfo":
+					this.setCombatInfo(true);
+					break;
+				case "itemmoderare":
+					this.itemMode = "rare";
+					break;
+				case "itemmodenone":
+					this.itemMode = "none";
+					break;
 			}
 		}
 	}
-	
+
 	@Override
 	public void save() {
 		SQLUpdate.add(this);
 	}
-	
+
 	@Override
 	public void saveNow() throws SQLException {
-		
+
 		HashMap<String, Object> hashmap = new HashMap<String, Object>();
-		
+
 		hashmap.put("name", this.getName());
 		hashmap.put("uuid", this.getUUIDString());
 		if (this.getTown() != null) {
@@ -465,13 +468,13 @@ public class Resident extends SQLObject {
 				hashmap.put("town_id", null);
 			}
 		}
-		
+
 		if (this.getCamp() != null) {
 			hashmap.put("camp_id", this.getCamp().getId());
 		} else {
 			hashmap.put("camp_id", null);
 		}
-		
+
 		hashmap.put("lastOnline", this.getLastOnline());
 		hashmap.put("registered", this.getRegistered());
 		hashmap.put("debt", this.getTreasury().getDebt());
@@ -485,7 +488,7 @@ public class Resident extends SQLObject {
 		hashmap.put("savedInventory", this.savedInventory);
 		hashmap.put("insideArena", this.insideArena);
 		hashmap.put("isProtected", this.isProtected);
-		
+
 		if (this.getTown() != null) {
 			hashmap.put("debug_town", this.getTown().getName());
 
@@ -493,17 +496,17 @@ public class Resident extends SQLObject {
 				hashmap.put("debug_civ", this.getCiv().getName());
 			}
 		}
-		
+
 		SQL.updateNamedObject(this, hashmap, TABLE_NAME);
 	}
-	
+
 	public String getTownString() {
 		if (town == null) {
 			return "none";
 		}
 		return this.getTown().getName();
 	}
-	
+
 	public Town getTown() {
 		return town;
 	}
@@ -533,7 +536,7 @@ public class Resident extends SQLObject {
 	}
 
 	@Override
-	public void delete() throws SQLException {	
+	public void delete() throws SQLException {
 		SQL.deleteByName(this.getName(), TABLE_NAME);
 	}
 
@@ -553,13 +556,13 @@ public class Resident extends SQLObject {
 		Player player;
 		try {
 			player = CivGlobal.getPlayer(this);
-			CivMessage.send(player, CivColor.Yellow+CivSettings.localize.localizedString("var_resident_debtmsg",this.getTreasury().getDebt(),CivSettings.CURRENCY_NAME));
-			CivMessage.send(player, CivColor.LightGray+CivSettings.localize.localizedString("var_resident_debtEvictAlert1",this.daysTilEvict));
+			CivMessage.send(player, CivColor.Yellow + CivSettings.localize.localizedString("var_resident_debtmsg", this.getTreasury().getDebt(), CivSettings.CURRENCY_NAME));
+			CivMessage.send(player, CivColor.LightGray + CivSettings.localize.localizedString("var_resident_debtEvictAlert1", this.daysTilEvict));
 		} catch (CivException e) {
 			//Player is not online.
 		}
 	}
-	
+
 	public int getDaysTilEvict() {
 		return daysTilEvict;
 	}
@@ -574,56 +577,56 @@ public class Resident extends SQLObject {
 			this.getTown().removeResident(this);
 
 			try {
-				CivMessage.send(CivGlobal.getPlayer(this), CivColor.Yellow+CivSettings.localize.localizedString("resident_evictedAlert"));
+				CivMessage.send(CivGlobal.getPlayer(this), CivColor.Yellow + CivSettings.localize.localizedString("resident_evictedAlert"));
 			} catch (CivException e) {
 				// Resident not online.
 			}
 			return;
 		}
-		
+
 		if (this.getTreasury().inDebt()) {
 			warnDebt();
 		} else {
 			warnEvict();
 		}
-		
+
 		this.save();
 	}
-	
+
 	public double getPropertyTaxOwed() {
 		double total = 0;
-		
+
 		if (this.getTown() == null) {
 			return total;
 		}
-		
+
 		for (TownChunk tc : this.getTown().getTownChunks()) {
 			if (tc.perms.getOwner() == this) {
-				double tax = tc.getValue()*this.getTown().getTaxRate();
+				double tax = tc.getValue() * this.getTown().getTaxRate();
 				total += tax;
 			}
 		}
 		return total;
 	}
-	
+
 	public boolean isLandOwner() {
-		if (this.getTown() == null) 
+		if (this.getTown() == null)
 			return false;
-		
+
 		for (TownChunk tc : this.getTown().getTownChunks()) {
 			if (tc.perms.getOwner() == this) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	
+
+
 	public double getFlatTaxOwed() {
 		if (this.getTown() == null)
 			return 0;
-		
+
 		return this.getTown().getFlatTax();
 	}
 
@@ -637,30 +640,30 @@ public class Resident extends SQLObject {
 		this.daysTilEvict = -1;
 		this.save();
 	}
-	
+
 	public void addFriend(Resident resident) {
 		friends.put(resident.getName(), 1);
 	}
-	
-	public boolean isFriend(Resident resident) {		
-		return  friends.containsKey(resident.getName());
+
+	public boolean isFriend(Resident resident) {
+		return friends.containsKey(resident.getName());
 	}
-	
+
 	public Collection<String> getFriends() {
 		return friends.keySet();
 	}
-	
+
 	private String getFriendsSaveString() {
 		String out = "";
 		for (String name : friends.keySet()) {
-			out += name+",";
+			out += name + ",";
 		}
 		return out;
 	}
-	
+
 	private void loadFriendsFromSaveString(String string) {
 		String[] split = string.split(",");
-		
+
 		for (String str : split) {
 			friends.put(str, 1);
 		}
@@ -672,7 +675,7 @@ public class Resident extends SQLObject {
 
 	public String getGroupsString() {
 		String out = "";
-		
+
 		for (PermissionGroup grp : CivGlobal.getGroups()) {
 			if (grp.hasMember(this)) {
 				if (grp.getTown() != null) {
@@ -681,22 +684,22 @@ public class Resident extends SQLObject {
 					} else {
 						out += CivColor.White;
 					}
-					out += grp.getName()+"("+grp.getTown().getName()+")";
-					
+					out += grp.getName() + "(" + grp.getTown().getName() + ")";
+
 				} else if (grp.getCiv() != null) {
-					out += CivColor.Gold+grp.getName()+"("+grp.getCiv().getName()+")";
+					out += CivColor.Gold + grp.getName() + "(" + grp.getCiv().getName() + ")";
 				}
-				
+
 				out += ", ";
-			} 
+			}
 		}
-		
+
 		return out;
 	}
 
 	public void warnEvict() {
 		try {
-			CivMessage.send(CivGlobal.getPlayer(this), CivColor.Yellow+CivSettings.localize.localizedString("var_resident_evictionNotice1",this.getDaysTilEvict()));
+			CivMessage.send(CivGlobal.getPlayer(this), CivColor.Yellow + CivSettings.localize.localizedString("var_resident_evictionNotice1", this.getDaysTilEvict()));
 		} catch (CivException e) {
 			//player offline.
 		}
@@ -749,7 +752,7 @@ public class Resident extends SQLObject {
 	public void setPermOverride(boolean permOverride) {
 		this.permOverride = permOverride;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public int takeItemsInHand(int itemId, int itemData) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
@@ -762,21 +765,21 @@ public class Resident extends SQLObject {
 				(player.getInventory().getItemInMainHand().getTypeId() != itemData)) {
 			return 0;
 		}
-		
+
 		ItemStack stack = player.getInventory().getItemInMainHand();
 		int count = stack.getAmount();
 		inv.removeItem(stack);
-		
+
 		player.updateInventory();
 		return count;
 	}
-	
-	
+
+
 	@SuppressWarnings("deprecation")
 	public boolean takeItemInHand(int itemId, int itemData, int amount) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
 		Inventory inv = player.getInventory();
-	
+
 		if (!inv.contains(itemId)) {
 			return false;
 		}
@@ -785,9 +788,9 @@ public class Resident extends SQLObject {
 				(player.getInventory().getItemInMainHand().getTypeId() != itemData)) {
 			return false;
 		}
-		
+
 		ItemStack stack = player.getInventory().getItemInMainHand();
-		
+
 		if (stack.getAmount() < amount) {
 			return false;
 		} else if (stack.getAmount() == amount) {
@@ -795,55 +798,54 @@ public class Resident extends SQLObject {
 		} else {
 			stack.setAmount(stack.getAmount() - amount);
 		}
-		
+
 		player.updateInventory();
 		return true;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public boolean takeItem(int itemId, int itemData, int amount) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
 		Inventory inv = player.getInventory();
-	
+
 		if (!inv.contains(itemId)) {
 			return false;
 		}
-		
+
 		HashMap<Integer, ? extends ItemStack> stacks;
 		stacks = inv.all(itemId);
-		
+
 		for (ItemStack stack : stacks.values()) {
-			if (stack.getData().getData() != (byte)itemData) {
+			if (stack.getData().getData() != (byte) itemData) {
 				continue;
 			}
-			
+
 			if (stack.getAmount() <= 0)
 				continue;
-			
+
 			if (stack.getAmount() < amount) {
 				amount -= stack.getAmount();
 				stack.setAmount(0);
 				inv.removeItem(stack);
 				continue;
-			}
-			else {			
-				stack.setAmount(stack.getAmount()-amount);
+			} else {
+				stack.setAmount(stack.getAmount() - amount);
 				break;
 			}
 		}
-		
+
 		player.updateInventory();
 		return true;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public int giveItem(int itemId, short damage, int amount) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
 		Inventory inv = player.getInventory();
 		ItemStack stack = new ItemStack(itemId, amount, damage);
-		HashMap <Integer, ItemStack> leftovers = null;
+		HashMap<Integer, ItemStack> leftovers = null;
 		leftovers = inv.addItem(stack);
-		
+
 		int leftoverAmount = 0;
 		for (ItemStack i : leftovers.values()) {
 			leftoverAmount += i.getAmount();
@@ -851,13 +853,13 @@ public class Resident extends SQLObject {
 		player.updateInventory();
 		return amount - leftoverAmount;
 	}
-	
+
 	public boolean buyItem(String itemName, int id, byte data, double price, int amount) throws CivException {
-		
+
 		if (!this.getTreasury().hasEnough(price)) {
-			throw new CivException(CivSettings.localize.localizedString("resident_notEnoughMoney")+" "+CivSettings.CURRENCY_NAME);
+			throw new CivException(CivSettings.localize.localizedString("resident_notEnoughMoney") + " " + CivSettings.CURRENCY_NAME);
 		}
-		
+
 		boolean completed = true;
 		int bought = 0;
 		bought = giveItem(id, data, amount);
@@ -868,11 +870,10 @@ public class Resident extends SQLObject {
 		} else {
 			this.getTreasury().withdraw(price);
 		}
-		
+
 		if (completed) {
 			return true;
-		}
-		else {
+		} else {
 			throw new CivException(CivSettings.localize.localizedString("resident_buyInvenFull"));
 		}
 	}
@@ -883,7 +884,7 @@ public class Resident extends SQLObject {
 		}
 		return this.getTown().getCiv();
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public void setScoreboardName(String name, String key) {
 		if (this.scoreboard == null) {
@@ -895,16 +896,16 @@ public class Resident extends SQLObject {
 			Team team = this.scoreboard.getTeam("team");
 			team.setDisplayName(name);
 		}
-		
+
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public void setScoreboardValue(String name, String key, int value) {
 		if (this.scoreboard == null) {
 			return;
 		}
-		
-		Objective obj = scoreboard.getObjective("obj:"+key);
+
+		Objective obj = scoreboard.getObjective("obj:" + key);
 		if (obj == null) {
 			obj = scoreboard.registerNewObjective(name, "dummy");
 			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -915,7 +916,7 @@ public class Resident extends SQLObject {
 			score.setScore(value);
 		}
 	}
-	
+
 	public void showScoreboard() {
 		if (this.scoreboard != null) {
 			Player player;
@@ -925,9 +926,9 @@ public class Resident extends SQLObject {
 			} catch (CivException e) {
 				e.printStackTrace();
 			}
-		} 
+		}
 	}
-	
+
 	public void hideScoreboard() {
 		Player player;
 		try {
@@ -958,12 +959,12 @@ public class Resident extends SQLObject {
 		this.interactiveMode = true;
 		this.interactiveResponse = interactive;
 	}
-	
+
 	public void clearInteractiveMode() {
 		this.interactiveMode = false;
 		this.interactiveResponse = null;
 	}
-	
+
 	public InteractiveResponse getInteractiveResponse() {
 		return this.interactiveResponse;
 	}
@@ -1003,18 +1004,18 @@ public class Resident extends SQLObject {
 		/* Notify Resident of any invalid structures. */
 		if (this.getTown() != null) {
 			for (Buildable struct : this.getTown().invalidStructures) {
-				CivMessage.send(player, CivColor.Yellow+ChatColor.BOLD+
-						CivSettings.localize.localizedString("var_resident_structInvalidAlert1",struct.getDisplayName(),struct.getCenterLocation())+
-						" "+CivSettings.localize.localizedString("resident_structInvalidAlert2")+" "+struct.getInvalidReason());
+				CivMessage.send(player, CivColor.Yellow + ChatColor.BOLD +
+						CivSettings.localize.localizedString("var_resident_structInvalidAlert1", struct.getDisplayName(), struct.getCenterLocation()) +
+						" " + CivSettings.localize.localizedString("resident_structInvalidAlert2") + " " + struct.getInvalidReason());
 			}
-			
+
 			/* Show any event messages. */
 			if (this.getTown().getActiveEvent() != null) {
-				CivMessage.send(player, CivColor.Yellow+CivSettings.localize.localizedString("var_resident_eventNotice1",this.getTown().getActiveEvent().configRandomEvent.name));
+				CivMessage.send(player, CivColor.Yellow + CivSettings.localize.localizedString("var_resident_eventNotice1", this.getTown().getActiveEvent().configRandomEvent.name));
 			}
 		}
-		
-		
+
+
 	}
 
 	public boolean isShowScout() {
@@ -1048,18 +1049,53 @@ public class Resident extends SQLObject {
 	public void setShowMap(boolean showMap) {
 		this.showMap = showMap;
 	}
-	
-	public void startPreviewTask(Template tpl, Block block, UUID uuid) {
-		this.previewTask = new BuildPreviewAsyncTask(tpl, block, uuid);
-		TaskMaster.asyncTask(previewTask, 0);
+
+	public void startPreviewTask(com.avrgaming.civcraft.template.Template tpl, org.bukkit.block.Block centerBlock, java.util.UUID playerUUID, int blockPerTick, int tickInterval) {
+		Plugin plugin = JavaPlugin.getPlugin(com.avrgaming.civcraft.main.CivCraft.class);
+		org.bukkit.entity.Player p = (playerUUID != null) ? Bukkit.getPlayer(playerUUID) : null;
+		this.previewTask = new BuildPreviewAsyncTask(tpl, centerBlock, playerUUID, this, plugin);
+		TaskMaster.asyncTask(this.previewTask, 0);
+
+		this.previewTask = new com.avrgaming.civcraft.threading.tasks.BuildPreviewAsyncTask(tpl, centerBlock, playerUUID, this, plugin);
+		com.avrgaming.civcraft.threading.TaskMaster.asyncTask(this.previewTask, 0);
+
+		startPreviewTimeoutWatcher();
+		touchPreviewActivity();
+
+		if (playerUUID != null) {
+			p = org.bukkit.Bukkit.getPlayer(playerUUID);
+		}
+		if (p == null) {
+			try {
+				p = org.bukkit.Bukkit.getPlayer(this.getName());
+			} catch (Exception ignored) {
+			}
+		}
+		if (playerUUID == null) {
+			com.avrgaming.civcraft.main.CivLog.warning("startPreviewTask: playerUUID is null for resident" + this.getName());
+		}
+
+		this.previewTask = new com.avrgaming.civcraft.threading.tasks.BuildPreviewAsyncTask(
+				tpl, centerBlock, playerUUID, this, plugin);
+
+
+		com.avrgaming.civcraft.threading.TaskMaster.asyncTask(this.previewTask, 0);
+
 	}
-	
+
+	public synchronized void onPreviewTaskFinished(com.avrgaming.civcraft.threading.tasks.BuildPreviewAsyncTask task) {
+		if (this.previewTask == task) {
+			this.previewTask = null;
+			stopPreviewTimeoutWatcher();
+		}
+	}
+
 	public void undoPreview() {
 		if (this.previewUndo == null) {
 			this.previewUndo = new ConcurrentHashMap<BlockCoord, SimpleBlock>();
 			return;
 		}
-		
+
 		if (this.previewTask != null) {
 			previewTask.lock.lock();
 			try {
@@ -1068,20 +1104,20 @@ public class Resident extends SQLObject {
 				previewTask.lock.unlock();
 			}
 		}
-		
+
 		try {
 			Player player = CivGlobal.getPlayer(this);
 			PlayerBlockChangeUtil util = new PlayerBlockChangeUtil();
 			for (BlockCoord coord : this.previewUndo.keySet()) {
 				SimpleBlock sb = this.previewUndo.get(coord);
 				util.addUpdateBlock(player.getName(), coord, sb.getType(), sb.getData());
- 			}
-			
+			}
+
 			util.sendUpdate(player.getName());
 		} catch (CivException e) {
 			//Fall down and return.
 		}
-		
+
 		this.previewUndo.clear();
 		this.previewUndo = new ConcurrentHashMap<BlockCoord, SimpleBlock>();
 	}
@@ -1108,14 +1144,14 @@ public class Resident extends SQLObject {
 
 	public void setSpyExposure(double spyExposure) {
 		this.spyExposure = spyExposure;
-		
+
 		try {
 			Player player = CivGlobal.getPlayer(this);
 			double percentage = spyExposure / MAX_SPY_EXPOSURE;
-			player.setExp((float)percentage);
+			player.setExp((float) percentage);
 		} catch (CivException e) {
 		}
-		
+
 	}
 
 	public boolean isPerformingMission() {
@@ -1125,13 +1161,13 @@ public class Resident extends SQLObject {
 	public void setPerformingMission(boolean performingMission) {
 		this.performingMission = performingMission;
 	}
-	
+
 	public void onRoadTest(BlockCoord coord, Player player) {
 		/* Test the block beneath us for a road, if so, set the road flag. */
 		BlockCoord feet = new BlockCoord(coord);
 		feet.setY(feet.getY() - 1);
 		RoadBlock rb = CivGlobal.getRoadBlock(feet);
-		
+
 		if (rb == null) {
 			onRoad = false;
 //			if (player.hasPotionEffect(PotionEffectType.SPEED)) {
@@ -1139,7 +1175,7 @@ public class Resident extends SQLObject {
 //			}
 		} else {
 			onRoad = true;
-			
+
 //			if (!player.hasPotionEffect(PotionEffectType.SPEED)) {
 //				CivLog.debug("setting effect.");
 //				player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 5, 5));
@@ -1154,7 +1190,7 @@ public class Resident extends SQLObject {
 	public void setOnRoad(boolean onRoad) {
 		this.onRoad = onRoad;
 	}
-	
+
 	public void giveTemplate(String name) {
 		int perkCount;
 		try {
@@ -1165,14 +1201,13 @@ public class Resident extends SQLObject {
 		}
 		for (ConfigPerk p : CivSettings.perks.values()) {
 			Perk perk = new Perk(p);
-			
-			if (perk.getIdent().startsWith(("tpl_"+name).toLowerCase()) || perk.getIdent().startsWith(("template_"+name).toLowerCase()))
-			{
+
+			if (perk.getIdent().startsWith(("tpl_" + name).toLowerCase()) || perk.getIdent().startsWith(("template_" + name).toLowerCase())) {
 				perk.count = perkCount;
 				this.perks.put(perk.getIdent(), perk);
 			}
 		}
-		
+
 	}
 
 	public void giveAllFreePerks() {
@@ -1183,36 +1218,35 @@ public class Resident extends SQLObject {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		for (ConfigPerk p : CivSettings.perks.values()) {
 			Perk perk = new Perk(p);
-			
-			if (perk.getIdent().startsWith("perk_"))
-			{
+
+			if (perk.getIdent().startsWith("perk_")) {
 				perk.count = perkCount;
 				this.perks.put(perk.getIdent(), perk);
 			}
 		}
-		
+
 	}
-	
+
 	public void loadPerks(final Player player) {
 //		if (!PlatinumManager.isEnabled()) {
 //			return;
 //		}
-		
+
 		class AsyncTask implements Runnable {
 			Resident resident;
-			
+
 			public AsyncTask(Resident resident) {
 				this.resident = resident;
 			}
-			
+
 			@Override
 			public void run() {
 				try {
-                    resident.perks.clear();
-					Player player = CivGlobal.getPlayer(resident);				
+					resident.perks.clear();
+					Player player = CivGlobal.getPlayer(resident);
 					try {
 						CivGlobal.perkManager.loadPerksForResident(resident);
 					} catch (SQLException e) {
@@ -1221,7 +1255,7 @@ public class Resident extends SQLObject {
 						return;
 					} catch (NotVerifiedException e) {
 						return;
-					}	
+					}
 				} catch (CivException e1) {
 					return;
 				}
@@ -1230,29 +1264,29 @@ public class Resident extends SQLObject {
 					String perkMessage = "";
 					if (CivSettings.getString(CivSettings.perkConfig, "system.free_perks").equalsIgnoreCase("true")) {
 						resident.giveAllFreePerks();
-						perkMessage = CivSettings.localize.localizedString("PlayerLoginAsync_perksMsg1")+" ";
+						perkMessage = CivSettings.localize.localizedString("PlayerLoginAsync_perksMsg1") + " ";
 					} else if (CivSettings.getString(CivSettings.perkConfig, "system.free_admin_perks").equalsIgnoreCase("true")) {
 						if (player.hasPermission(CivSettings.MINI_ADMIN) || player.hasPermission(CivSettings.FREE_PERKS)) {
 							resident.giveAllFreePerks();
-							perkMessage = CivSettings.localize.localizedString("PlayerLoginAsync_perksMsg1")+": ";
-							perkMessage += "Weather"+", ";
+							perkMessage = CivSettings.localize.localizedString("PlayerLoginAsync_perksMsg1") + ": ";
+							perkMessage += "Weather" + ", ";
 						}
 					}
-					
+
 					for (ConfigPerk p : CivSettings.templates.values()) {
-						if (player.hasPermission("civ.perk."+p.simple_name)) {
+						if (player.hasPermission("civ.perk." + p.simple_name)) {
 							resident.giveTemplate(p.simple_name);
-							perkMessage += p.display_name+", ";
+							perkMessage += p.display_name + ", ";
 						}
 					}
 
 					perkMessage += CivSettings.localize.localizedString("PlayerLoginAsync_perksMsg2");
-					
-					CivMessage.send(resident, CivColor.LightGreen+perkMessage);
+
+					CivMessage.send(resident, CivColor.LightGreen + perkMessage);
 				} catch (InvalidConfiguration e) {
 					e.printStackTrace();
 				}
-				
+
 				/* User was verified, lets see if it was the first time. */
 //				PlatinumManager.givePlatinumOnce(resident,
 //				CivSettings.platinumRewards.get("loginFirstVerified").name, 
@@ -1260,30 +1294,30 @@ public class Resident extends SQLObject {
 //				"Achievement! First time you've logged in while verified! %d");
 			}
 		}
-		
+
 		TaskMaster.asyncTask(new AsyncTask(this), 0);
 	}
 
-	public void setRejoinCooldown(Town town) {	
-		String value = ""+town.getCiv().getId();
+	public void setRejoinCooldown(Town town) {
+		String value = "" + town.getCiv().getId();
 		String key = getCooldownKey();
 		CivGlobal.getSessionDB().add(key, value, 0, 0, 0);
 	}
-	
+
 	public String getCooldownKey() {
-		return "cooldown:"+this.getName();
+		return "cooldown:" + this.getName();
 	}
-	
+
 	public void cleanupCooldown() {
 		CivGlobal.getSessionDB().delete_all(getCooldownKey());
 	}
-	
+
 	public void validateJoinTown(Town town) throws CivException {
 		if (this.hasTown() && this.getCiv() == town.getCiv()) {
 			/* allow players to join the same civ, no probs */
 			return;
 		}
-		
+
 		long cooldownTime;
 		int cooldownHours;
 		try {
@@ -1292,8 +1326,8 @@ public class Resident extends SQLObject {
 			e.printStackTrace();
 			return;
 		}
-		
-		cooldownTime = cooldownHours * 60*60*1000; /*convert hours to milliseconds. */
+
+		cooldownTime = cooldownHours * 60 * 60 * 1000; /*convert hours to milliseconds. */
 
 		ArrayList<SessionEntry> entries = CivGlobal.getSessionDB().lookup(getCooldownKey());
 		if (entries.size() > 0) {
@@ -1303,12 +1337,12 @@ public class Resident extends SQLObject {
 				cleanupCooldown();
 				return;
 			}
-			
+
 //			if (oldCiv == town.getCiv()) {
 //				/* We're rejoining the old civ, allow it. */
 //				return;
 //			}
-			
+
 			/* Check if cooldown is expired. */
 			Date now = new Date();
 			if (now.getTime() > (entries.get(0).time + cooldownTime)) {
@@ -1316,20 +1350,20 @@ public class Resident extends SQLObject {
 				cleanupCooldown();
 				return;
 			}
-			
-			throw new CivException(CivSettings.localize.localizedString("var_resident_cannotJoinCivJustLeft1",cooldownHours));
-		}	
+
+			throw new CivException(CivSettings.localize.localizedString("var_resident_cannotJoinCivJustLeft1", cooldownHours));
+		}
 	}
-	
+
 	public LinkedList<Perk> getPersonalTemplatePerks(ConfigBuildableInfo info) {
 		LinkedList<Perk> templates = new LinkedList<Perk>();
-		
+
 		for (Perk perk : this.perks.values()) {
 			CustomPersonalTemplate customTemplate = (CustomPersonalTemplate) perk.getComponent("CustomPersonalTemplate");
 			if (customTemplate == null) {
 				continue;
 			}
-			
+
 			if (customTemplate.getString("id").equals(info.id)) {
 				templates.add(perk);
 			}
@@ -1341,29 +1375,28 @@ public class Resident extends SQLObject {
 		ArrayList<Perk> unboundPerks = new ArrayList<Perk>();
 		for (Perk ourPerk : perks.values()) {
 
-			if (!ourPerk.getIdent().contains("template"))
-			{
-			CustomTemplate customTemplate = (CustomTemplate) ourPerk.getComponent("CustomTemplate");
-			if (customTemplate == null) {
-				continue;
-			}
-			
-			if (!customTemplate.getString("template").equals(info.template_base_name)) {
-				/* Not the correct template. */
-				continue;
-			}
-			
-			for (Perk perk : alreadyBoundPerkList) {
-				if (perk.getIdent().equals(ourPerk.getIdent())) {
-					/* Perk is already bound in this town, do not display for binding. */
-					break;
+			if (!ourPerk.getIdent().contains("template")) {
+				CustomTemplate customTemplate = (CustomTemplate) ourPerk.getComponent("CustomTemplate");
+				if (customTemplate == null) {
+					continue;
 				}
-			}
-			
-			unboundPerks.add(ourPerk);
+
+				if (!customTemplate.getString("template").equals(info.template_base_name)) {
+					/* Not the correct template. */
+					continue;
+				}
+
+				for (Perk perk : alreadyBoundPerkList) {
+					if (perk.getIdent().equals(ourPerk.getIdent())) {
+						/* Perk is already bound in this town, do not display for binding. */
+						break;
+					}
+				}
+
+				unboundPerks.add(ourPerk);
 			}
 		}
-		
+
 		return unboundPerks;
 	}
 
@@ -1375,7 +1408,7 @@ public class Resident extends SQLObject {
 		this.controlBlockInstantBreak = controlBlockInstantBreak;
 	}
 
-	
+
 	public boolean isMuted() {
 		return muted;
 	}
@@ -1396,13 +1429,13 @@ public class Resident extends SQLObject {
 		Calendar now = Calendar.getInstance();
 		Calendar expire = Calendar.getInstance();
 		expire.setTimeInMillis(this.getLastOnline());
-		
+
 		expire.add(Calendar.DATE, days);
-		
+
 		if (now.after(expire)) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -1420,106 +1453,105 @@ public class Resident extends SQLObject {
 			if (player.isDead()) {
 				throw new CivException(CivSettings.localize.localizedString("resident_tradeErrorPlayerDead"));
 			}
-			Inventory inv = Bukkit.createInventory(player, 9*5, this.getName()+" : "+resident.getName());
-			
-			/* 
+			Inventory inv = Bukkit.createInventory(player, 9 * 5, this.getName() + " : " + resident.getName());
+
+			/*
 			 * Set up top and bottom layer with buttons.
 			 */
-			
+
 			/* Top part which is for the other resident. */
 			ItemStack signStack = LoreGuiItem.build("", CivData.WOOL, CivData.DATA_WOOL_WHITE, "");
 			int start = 0;
 			for (int i = start; i < (9 + start); i++) {
-				if ((i-start) == 8) {
-					ItemStack guiStack = LoreGuiItem.build(resident.getName()+" Confirm", 
-							CivData.WOOL, CivData.DATA_WOOL_RED, 
-							CivColor.LightGreen+CivSettings.localize.localizedString("var_resident_tradeWait1",CivColor.LightBlue+resident.getName()),
-							CivColor.LightGray+" "+CivSettings.localize.localizedString("resident_tradeWait2"));
+				if ((i - start) == 8) {
+					ItemStack guiStack = LoreGuiItem.build(resident.getName() + " Confirm",
+							CivData.WOOL, CivData.DATA_WOOL_RED,
+							CivColor.LightGreen + CivSettings.localize.localizedString("var_resident_tradeWait1", CivColor.LightBlue + resident.getName()),
+							CivColor.LightGray + " " + CivSettings.localize.localizedString("resident_tradeWait2"));
 					inv.setItem(i, guiStack);
-				} else if ((i-start) == 7) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.CURRENCY_NAME+" "+CivSettings.localize.localizedString("resident_tradeOffered"), 
-							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0, 
-							CivColor.Yellow+"0 "+CivSettings.CURRENCY_NAME);
+				} else if ((i - start) == 7) {
+					ItemStack guiStack = LoreGuiItem.build(CivSettings.CURRENCY_NAME + " " + CivSettings.localize.localizedString("resident_tradeOffered"),
+							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0,
+							CivColor.Yellow + "0 " + CivSettings.CURRENCY_NAME);
 					inv.setItem(i, guiStack);
 				} else {
 					inv.setItem(i, signStack);
 				}
 			}
-			
-			start = 4*9;
+
+			start = 4 * 9;
 			for (int i = start; i < (9 + start); i++) {
-				if ((i-start) == 8) {					
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeYourConfirm"), 
-							CivData.WOOL, CivData.DATA_WOOL_RED, 
-							CivColor.Gold+CivSettings.localize.localizedString("resident_tradeClicktoConfirm"));
+				if ((i - start) == 8) {
+					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeYourConfirm"),
+							CivData.WOOL, CivData.DATA_WOOL_RED,
+							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeClicktoConfirm"));
 					inv.setItem(i, guiStack);
-					
-				} else if ((i-start) == 0){ 
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeRemove")+" "+CivSettings.CURRENCY_NAME, 
-							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0, 
-							CivColor.Gold+CivSettings.localize.localizedString("resident_tradeRemove100")+" "+CivSettings.CURRENCY_NAME,
-							CivColor.Gold+CivSettings.localize.localizedString("resident_tradeRemove1000")+" "+CivSettings.CURRENCY_NAME);
+
+				} else if ((i - start) == 0) {
+					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeRemove") + " " + CivSettings.CURRENCY_NAME,
+							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0,
+							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeRemove100") + " " + CivSettings.CURRENCY_NAME,
+							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeRemove1000") + " " + CivSettings.CURRENCY_NAME);
 					inv.setItem(i, guiStack);
-				} else if ((i-start) == 1) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeAdd")+" "+CivSettings.CURRENCY_NAME, 
-							ItemManager.getId(Material.GOLD_INGOT), 0, 
-							CivColor.Gold+CivSettings.localize.localizedString("resident_tradeAdd100")+" "+CivSettings.CURRENCY_NAME,
-							CivColor.Gold+CivSettings.localize.localizedString("resident_tradeAdd1000")+" "+CivSettings.CURRENCY_NAME);
+				} else if ((i - start) == 1) {
+					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeAdd") + " " + CivSettings.CURRENCY_NAME,
+							ItemManager.getId(Material.GOLD_INGOT), 0,
+							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeAdd100") + " " + CivSettings.CURRENCY_NAME,
+							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeAdd1000") + " " + CivSettings.CURRENCY_NAME);
 					inv.setItem(i, guiStack);
-				} else if ((i-start) == 7) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.CURRENCY_NAME+" "+CivSettings.localize.localizedString("resident_tradeOffered"), 
-							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0, 
-							CivColor.Yellow+"0 "+CivSettings.CURRENCY_NAME);
+				} else if ((i - start) == 7) {
+					ItemStack guiStack = LoreGuiItem.build(CivSettings.CURRENCY_NAME + " " + CivSettings.localize.localizedString("resident_tradeOffered"),
+							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0,
+							CivColor.Yellow + "0 " + CivSettings.CURRENCY_NAME);
 					inv.setItem(i, guiStack);
-				}
-				else {
+				} else {
 					inv.setItem(i, signStack);
 				}
 			}
-			
+
 			/*
 			 * Set up middle divider.
 			 */
-			start = 2*9;
+			start = 2 * 9;
 			for (int i = start; i < (9 + start); i++) {
 				inv.setItem(i, signStack);
 			}
-			
+
 			player.openInventory(inv);
 			return inv;
 		} catch (CivException e) {
-			try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("possibleCheaters.txt", true)))) {
-			    out.println("trade:"+this.getName()+" WITH "+resident.getName()+" and was dead");
-			}catch (IOException e1) {
-			    //exception handling left as an exercise for the reader
+			try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("possibleCheaters.txt", true)))) {
+				out.println("trade:" + this.getName() + " WITH " + resident.getName() + " and was dead");
+			} catch (IOException e1) {
+				//exception handling left as an exercise for the reader
 			}
 
-			
-			CivMessage.sendError(this, CivSettings.localize.localizedString("resident_tradeCouldNotTrade")+" "+e.getMessage());
-			CivMessage.sendError(resident, CivSettings.localize.localizedString("resident_tradeCouldNotTrade")+" "+e.getMessage());
+
+			CivMessage.sendError(this, CivSettings.localize.localizedString("resident_tradeCouldNotTrade") + " " + e.getMessage());
+			CivMessage.sendError(resident, CivSettings.localize.localizedString("resident_tradeCouldNotTrade") + " " + e.getMessage());
 			return null;
 		}
-				
+
 	}
-	
+
 	public boolean hasTechForItem(ItemStack stack) {
 		if (this.isInsideArena()) {
 			return true;
 		}
-		
+
 		LoreCraftableMaterial craftMat = LoreCraftableMaterial.getCraftMaterial(stack);
 		if (craftMat == null) {
 			return true;
 		}
-		
+
 		if (craftMat.getConfigMaterial().required_tech == null) {
 			return true;
 		}
-		
+
 		if (!this.hasTown()) {
 			return false;
 		}
-		
+
 		/* Parse technoloies */
 		String[] split = craftMat.getConfigMaterial().required_tech.split(",");
 		for (String tech : split) {
@@ -1528,8 +1560,8 @@ public class Resident extends SQLObject {
 				return false;
 			}
 		}
-		
-		return true;	
+
+		return true;
 	}
 
 	public Date getLastKilledTime() {
@@ -1559,21 +1591,21 @@ public class Resident extends SQLObject {
 	public void toggleItemMode() {
 		if (this.itemMode.equals("all")) {
 			this.itemMode = "rare";
-			CivMessage.send(this, CivColor.LightGreen+CivSettings.localize.localizedString("resident_toggleItemRare"));
+			CivMessage.send(this, CivColor.LightGreen + CivSettings.localize.localizedString("resident_toggleItemRare"));
 		} else if (this.itemMode.equals("rare")) {
 			this.itemMode = "none";
-			CivMessage.send(this, CivColor.LightGreen+CivSettings.localize.localizedString("resident_toggleItemNone"));
+			CivMessage.send(this, CivColor.LightGreen + CivSettings.localize.localizedString("resident_toggleItemNone"));
 		} else {
 			this.itemMode = "all";
-			CivMessage.send(this, CivColor.LightGreen+CivSettings.localize.localizedString("resident_toggleItemAll"));
+			CivMessage.send(this, CivColor.LightGreen + CivSettings.localize.localizedString("resident_toggleItemAll"));
 		}
 		this.save();
 	}
-	
+
 	public void setLastIP(String hostAddress) {
 		this.lastIP = hostAddress;
 	}
-	
+
 	public String getLastIP() {
 		return this.lastIP;
 	}
@@ -1587,8 +1619,8 @@ public class Resident extends SQLObject {
 			return;
 		}
 	}
-	
-	public void teleportHome(Player player) {		
+
+	public void teleportHome(Player player) {
 		if (this.hasTown()) {
 			TownHall townhall = this.getTown().getTownHall();
 			if (townhall != null) {
@@ -1600,14 +1632,14 @@ public class Resident extends SQLObject {
 			player.teleport(world.getSpawnLocation());
 		}
 	}
-	
+
 	public boolean canDamageControlBlock() {
 		if (this.hasTown()) {
 			if (!this.getCiv().getCapitolStructure().isValid()) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -1619,7 +1651,7 @@ public class Resident extends SQLObject {
 	public void setUsesAntiCheat(boolean usesAntiCheat) {
 		this.usesAntiCheat = usesAntiCheat;
 	}
-	
+
 	public boolean hasTeam() {
 		ArenaTeam team = ArenaTeam.getTeamForResident(this);
 		if (team == null) {
@@ -1627,7 +1659,7 @@ public class Resident extends SQLObject {
 		}
 		return true;
 	}
-	
+
 	public ArenaTeam getTeam() {
 		ArenaTeam team = ArenaTeam.getTeamForResident(this);
 		if (team == null) {
@@ -1641,24 +1673,24 @@ public class Resident extends SQLObject {
 		if (team == null) {
 			return false;
 		}
-		
+
 		if (team.getLeader() == this) {
 			return true;
 		}
-		
-		return false;		
+
+		return false;
 	}
-	
+
 	public void saveInventory() {
 		try {
-			Player player = CivGlobal.getPlayer(this);			
-			String serial =  InventorySerializer.InventoryToString(player.getInventory());
+			Player player = CivGlobal.getPlayer(this);
+			String serial = InventorySerializer.InventoryToString(player.getInventory());
 			this.setSavedInventory(serial);
 			this.save();
 		} catch (CivException e) {
 		}
 	}
-	
+
 	public void clearInventory() {
 		try {
 			Player player = CivGlobal.getPlayer(this);
@@ -1672,7 +1704,7 @@ public class Resident extends SQLObject {
 		if (this.savedInventory == null) {
 			return;
 		}
-		
+
 		try {
 			Player player = CivGlobal.getPlayer(this);
 			clearInventory();
@@ -1686,7 +1718,7 @@ public class Resident extends SQLObject {
 			this.save();
 		}
 	}
-	
+
 	public String getSavedInventory() {
 		return savedInventory;
 	}
@@ -1699,44 +1731,44 @@ public class Resident extends SQLObject {
 		if (this.getTeam() == null) {
 			return null;
 		}
-		
+
 		return this.getTeam().getCurrentArena();
 	}
-	
+
 	public boolean isInsideArena() {
-		
+
 		if (!hasTeam()) {
 			this.insideArena = false;
 			return false;
 		}
-		
+
 		try {
 			Player player = CivGlobal.getPlayer(this);
-			
+
 			if (player.getWorld().getName().equals("world")) {
 				this.insideArena = false;
 				return false;
 			}
-			
+
 		} catch (CivException e) {
 			return false;
 		}
-		
+
 		return this.insideArena;
 	}
-	
+
 	public void setInsideArena(boolean inside) {
 		this.insideArena = inside;
 	}
-	
+
 	public boolean isProtected() {
 		return isProtected;
 	}
-	
+
 	public void setisProtected(boolean prot) {
 		isProtected = prot;
 	}
-	
+
 	public void showPerkPage(int pageNumber) {
 		Player player;
 		try {
@@ -1744,41 +1776,38 @@ public class Resident extends SQLObject {
 		} catch (CivException e) {
 			return;
 		}
-		
-		Inventory inv = Bukkit.getServer().createInventory(player, CivTutorial.MAX_CHEST_SIZE*9, CivSettings.localize.localizedString("resident_perksGuiHeading"));
-		
-		for (Object obj : perks.values()) {
-			Perk p = (Perk)obj;
 
-			if (p.getIdent().startsWith("temp"))
-			{
-				ItemStack stack = LoreGuiItem.build(p.configPerk.display_name, 
-						p.configPerk.type_id, 
-						p.configPerk.data, CivColor.LightBlue+CivSettings.localize.localizedString("resident_perksGuiClickToView"),
-						CivColor.LightBlue+CivSettings.localize.localizedString("resident_perksGuiTheseTemplates"));
+		Inventory inv = Bukkit.getServer().createInventory(player, CivTutorial.MAX_CHEST_SIZE * 9, CivSettings.localize.localizedString("resident_perksGuiHeading"));
+
+		for (Object obj : perks.values()) {
+			Perk p = (Perk) obj;
+
+			if (p.getIdent().startsWith("temp")) {
+				ItemStack stack = LoreGuiItem.build(p.configPerk.display_name,
+						p.configPerk.type_id,
+						p.configPerk.data, CivColor.LightBlue + CivSettings.localize.localizedString("resident_perksGuiClickToView"),
+						CivColor.LightBlue + CivSettings.localize.localizedString("resident_perksGuiTheseTemplates"));
 				stack = LoreGuiItem.setAction(stack, "ShowTemplateType");
 				stack = LoreGuiItem.setActionData(stack, "perk", p.configPerk.id);
 
 				inv.addItem(stack);
-			}
-			else if (p.getIdent().startsWith("perk"))
-			{
-				ItemStack stack = LoreGuiItem.build(p.getDisplayName(), 
-						p.configPerk.type_id, 
-						p.configPerk.data, CivColor.Gold+CivSettings.localize.localizedString("resident_perksGui_clickToActivate"),
+			} else if (p.getIdent().startsWith("perk")) {
+				ItemStack stack = LoreGuiItem.build(p.getDisplayName(),
+						p.configPerk.type_id,
+						p.configPerk.data, CivColor.Gold + CivSettings.localize.localizedString("resident_perksGui_clickToActivate"),
 						"Unlimted Uses");
 				stack = LoreGuiItem.setAction(stack, "ActivatePerk");
 				stack = LoreGuiItem.setActionData(stack, "perk", p.configPerk.id);
 
 				inv.addItem(stack);
-				
+
 			}
-			
+
 		}
-		
+
 		player.openInventory(inv);
 	}
-	
+
 	public void showTemplatePerks(String name) {
 		Player player;
 		try {
@@ -1786,35 +1815,34 @@ public class Resident extends SQLObject {
 		} catch (CivException e) {
 			return;
 		}
-		
-		Inventory inv = Bukkit.getServer().createInventory(player, CivTutorial.MAX_CHEST_SIZE*9, CivSettings.localize.localizedString("resident_perksGui_templatesHeading")+" "+name);
-		
-		for (Object obj : perks.values()) {
-			Perk p = (Perk)obj;
-			if (p.getIdent().contains("tpl_" +name))
-			{
-			ItemStack stack = LoreGuiItem.build(p.configPerk.display_name, 
-					p.configPerk.type_id, 
-					p.configPerk.data, CivColor.Gold+CivSettings.localize.localizedString("resident_perksGui_clickToActivate"),
-					CivColor.LightBlue+"Count: "+p.count);
-			stack = LoreGuiItem.setAction(stack, "ActivatePerk");
-			stack = LoreGuiItem.setActionData(stack, "perk", p.configPerk.id);
 
-			inv.addItem(stack);
+		Inventory inv = Bukkit.getServer().createInventory(player, CivTutorial.MAX_CHEST_SIZE * 9, CivSettings.localize.localizedString("resident_perksGui_templatesHeading") + " " + name);
+
+		for (Object obj : perks.values()) {
+			Perk p = (Perk) obj;
+			if (p.getIdent().contains("tpl_" + name)) {
+				ItemStack stack = LoreGuiItem.build(p.configPerk.display_name,
+						p.configPerk.type_id,
+						p.configPerk.data, CivColor.Gold + CivSettings.localize.localizedString("resident_perksGui_clickToActivate"),
+						CivColor.LightBlue + "Count: " + p.count);
+				stack = LoreGuiItem.setAction(stack, "ActivatePerk");
+				stack = LoreGuiItem.setActionData(stack, "perk", p.configPerk.id);
+
+				inv.addItem(stack);
 			}
 		}
-		
+
 		player.openInventory(inv);
 	}
 
 	public UUID getUUID() {
 		return uid;
 	}
-	
+
 	public String getUUIDString() {
 		return uid.toString();
 	}
-	
+
 	public void setUUID(UUID uid) {
 		this.uid = uid;
 	}
@@ -1826,10 +1854,10 @@ public class Resident extends SQLObject {
 	public void setWalkingModifier(double walkingModifier) {
 		this.walkingModifier = walkingModifier;
 	}
-	
+
 	public void calculateWalkingModifier(Player player) {
 		double speed = CivSettings.normal_speed;
-		
+
 		/* Set speed from armor. */
 		if (Unit.isWearingFullComposite(player)) {
 			speed *= CivSettings.T4_leather_speed;
@@ -1853,11 +1881,125 @@ public class Resident extends SQLObject {
 		this.walkingModifier = speed;
 	}
 
-	public boolean isTitleAPI() {
-		return titleAPI;
+
+	public synchronized void cancelPreviewIfAny(Player player) {
+		boolean hadTask = (this.previewTask != null);
+
+		if (this.previewTask != null) {
+			// stopt ticker + zet client blocks terug via abortAndUndoPreview
+			this.previewTask.abortAndUndoPreview(player);
+			this.previewTask = null;
+		} else if (this.previewUndo != null && !this.previewUndo.isEmpty()) {
+			// geen task, maar nog ghost blocks zichtbaar -> revert naar echte wereldstate
+			if (player != null) {
+				java.util.ArrayList<BlockCoord> coords = new java.util.ArrayList<>(this.previewUndo.keySet());
+				for (BlockCoord bc : coords) {
+					org.bukkit.block.Block worldBlock = bc.getBlock();
+					ItemManager.sendBlockChange(
+							player,
+							worldBlock.getLocation(),
+							ItemManager.getId(worldBlock),
+							ItemManager.getData(worldBlock));
+				}
+			}
+			this.previewUndo.clear();
+		}
+
+		// timeout watcher altijd stoppen
+		stopPreviewTimeoutWatcher();
 	}
 
-	public void setTitleAPI(boolean titleAPI) {
-		this.titleAPI = titleAPI;
+	public synchronized void cancelPreviewIfAny(Player player, boolean notify) {
+		boolean hadPreview = (this.previewTask != null) ||
+				(this.previewUndo != null && !this.previewUndo.isEmpty());
+
+		// stille cancel
+		cancelPreviewIfAny(player);
+
+		if (notify && hadPreview && player != null) {
+			CivMessage.send(player, ChatColor.RED + "Preview removed");
+		}
 	}
+
+	private synchronized void startPreviewTimeoutWatcher() {
+		stopPreviewTimeoutWatcher();
+		this.previewLastActivityAt = System.currentTimeMillis();
+
+		final int timeoutSeconds = 180;   // maak dit desgewenst configureerbaar
+		final long periodTicks = 40L;   // check elke 2s
+
+		final org.bukkit.plugin.Plugin plugin =
+				org.bukkit.plugin.java.JavaPlugin.getPlugin(com.avrgaming.civcraft.main.CivCraft.class);
+
+		this.previewTimeoutTask = org.bukkit.Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+			com.avrgaming.civcraft.threading.tasks.BuildPreviewAsyncTask task = this.previewTask;
+			if (task == null) { // niks te waken
+				stopPreviewTimeoutWatcher();
+				return;
+			}
+
+			long idleMs = System.currentTimeMillis() - this.previewLastActivityAt;
+			if (idleMs < timeoutSeconds * 1000L) {
+				return;
+			}
+
+			// --- Belangrijk: altijd proberen een Player te vinden ---
+			org.bukkit.entity.Player p = null;
+			try {
+				// 1) via de task (heeft de juiste UUID)
+				p = task.getPlayer(); // kan CivException gooien
+			} catch (com.avrgaming.civcraft.exception.CivException ignored) {
+			}
+
+			if (p == null && this.getUUID() != null) {
+				p = Bukkit.getPlayer(this.getUUID());
+			}
+
+			if (p == null) {
+				// 2) fallback via Resident → naam/uuid
+				try {
+					p = org.bukkit.Bukkit.getPlayerExact(this.getName());
+				} catch (Exception ignored) {
+				}
+				try {
+					java.util.UUID u = null;
+					try {
+						u = (java.util.UUID) this.getClass().getMethod("getUUID").invoke(this);
+					} catch (Exception ignored) {
+					}
+					if (p == null && u != null) p = org.bukkit.Bukkit.getPlayer(u);
+				} catch (Exception ignored) {
+				}
+			}
+			try {
+				if(this.previewTask != null) {
+					p = this.previewTask.getPlayer();
+				}
+			} catch (com.avrgaming.civcraft.exception.CivException ignored) {}
+
+			if (p == null) {
+				p = org.bukkit.Bukkit.getPlayer(this.getName());
+			}
+
+			// preview annuleren (met of zonder p; met p stuurt revert packets)
+			cancelPreviewIfAny(p);
+			stopPreviewTimeoutWatcher();
+		}, periodTicks, periodTicks);
+	}
+
+	private synchronized void stopPreviewTimeoutWatcher() {
+		if (this.previewTimeoutTask != null) {
+			this.previewTimeoutTask.cancel();
+			this.previewTimeoutTask = null;
+		}
+	}
+
+	public synchronized void touchPreviewActivity() {
+		this.previewLastActivityAt = System.currentTimeMillis();
+	}
+	public BuildPreviewAsyncTask getPreviewTask() {
+		return this.previewTask;
+	}
+
+
 }
