@@ -3,67 +3,68 @@ plugins{
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-java { toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+java {
+    // Eén duidelijke Java 8-config
+    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-
 }
+
 val civLibs = rootProject.file("civcraft/libs")
 
 repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://oss.sonatype.org/content/groups/public/")
-    flatDir { dirs(civLibs) }
-}
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+    flatDir { dirs(civLibs) } // lokale jars
 }
 
 dependencies {
 
-    // kies precies één Spigot API (voorbeeld: 1.12.2). Gebruik óf Maven óf je lokale jar.
-    // compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
-    compileOnly(files("$civLibs/spigot-1.12.2.jar"))
-    compileOnly(files(rootProject.file("civcraft/libs/spigot-1.12.2.jar"))) // kies jouw versie
+    // --- Spigot/CraftBukkit 1.12.2 (NMS/CraftBukkit nodig!) ---
+    // Optie A: via BuildTools (aanrader – zet dan craftbukkit in je lokale maven):
+    // compileOnly("org.bukkit:craftbukkit:1.12.2-R0.1-SNAPSHOT")
+    // (óf compileOnly("org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT"))
 
-    // alle overige plugin-JARs uit libs, maar sluit spigot-jars uit
+    // Optie B: via lokale server-jar (moet de **server** zijn, niet alleen API!)
+    // Zet de daadwerkelijke bestandsnaam goed (meestal ~30–50 MB groot):
+    compileOnly(files("$civLibs/spigot-1.12.2.jar"))
+
+    // Alle overige plugin-jars uit libs/, spigot-*.jar uitsluiten
     compileOnly(fileTree(civLibs) {
         include("*.jar")
         exclude("spigot-*.jar")
-
     })
+
+    // --- Runtime/Compile libs ---
+    // MySQL 5.1.x voor com.mysql.jdbc.StringUtils (Connector/J 8.x heeft deze niet meer)
+    implementation("mysql:mysql-connector-java:8.0.33")
+
+    // Apache Commons IO voor FileUtils
+    implementation("commons-io:commons-io:2.6")
+
+    // Logging + Hikari (zoals je had)
     implementation("com.zaxxer:HikariCP:3.4.5")
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("org.slf4j:slf4j-simple:1.7.36")
-    implementation("mysql:mysql-connector-java:8.0.33")
 
-    // Tests (laat staan als je deze al hebt)
+    // Annotations voor @Nonnull/@Nullable
+    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
+
+    // --- Tests ---
     testImplementation("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("org.mockito:mockito-core:4.11.0")
     testImplementation("org.mockito:mockito-inline:4.11.0")
-    testImplementation("org.mockito:mockito-core:2.28.2")
-
-    // ➜ Bukkit/Spigot API ook voor tests beschikbaar maken:
-    val libsDir = rootProject.file("civcraft/libs")
-    testCompileOnly(files("$libsDir/spigot-1.12.2.jar"))
-    // (alternatief via Maven:)
-    // testCompileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
-    tasks.test {
-        useJUnit() // JUnit 4
 }
 
-// civcraft/build.gradle.kts
 tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "windows-1252"  // i.p.v. UTF-8
-}
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:unchecked"))
     options.encoding = "UTF-8"
-}}
+    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:unchecked"))
+}
+
+// Tests (JUnit 4)
 tasks.test {
     useJUnit()
     testLogging {
@@ -72,16 +73,14 @@ tasks.test {
         showCauses = true
         showExceptions = true
         showStackTraces = true
-    }}
-tasks.withType<JavaCompile>{
-    options.compilerArgs.removeAll(listOf("--release", "8"))
-    options.encoding = "UTF-8"
+    }
 }
+
 tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar"){
-    archiveClassifier.set("")
-    relocate("com.zaxxer.hikari.*", "com.avrgaming.shaded.hikari")
+    archiveClassifier.set("")         // publiceer alleen shadow
+    // minimize() // optioneel; uitzetten als je iets mist
+    relocate("com.zaxxer.hikari", "com.avrgaming.shaded.hikari")
 }
-tasks.build {
-    dependsOn(tasks.named("shadowJar"))
-}
+
+tasks.build { dependsOn(tasks.named("shadowJar")) }
 tasks.jar { enabled = false }

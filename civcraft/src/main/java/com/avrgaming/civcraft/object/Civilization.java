@@ -32,6 +32,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.avrgaming.civcraft.util.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -61,11 +63,6 @@ import com.avrgaming.civcraft.structure.TownHall;
 import com.avrgaming.civcraft.threading.TaskMaster;
 import com.avrgaming.civcraft.threading.tasks.UpdateTechBar;
 import com.avrgaming.civcraft.threading.timers.BeakerTimer;
-import com.avrgaming.civcraft.util.BlockCoord;
-import com.avrgaming.civcraft.util.ChunkCoord;
-import com.avrgaming.civcraft.util.CivColor;
-import com.avrgaming.civcraft.util.DateUtil;
-import com.avrgaming.civcraft.util.ItemManager;
 
 public class Civilization extends SQLObject {
 
@@ -125,7 +122,8 @@ public class Civilization extends SQLObject {
 		this.setName(name);
 		this.leaderName = leader.getUUID().toString();
 		this.setCapitolName(capitolName);
-		
+        TagUtil.createTeam(getName());
+
 		this.government = CivSettings.governments.get("gov_tribalism");		
 		this.color = this.pickCivColor();		
 		this.setTreasury(CivGlobal.createEconObject(this));

@@ -227,15 +227,6 @@ public final class CivCraft extends JavaPlugin {
 		pluginManager.registerEvents(new FishingListener(), this);	
 		pluginManager.registerEvents(new PvPListener(), this);
 		pluginManager.registerEvents(new LoreEnhancementArenaItem(), this);
-
-		if ((hasPlugin("iTag") || hasPlugin("TagAPI")) && hasPlugin("ProtocolLib")) {
-			CivSettings.hasITag = true;
-			pluginManager.registerEvents(new TagAPIListener(), this);
-			CivLog.debug("TagAPI Registered");
-		} else {
-			CivLog.warning("TagAPI not found, not registering TagAPI hooks. This is fine if you're not using TagAPI.");
-
-		}
 		
 		if (hasPlugin("HeroChat")) {
 			pluginManager.registerEvents(new HeroChatListener(), this);
