@@ -241,6 +241,8 @@ public final class CivCraft extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
+		new com.avrgaming.civcraft.util.DiskSpaceMonitor(this).start();
 		setPlugin(this);
 		
 		this.saveDefaultConfig();
