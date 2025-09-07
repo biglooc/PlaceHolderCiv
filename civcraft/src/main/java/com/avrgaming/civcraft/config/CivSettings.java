@@ -18,9 +18,6 @@
  */
 package com.avrgaming.civcraft.config;
 
-import com.avrgaming.civcraft.mobs.MobIntegration;
-import com.avrgaming.civcraft.mobs.MythicMobsAdapter;
-import com.avrgaming.civcraft.mobs.NoopMobIntegration;
 import localize.Localize;
 
 import java.io.BufferedReader;
@@ -321,13 +318,14 @@ public class CivSettings {
 			CivLog.warning("TitleAPI not found, not registering TitleAPI hooks. This is fine if you're not using TitleAPI.");
 		}
 
-		if (plugin.getServer().getPluginManager().isPluginEnabled("MythicMobs")
-			&& CivSettings.getBoolean(spawnersConfig, "enable")) {
-			mobIntegration = new MythicMobsAdapter();
-			hasMobIntergration = mobIntegration.isEnabled();
+		if (plugin.getServer().getPluginManager().isPluginEnabled("MythicMobs")) {
+			CivSettings.mobIntegration = new com.avrgaming.civcraft.mobs.MythicMobsAdapter();
+			CivSettings.hasMobIntergration = CivSettings.mobIntegration.isEnabled();
 			CivLog.info("MythicMobs hooks enabled");
 		} else {
 			CivLog.warning("MythicMobs not found or disabled; skipping mob intergration");
+			CivSettings.mobIntegration = new com.avrgaming.civcraft.mobs.NoopMobIntegration();
+			CivSettings.hasMobIntergration = false;
 		}
 
 		try {

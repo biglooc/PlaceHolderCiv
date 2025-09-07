@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.avrgaming.civcraft.unittests.TestMultiInventory" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-09-07T09:46:20.927Z" hostname="DESKTOP-R2Q79GI" time="0.739">
+<testsuite name="com.avrgaming.civcraft.unittests.TestMultiInventory" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-09-07T10:29:55.234Z" hostname="DESKTOP-R2Q79GI" time="0.78">
   <properties/>
-  <testcase name="addSingleItemToInventory" classname="com.avrgaming.civcraft.unittests.TestMultiInventory" time="0.739"/>
+  <testcase name="addSingleItemToInventory" classname="com.avrgaming.civcraft.unittests.TestMultiInventory" time="0.78"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

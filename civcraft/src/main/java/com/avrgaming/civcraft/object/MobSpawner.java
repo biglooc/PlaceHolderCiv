@@ -139,6 +139,22 @@ public class MobSpawner extends SQLObject {
         mobIntegration.ensureSpawner(this.getName(), this.getCoord().getLocation(), delaySec, this.active);
     }
 
-    
-    
+    public void setActive(boolean active) {
+        this.active = active;
+
+        //make sure mobIntergration is never null
+        com.avrgaming.civcraft.mobs.MobIntegration mi = mobIntegration;
+        if (mi == null) {
+            CivLog.warning("[Spawner] mobIntergration was null; installing NoopMobIntegration");
+            mi = new com.avrgaming.civcraft.mobs.NoopMobIntegration();
+            mobIntegration = mi;
+            CivSettings.hasMobIntergration = false;
+        }
+        try {
+            CivSettings.mobIntegration.ensureSpawner(this.getName(), this.getCoord().getLocation(), this.active);
+        } catch (Throwable t) {
+            CivLog.warning("[Spawner] ensureSpawner failed");
+        }
+    }
+
 }
