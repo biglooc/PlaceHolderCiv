@@ -498,22 +498,26 @@ public class Town extends SQLObject {
 	
 	public void addResident(Resident res) throws AlreadyRegisteredException {
 		String key = res.getName().toLowerCase();
-		
+		Player player = Bukkit.getPlayer(res.getUUID());
+
 		if (residents.containsKey(key)) {
 			throw new AlreadyRegisteredException(res.getName()+" already a member of town "+this.getName());
 		}
 		
-		res.setTown(this);				
-		
-		residents.put(key, res);
+		res.setTown(this);
+
+        String teamName;
+        if(motherCiv != null) {
+            teamName = motherCiv.getName().length() > 16 ? motherCiv.getName().substring(0, 16) : motherCiv.getName();
+        } else {
+            teamName = civ.getName().length() > 16 ? civ.getName().substring(0, 16) : civ.getName();
+        }
+        TagUtil.addToTeam(player, teamName);
+
+        residents.put(key, res);
 		if (this.defaultGroup != null && !this.defaultGroup.hasMember(res)) {
 			this.defaultGroup.addMember(res);
 			this.defaultGroup.save();
-		}
-		Player player = Bukkit.getPlayer(res.getUUID());
-		if (player != null && CivSettings.hasITag)
-		{
-			TagUtil.refreshPlayer(player, new HashSet<>(Bukkit.getOnlinePlayers()));
 		}
 	}
 	
@@ -1288,9 +1292,17 @@ public class Town extends SQLObject {
 		resident.save();
 		this.save();
 		Player player = Bukkit.getPlayer(resident.getUUID());
-		if (player != null && CivSettings.hasITag)
+
+        String civName;
+        if(motherCiv != null) {
+            civName = motherCiv.getName();
+        } else {
+            civName = civ.getName();
+        }
+
+		if (player != null)
 		{
-			TagUtil.refreshPlayer(player); new HashSet<>(Bukkit.getOnlinePlayers());
+			TagUtil.removeFromTeam(player, civName);
 		}
 	}
 
