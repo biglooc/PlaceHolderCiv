@@ -18,6 +18,9 @@
  */
 package com.avrgaming.civcraft.config;
 
+import com.avrgaming.civcraft.mobs.MobIntegration;
+import com.avrgaming.civcraft.mobs.MythicMobsAdapter;
+import com.avrgaming.civcraft.mobs.NoopMobIntegration;
 import localize.Localize;
 
 import java.io.BufferedReader;
@@ -220,7 +223,8 @@ public class CivSettings {
 	public static boolean hasTitleAPI = false;
 	public static boolean hasITag = false;
 
-	public static boolean hasCustomMobs = false;
+	public static boolean hasMobIntergration = false;
+	public static com.avrgaming.civcraft.mobs.MobIntegration mobIntegration = new com.avrgaming.civcraft.mobs.NoopMobIntegration();
 
 	public static Material previewMaterial = Material.GLASS;
 	public static Boolean showPreview = true;
@@ -317,11 +321,13 @@ public class CivSettings {
 			CivLog.warning("TitleAPI not found, not registering TitleAPI hooks. This is fine if you're not using TitleAPI.");
 		}
 
-		if (plugin.hasPlugin("CustomMobs") && CivSettings.getBoolean(spawnersConfig, "enable")) {
-			hasCustomMobs = true;
-			CivLog.info("CustomMobs hooks enabled");
+		if (plugin.getServer().getPluginManager().isPluginEnabled("MythicMobs")
+			&& CivSettings.getBoolean(spawnersConfig, "enable")) {
+			mobIntegration = new MythicMobsAdapter();
+			hasMobIntergration = mobIntegration.isEnabled();
+			CivLog.info("MythicMobs hooks enabled");
 		} else {
-			CivLog.warning("CustomMobs not found or disabled, not registering CustomMob hooks. This is fine if you're not using Custom Mobs.");
+			CivLog.warning("MythicMobs not found or disabled; skipping mob intergration");
 		}
 
 		try {

@@ -99,7 +99,7 @@ public class SQL {
 		CivLog.heading("Initializing SQL");
 		
 		SQL.hostname = CivSettings.getStringBase("mysql.hostname");
-		SQL.port = Integer.valueOf(CivSettings.getStringBase("mysql.port"));
+		SQL.port = Integer.parseInt(CivSettings.getStringBase("mysql.port"));
 		SQL.db_name = CivSettings.getStringBase("mysql.database");
 		SQL.username = CivSettings.getStringBase("mysql.username");
 		SQL.password = CivSettings.getStringBase("mysql.password");
@@ -112,7 +112,7 @@ public class SQL {
 
 		CivLog.info("\t Building Connection Pool for GAME database.");
 		gameDatabase = new ConnectionPool();
-		gameDatabase.init(hostname, port, db_name, username, password, max_conns, min_conns);
+		ConnectionPool.init(hostname, port, db_name, username, password, max_conns, min_conns);
 		CivLog.info("\t Connected to GAME database");
 		
 		CivLog.heading("Initializing Global SQL Database");
@@ -129,7 +129,7 @@ public class SQL {
 		CivLog.info("\t Using GLOBAL db at:"+SQL.global_hostname+":"+SQL.global_port+" user:"+SQL.global_username+" DB:"+SQL.global_db);
 		CivLog.info("\t Building Connection Pool for GLOBAL database.");
 		globalDatabase = new ConnectionPool();
-		gameDatabase.init(hostname, port, db_name, username, password, max_conns, min_conns);
+		ConnectionPool.init(hostname, port, db_name, username, password, max_conns, min_conns);
 		CivLog.info("\t Connected to GLOBAL database");
 		
 		CivGlobal.perkManager = new PerkManager();
