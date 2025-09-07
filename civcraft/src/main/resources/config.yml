@@ -63,4 +63,10 @@ global_database:
 
 server_phase: 'beta8'
 
- 
+monitor:
+    interval_minutes: 10       # hoe vaak meten
+    warn_percent_free: 15      # waarschuwing bij < 15% vrij
+    critical_percent_free: 5   # kritiek bij < 5% vrij
+    notify_admins: true        # stuur melding aan spelers met permissie
+    admin_permission: "civ.admin"
+    auto_cleanup_on_critical: true  # voer opschonen uit bij kritiek
