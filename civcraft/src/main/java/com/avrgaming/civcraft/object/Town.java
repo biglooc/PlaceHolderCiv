@@ -506,7 +506,10 @@ public class Town extends SQLObject {
         } else {
             teamName = civ.getName().length() > 16 ? civ.getName().substring(0, 16) : civ.getName();
         }
-        TagUtil.addToTeam(player, teamName);
+
+        if (player != null) {
+            TagUtil.addToTeam(player, teamName);
+        }
 
         residents.put(key, res);
 		if (this.defaultGroup != null && !this.defaultGroup.hasMember(res)) {
