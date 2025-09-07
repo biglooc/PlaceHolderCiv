@@ -1132,7 +1132,7 @@ public class DebugCommand extends CommandBase {
 	}
 	
 	public void mobspawnergenerate_cmd() throws CivException {
-		if (CivSettings.hasCustomMobs) {
+		if (CivSettings.hasMobIntergration) {
 			String playerName;
 			
 			if (sender instanceof Player) {
@@ -1179,7 +1179,7 @@ public class DebugCommand extends CommandBase {
 	}
 	
 	public void createmobspawner_cmd() throws CivException {
-		if (CivSettings.hasCustomMobs) {
+		if (CivSettings.hasMobIntergration) {
 			if (args.length < 2) {
 				throw new CivException("Enter mob spawner id");
 			}

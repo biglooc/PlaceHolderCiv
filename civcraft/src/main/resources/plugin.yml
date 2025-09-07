@@ -2,7 +2,7 @@ name: CivCraft
 main: com.avrgaming.civcraft.main.CivCraft
 softdepends: [TitleAPI]
 version: 1.0.0 ALPHA
-depend: [CustomMobs]
+depend: [MythicMobs]
 
 commands:
     town:
@@ -18,7 +18,7 @@ commands:
     deny:
         aliases: [no]
     civ:
-        aliases:
+        aliases: [c]
     tc:
         aliases:
     cc:
