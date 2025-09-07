@@ -311,13 +311,6 @@ public class CivSettings {
 			CivLog.warning("VanishNoPacket not found, not registering VanishNoPacket hooks. This is fine if you're not using VanishNoPacket.");
 		}
 
-		if (plugin.hasPlugin("TitleAPI")) {
-			hasTitleAPI = true;
-			CivLog.info("TitleAPI hooks enabled");
-		} else {
-			CivLog.warning("TitleAPI not found, not registering TitleAPI hooks. This is fine if you're not using TitleAPI.");
-		}
-
 		if (plugin.getServer().getPluginManager().isPluginEnabled("MythicMobs")) {
 			CivSettings.mobIntegration = new com.avrgaming.civcraft.mobs.MythicMobsAdapter();
 			CivSettings.hasMobIntergration = CivSettings.mobIntegration.isEnabled();

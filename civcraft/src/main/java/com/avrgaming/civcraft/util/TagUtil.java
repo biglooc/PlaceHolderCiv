@@ -9,33 +9,13 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Vervanger voor iTag/TagAPI aanroepen via reflectie.
- * Werkt ofwel met (Player), of met (Player, Set<? extends Player>) zoals iTag.
- */
 public final class TagUtil {
     private TagUtil() {}
     private final static Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
-    /** Vervanger voor TagAPI (1 param) en iTag (we maken zelf de online set). */
-    public static void refreshPlayer(Player player) {
-        if (player == null) return;
-
-        // iTag: net.md_5.itag.iTag.getInstance().refreshPlayer(Player, Set<Player>)
-        try {
-            Class<?> c = Class.forName("net.md_5.itag.iTag");
-            Object itag = c.getMethod("getInstance").invoke(null);
-            Method m = c.getMethod("refreshPlayer", Player.class, java.util.Set.class);
-            m.invoke(itag, player, new HashSet<>(Bukkit.getOnlinePlayers()));
-            return;
-        } catch (Throwable ignored) { /* fallthrough */ }
-
-        // TagAPI: org.kitteh.tag.TagAPI.refreshPlayer(Player)
-        try {
-            Class<?> c = Class.forName("org.kitteh.tag.TagAPI");
-            c.getMethod("refreshPlayer", Player.class).invoke(null, player);
-        } catch (Throwable ignored) {
-            // geen provider — no-op
+    public static void refreshPlayers() {
+        for(Player _player : Bukkit.getOnlinePlayers()) {
+            _player.setScoreboard(scoreboard);
         }
     }
 
@@ -49,7 +29,7 @@ public final class TagUtil {
             team = scoreboard.registerNewTeam(teamName);
         }
 
-        String prefix = teamName.substring(0, 3);
+        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "]";
         team.setPrefix(prefix);
     }
 
@@ -61,7 +41,9 @@ public final class TagUtil {
 
         if(team != null) {
             team.addEntry(player.getName());
-            player.setScoreboard(scoreboard);
+            for(Player _player : Bukkit.getOnlinePlayers()) {
+                _player.setScoreboard(scoreboard);
+            }
         }
     }
 
@@ -73,6 +55,9 @@ public final class TagUtil {
 
         if (team != null && team.hasEntry(player.getName())) {
             team.removeEntry(player.getName());
+            for(Player _player : Bukkit.getOnlinePlayers()) {
+                _player.setScoreboard(scoreboard);
+            }
         }
     }
 }
