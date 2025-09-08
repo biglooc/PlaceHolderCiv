@@ -1,6 +1,7 @@
 package com.avrgaming.civcraft.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -29,8 +30,17 @@ public final class TagUtil {
             team = scoreboard.registerNewTeam(teamName);
         }
 
-        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "] ";
-        team.setPrefix(prefix);
+        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "] " + ChatColor.RESET;
+        team.setPrefix(ChatColor.LIGHT_PURPLE + prefix);
+    }
+
+    public static void removeTeam(String civName) {
+        String teamName = civName.length() > 16 ? civName.substring(0, 16) : civName;
+        Team team = scoreboard.getTeam(teamName);
+
+        if(team != null) {
+            team.unregister();
+        }
     }
 
     public static void addToTeam(Player player, String civName) {
@@ -40,9 +50,9 @@ public final class TagUtil {
         Team team = scoreboard.getTeam(teamName);
 
         if(team != null) {
-            team.addEntry(player.getName());
-            for(Player _player : Bukkit.getOnlinePlayers()) {
-                _player.setScoreboard(scoreboard);
+            if(!team.hasEntry(player.getName())) {
+                team.addEntry(player.getName());
+                refreshPlayers();
             }
         }
     }
@@ -55,9 +65,7 @@ public final class TagUtil {
 
         if (team != null && team.hasEntry(player.getName())) {
             team.removeEntry(player.getName());
-            for(Player _player : Bukkit.getOnlinePlayers()) {
-                _player.setScoreboard(scoreboard);
-            }
+            refreshPlayers();
         }
     }
 }

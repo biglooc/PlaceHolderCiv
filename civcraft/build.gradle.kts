@@ -1,3 +1,5 @@
+val compileClasspath = configurations.getByName("compileClasspath")
+
 plugins{
     java
     id("com.github.johnrengelman.shadow") version "8.1.1"
@@ -48,6 +50,9 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("org.slf4j:slf4j-simple:1.7.36")
 
+    // Guava
+    implementation("com.google.guava:guava:21.0")
+
     // Annotations voor @Nonnull/@Nullable
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 
@@ -80,6 +85,28 @@ tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJ
     archiveClassifier.set("")         // publiceer alleen shadow
     // minimize() // optioneel; uitzetten als je iets mist
     relocate("com.zaxxer.hikari", "com.avrgaming.shaded.hikari")
+}
+
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("spigotCivcraftJar") {
+    archiveBaseName.set("spigot-civcraft")
+    archiveVersion.set("")
+    archiveClassifier.set("")
+
+    from(sourceSets.main.get().output)
+
+    dependencies {
+        exclude(dependency("com.google.guava:guava"))
+    }
+
+    with(tasks.jar.get())
+
+    manifest {
+        attributes(
+            "Main-Class" to "org.bukkit.craftbukkit.Main",
+            "Implementation-Title" to "Spigot-CivCraft",
+            "Implementation-Version" to project.version,
+        )
+    }
 }
 
 tasks.build { dependsOn(tasks.named("shadowJar")) }

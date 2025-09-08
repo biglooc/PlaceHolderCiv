@@ -37,7 +37,14 @@ public class ItemManager {
 
 	@SuppressWarnings("deprecation")
 	public static MaterialData getMaterialData(int type_id, int data) {
-		return new MaterialData(type_id, (byte)data);
+        Material mat = Material.getMaterial(type_id);
+
+        // Voor items die geen data gebruiken (zoals stick, cobblestone)
+        if (data <= 0) {
+            return mat.getNewData((byte)0); // veilige default
+        }
+
+        return new MaterialData(mat, (byte)data);
 	}
 	
 	@SuppressWarnings("deprecation")
