@@ -30,7 +30,7 @@ public final class TagUtil {
             team = scoreboard.registerNewTeam(teamName);
         }
 
-        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "] ";
+        String prefix = "[" + teamName.substring(0, 3).toUpperCase() + "] " + ChatColor.RESET;
         team.setPrefix(ChatColor.LIGHT_PURPLE + prefix);
     }
 
