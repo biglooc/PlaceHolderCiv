@@ -205,152 +205,94 @@ public class LoreCraftableMaterial extends LoreMaterial {
 		}
 	}
 
-	public static void buildRecipes() {
-		/*
-		 * Loads in materials from configuration file.
-		 */
-		for (LoreCraftableMaterial loreMat : materials.values()) {
-			if (!loreMat.isCraftable()) {
-				continue;
-			}
-			
-			ItemStack stack = LoreMaterial.spawn(loreMat);			
-			ConfigMaterial configMaterial = loreMat.configMaterial;
-			
-			if (loreMat.isShaped()) {
-				ItemStack[] matrix = new ItemStack[9];
-				@SuppressWarnings("deprecation")
-				ShapedRecipe recipe = new ShapedRecipe(stack);
-				recipe.shape(configMaterial.shape[0], configMaterial.shape[1], configMaterial.shape[2]);
-				
-				/* Setup the ingredients. */
-				for (ConfigIngredient ingred : configMaterial.ingredients.values()) {
-					ItemStack ingredStack = null;
+    public static void buildRecipes() {
+        CivLog.info("Building recipes");
+        for (LoreCraftableMaterial loreMat : materials.values()) {
+            if (!loreMat.isCraftable()) continue;
 
-					if (ingred.custom_id == null) {
-						recipe.setIngredient(ingred.letter.charAt(0), ItemManager.getMaterialData(ingred.type_id, ingred.data));
-						ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
-					} else{
-						LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
-						if (customLoreMat == null) {
-							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
-						}
-						
-						ConfigMaterial customMat = customLoreMat.configMaterial;
-						if (customMat != null) {
-							recipe.setIngredient(ingred.letter.charAt(0), ItemManager.getMaterialData(customMat.item_id, customMat.item_data));
-						} else {
-							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
-						}
+            ItemStack stack = LoreMaterial.spawn(loreMat);
+            ConfigMaterial configMaterial = loreMat.configMaterial;
 
-						ingredStack = LoreMaterial.spawn(customLoreMat);
-					}
-				
-					/* Add this incred to the shape. */
-					int i = 0;
-					for (String row : configMaterial.shape) {
-						for (int c = 0; c < row.length(); c++) {
-							if (row.charAt(c) == ingred.letter.charAt(0)) {
-								matrix[i] = ingredStack;
-							} else if (row.charAt(c) == ' '){
-								matrix[i] = new ItemStack(Material.AIR, 0, (short)-1);
-							}
-							i++;
-						}
-					}
-				
-				}
-				
-				shapedRecipes.put(loreMat, matrix);
-				String key = getShapedRecipeKey(matrix);
-				shapedKeys.put(key, loreMat);
-				
+            if (loreMat.isShaped()) {
+                ItemStack[] matrix = new ItemStack[9];
+                ShapedRecipe recipe = new ShapedRecipe(stack);
+                recipe.shape(configMaterial.shape[0], configMaterial.shape[1], configMaterial.shape[2]);
 
-				/* Register recipe with server. */
-				Bukkit.getServer().addRecipe(recipe);
-			} else {
-				/* Shapeless Recipe */
-				@SuppressWarnings("deprecation")
-				ShapelessRecipe recipe = new ShapelessRecipe(stack);
-				LinkedList<ItemStack> items = new LinkedList<ItemStack>();
-				ItemStack[] matrix = new ItemStack[9];
-				int matrixIndex = 0;
-				
-				/* Setup the ingredients. */
-				for (ConfigIngredient ingred : configMaterial.ingredients.values()) {
-					ItemStack ingredStack = null;
-					
-					try {
-					if (ingred.custom_id == null) {
-						recipe.addIngredient(ingred.count, ItemManager.getMaterialData(ingred.type_id, ingred.data));
-						ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
-					} else {
-						LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
-						if (customLoreMat == null) {
-							CivLog.error("Couldn't configure ingredient:"+ingred.custom_id+" in config mat:"+configMaterial.id);
-						}
-						ConfigMaterial customMat = customLoreMat.configMaterial;
-						if (customMat != null) {
-							recipe.addIngredient(ingred.count, ItemManager.getMaterialData(customMat.item_id, customMat.item_data));
-							ingredStack = LoreMaterial.spawn(customLoreMat);
-						} else {
-							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
-						}
-					}
-					} catch (IllegalArgumentException e) {
-						CivLog.warning("Trying to process ingredient:"+ingred.type_id+":"+ingred.custom_id+" for material:"+configMaterial.id);
-						throw e;
-					}
-					
-					if (ingredStack != null) {
-					//	loreMat.shaplessIngredientList.add(ingredStack);
-						for (int i = 0; i < ingred.count; i++) {
-							if (matrixIndex > 9) {
-								break;
-							}
-							
-							matrix[matrixIndex] = ingredStack;
-							matrixIndex++;
-						}
-						
-						ingredStack.setAmount(ingred.count);
-						items.add(ingredStack);
-					}
-				}
-				
-				shapelessRecipes.put(loreMat, items);
-				String key = getShapelessRecipeKey(matrix);
-				shapelessKeys.put(key, loreMat);
-				
-				/* Register recipe with server. */
-				Bukkit.getServer().addRecipe(recipe);
-			}
-		}
-		
-//		/* Configure Mercury recs */
-//		CivLog.debug("setting mercury..");
-//
-//		LoreCraftableMaterial mercury = LoreCraftableMaterial.getCraftMaterialFromId("mat_mercury");
-//		if (mercury != null) {
-//			CivLog.debug("no merc?");
-//			ItemStack stack = LoreCraftableMaterial.spawn(mercury);
-//			stack.setAmount(4);
-//			ShapelessRecipe recipe = new ShapelessRecipe(stack);
-//			recipe.addIngredient(1, ItemManager.getMaterialData(CivData.FISH_RAW, CivData.PUFFERFISH));
-//			Bukkit.getServer().addRecipe(recipe);
-//		}
-//		
-//		CivLog.debug("setting mercury bath...");
-//		LoreCraftableMaterial mercuryBath = LoreCraftableMaterial.getCraftMaterialFromId("mat_mercury_bath");
-//		if (mercuryBath != null) {
-//			CivLog.debug("no bath?!");
-//			ItemStack stack = LoreCraftableMaterial.spawn(mercuryBath);
-//			ShapelessRecipe recipe = new ShapelessRecipe(stack);
-//			recipe.addIngredient(1, ItemManager.getMaterialData(CivData.FISH_RAW, CivData.CLOWNFISH));
-//			Bukkit.getServer().addRecipe(recipe);
-//		}
-	}
-	
+                for (ConfigIngredient ingred : configMaterial.ingredients.values()) {
+                    ItemStack ingredStack;
+
+                    if (ingred.custom_id == null) {
+                        recipe.setIngredient(ingred.letter.charAt(0), ItemManager.getMaterialData(ingred.type_id, ingred.data));
+                        ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
+                    } else {
+                        LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
+                        if (customLoreMat == null) {
+                            CivLog.warning("Couldn't find custom material id:" + ingred.custom_id);
+                            continue;
+                        }
+                        ConfigMaterial customMat = customLoreMat.configMaterial;
+                        recipe.setIngredient(ingred.letter.charAt(0), ItemManager.getMaterialData(customMat.item_id, customMat.item_data));
+                        ingredStack = LoreMaterial.spawn(customLoreMat);
+                    }
+
+                    // Vul de matrix
+                    int i = 0;
+                    for (String row : configMaterial.shape) {
+                        for (int c = 0; c < row.length(); c++) {
+                            if (row.charAt(c) == ingred.letter.charAt(0)) {
+                                matrix[i] = ingredStack;
+                            } else if (row.charAt(c) == ' ') {
+                                matrix[i] = null; // lege slot
+                            }
+                            i++;
+                        }
+                    }
+                }
+
+                shapedRecipes.put(loreMat, matrix);
+                shapedKeys.put(getShapedRecipeKey(matrix), loreMat);
+
+                Bukkit.getServer().addRecipe(recipe);
+
+            } else { // Shapeless
+                ShapelessRecipe recipe = new ShapelessRecipe(stack);
+                LinkedList<ItemStack> items = new LinkedList<>();
+                ItemStack[] matrix = new ItemStack[9];
+                int matrixIndex = 0;
+
+                for (ConfigIngredient ingred : configMaterial.ingredients.values()) {
+                    ItemStack ingredStack;
+
+                    if (ingred.custom_id == null) {
+                        recipe.addIngredient(ingred.count, ItemManager.getMaterialData(ingred.type_id, ingred.data));
+                        ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
+                    } else {
+                        LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
+                        if (customLoreMat == null) {
+                            CivLog.warning("Couldn't configure ingredient:" + ingred.custom_id);
+                            continue;
+                        }
+                        ConfigMaterial customMat = customLoreMat.configMaterial;
+                        recipe.addIngredient(ingred.count, ItemManager.getMaterialData(customMat.item_id, customMat.item_data));
+                        ingredStack = LoreMaterial.spawn(customLoreMat);
+                    }
+
+                    for (int i = 0; i < ingred.count && matrixIndex < 9; i++) {
+                        matrix[matrixIndex] = ingredStack;
+                        matrixIndex++;
+                    }
+
+                    ingredStack.setAmount(ingred.count);
+                    items.add(ingredStack);
+                }
+
+                shapelessRecipes.put(loreMat, items);
+                shapelessKeys.put(getShapelessRecipeKey(matrix), loreMat);
+
+                Bukkit.getServer().addRecipe(recipe);
+            }
+        }
+    }
 	
 	@Override
 	public void onHit(EntityDamageByEntityEvent event) {

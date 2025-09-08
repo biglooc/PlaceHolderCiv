@@ -1,7 +1,7 @@
 name: CivCraft
 main: com.avrgaming.civcraft.main.CivCraft
 softdepends: [TitleAPI]
-version: 1.0.0 ALPHA
+version: "1.0.0-ALPHA"
 depend: [MythicMobs]
 
 commands:
@@ -20,36 +20,36 @@ commands:
     civ:
         aliases: [c]
     tc:
-        aliases:
+        aliases: []
     cc:
-        aliases:
+        aliases: []
     ac:
-        aliases:
+        aliases: []
     gc:
-        aliases:
+        aliases: []
     ad:
-        aliases:
+        aliases: []
     build:
-        aliases:
+        aliases: []
     market:
         aliases: [m]
     select:
-        aliases:
+        aliases: []
     econ:
         aliases: [money]
     pay:
-        aliases:
+        aliases: []
     here:
-        aliases:
+        aliases: []
     camp:
-        aliases:
+        aliases: []
     report:
-        aliases:
+        aliases: []
     trade:
-        aliases:
+        aliases: []
     kill:
-        aliases:
+        aliases: []
     team:
-        aliases:
+        aliases: []
     sb:
-        aliases:
+        aliases: []
