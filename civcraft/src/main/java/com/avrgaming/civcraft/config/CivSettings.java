@@ -112,10 +112,6 @@ public class CivSettings {
 	public static Map<Integer, ConfigTechItem> techItems = new HashMap<>();
 	public static Map<String, ConfigTechPotion> techPotions = new HashMap<>();
 
-	public static FileConfiguration spawnersConfig; /* spawners.yml */
-	public static Map<String, ConfigMobSpawner> spawners = new HashMap<>();
-	public static Map<String, ConfigMobSpawner> landSpawners = new HashMap<>();
-	public static Map<String, ConfigMobSpawner> waterSpawners = new HashMap<>();
 
 	public static FileConfiguration goodsConfig; /* goods.yml */
 	public static Map<String, ConfigTradeGood> goods = new HashMap<>();
@@ -419,7 +415,6 @@ public class CivSettings {
 		structureConfig = loadCivConfig("structures.yml");
 		techsConfig = loadCivConfig("techs.yml");
 		goodsConfig = loadCivConfig("goods.yml");
-		spawnersConfig = loadCivConfig("spawners.yml");
 		buffConfig = loadCivConfig("buffs.yml");
 		governmentConfig = loadCivConfig("governments.yml");
 		warConfig = loadCivConfig("war.yml");
@@ -464,7 +459,6 @@ public class CivSettings {
 		ConfigHemisphere.loadConfig(goodsConfig, hemispheres);
 		ConfigBuff.loadConfig(buffConfig, buffs);
 		ConfigWonderBuff.loadConfig(wonderConfig, wonderBuffs);
-		ConfigMobSpawner.loadConfig(spawnersConfig, spawners, landSpawners, waterSpawners);
 		ConfigTradeGood.loadConfig(goodsConfig, goods, landGoods, waterGoods);
 		ConfigGrocerLevel.loadConfig(structureConfig, grocerLevels);
 		ConfigCottageLevel.loadConfig(structureConfig, cottageLevels);
@@ -494,7 +488,6 @@ public class CivSettings {
 
 		ConfigRemovedRecipes.removeRecipes(materialsConfig, removedRecipies);
 		CivGlobal.tradeGoodPreGenerator.preGenerate();
-		CivGlobal.mobSpawnerPreGenerator.preGenerate();
 		Wall.init_settings();
 		FortifiedWall.init_settings();
 	}

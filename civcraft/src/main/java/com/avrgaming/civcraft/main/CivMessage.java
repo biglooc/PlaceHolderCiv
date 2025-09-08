@@ -40,7 +40,6 @@ import com.avrgaming.civcraft.object.Resident;
 import com.avrgaming.civcraft.object.Town;
 import com.avrgaming.civcraft.util.CivColor;
 import com.avrgaming.civcraft.util.Reflection;
-import com.connorlinfoot.titleapi.TitleAPI;
 
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -104,7 +103,7 @@ public class CivMessage {
 			}
 			if (player != null && resident != null && resident.isTitleAPI())
 			{
-				TitleAPI.sendTitle(player, fadeIn, show, fadeOut, title, subTitle);
+				player.sendTitle(title, subTitle, fadeIn, show, fadeOut);
 			}
 		}
 		send(sender, title);
