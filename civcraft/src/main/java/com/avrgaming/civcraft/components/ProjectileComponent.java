@@ -23,7 +23,6 @@ import java.util.HashSet;
 import com.avrgaming.civcraft.main.CivLog;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -37,7 +36,6 @@ import com.avrgaming.civcraft.structure.Buildable;
 import com.avrgaming.civcraft.threading.TaskMaster;
 import com.avrgaming.civcraft.util.BlockCoord;
 
-import net.minecraft.server.v1_12_R1.Vec3D;
 
 public abstract class ProjectileComponent extends Component {
 
@@ -153,9 +151,13 @@ public abstract class ProjectileComponent extends Component {
 	
 	private boolean canSee(Player player, Location loc2) {
 		Location loc1 = player.getLocation();
-		Vec3D vec1 = new Vec3D(loc1.getX(), loc1.getY() + player.getEyeHeight(), loc1.getZ());
-		Vec3D vec2 = new Vec3D(loc2.getX(), loc2.getY(), loc2.getZ());
-		return ((CraftWorld)loc1.getWorld()).getHandle().rayTrace(vec1, vec2) == null;
+		if (loc1.getWorld() == null || loc2.getWorld() == null || loc1.getWorld() != loc2.getWorld()) {
+			return false;
+		}
+		org.bukkit.util.Vector direction = loc2.toVector().subtract(loc1.toVector()).normalize();
+		double maxDistance = loc1.distance(loc2);
+		return loc1.getWorld().rayTraceBlocks(loc1.add(0, player.getEyeHeight(), 0), direction, maxDistance,
+				org.bukkit.FluidCollisionMode.NEVER, true) == null;
 	}
 	
 	protected Location adjustTurretLocation(Location turretLoc, Location playerLoc) {

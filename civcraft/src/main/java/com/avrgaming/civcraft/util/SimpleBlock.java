@@ -111,7 +111,11 @@ public class SimpleBlock {
 	
 	@SuppressWarnings("deprecation")
 	public Material getMaterial() {
-		return Material.getMaterial(type);
+		Material[] vals = Material.values();
+		if (type >= 0 && type < vals.length) {
+			return vals[type];
+		}
+		return Material.AIR;
 	}
 	
 	/**

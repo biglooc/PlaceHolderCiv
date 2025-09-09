@@ -119,7 +119,6 @@ import com.avrgaming.civcraft.util.ItemManager;
 import com.avrgaming.civcraft.util.SimpleBlock;
 import com.avrgaming.global.perks.Perk;
 
-import static net.minecraft.server.v1_12_R1.CriterionTriggers.s;
 
 public class DebugCommand extends CommandBase {
 
@@ -256,7 +255,7 @@ public class DebugCommand extends CommandBase {
 	
 	public void packet_cmd() throws CivException {
 		Player player = getPlayer();
-		player.sendPluginMessage(CivCraft.getPlugin(), "CAC", "Test Message".getBytes());
+		player.sendPluginMessage(CivCraft.getPlugin(), "civcraft:cac", "Test Message".getBytes());
 		CivMessage.sendSuccess(player, "Sent test message");
 	}
 	

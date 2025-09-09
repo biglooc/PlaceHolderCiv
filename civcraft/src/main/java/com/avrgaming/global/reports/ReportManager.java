@@ -23,7 +23,7 @@ public class ReportManager {
 	
 	public static String TABLE_NAME = "REPORTS";
 	public static void init() throws SQLException {
-		System.out.println("================= REPORTS INIT ======================");
+		CivLog.info("================= REPORTS INIT ======================");
 		
 		// Check/Build SessionDB tables				
 		if (!SQL.hasGlobalTable(TABLE_NAME)) {
@@ -43,7 +43,7 @@ public class ReportManager {
 			CivLog.info(TABLE_NAME+" table OK!");
 		}		
 				
-		System.out.println("==================================================");
+		CivLog.info("==================================================");
 	}
 	
 	public static String getReportTypes() {
@@ -96,7 +96,7 @@ public class ReportManager {
 			Date now = new Date();
 			
 			s.setString(1, name);
-			s.setString(2, Bukkit.getServerName());
+			s.setString(2, Bukkit.getServer().getName());
 			s.setString(3, reportType);
 			s.setString(4, message);
 			s.setString(5, reportedBy);

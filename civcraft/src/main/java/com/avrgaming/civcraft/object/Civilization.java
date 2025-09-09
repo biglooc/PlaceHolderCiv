@@ -959,7 +959,7 @@ public class Civilization extends SQLObject {
 		//If we couldn't find a close color withing the max retries, pick any old color as a failsafe.
 		if (found == false) {
 			c = rand.nextInt();
-			System.out.println(CivSettings.localize.localizedString("civ_colorExhaustion"));
+			CivLog.info(CivSettings.localize.localizedString("civ_colorExhaustion"));
 		}
 		
 		return c;

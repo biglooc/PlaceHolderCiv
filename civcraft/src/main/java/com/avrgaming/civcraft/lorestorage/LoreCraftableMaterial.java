@@ -29,6 +29,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.NamespacedKey;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.avrgaming.civcraft.config.CivSettings;
@@ -40,7 +42,8 @@ import com.avrgaming.civcraft.main.CivData;
 import com.avrgaming.civcraft.main.CivLog;
 import com.avrgaming.civcraft.object.BuildableDamageBlock;
 import com.avrgaming.civcraft.util.ItemManager;
-import com.mysql.jdbc.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import java.nio.charset.StandardCharsets;
 
 import gpl.AttributeUtil;
 
@@ -205,7 +208,15 @@ public class LoreCraftableMaterial extends LoreMaterial {
 		}
 	}
 
-	public static void buildRecipes() {
+	
+ 	private static NamespacedKey keyForRecipe(LoreCraftableMaterial loreMat, boolean shaped) {
+ 		JavaPlugin plugin = JavaPlugin.getProvidingPlugin(LoreCraftableMaterial.class);
+ 		String type = shaped ? "shaped" : "shapeless";
+ 		String key = ("civ_" + type + "_" + loreMat.getConfigId()).toLowerCase();
+ 		return new NamespacedKey(plugin, key);
+ 	}
+	
+ 	public static void buildRecipes() {
 		/*
 		 * Loads in materials from configuration file.
 		 */
@@ -215,45 +226,118 @@ public class LoreCraftableMaterial extends LoreMaterial {
 			}
 			
 			ItemStack stack = LoreMaterial.spawn(loreMat);			
+			if (stack == null || stack.getType() == Material.AIR) {
+				CivLog.warning("Skipping recipe for material '" + loreMat.getConfigId() + "' because result item is AIR or null. Check item_id mapping.");
+				continue;
+			}
 			ConfigMaterial configMaterial = loreMat.configMaterial;
 			
 			if (loreMat.isShaped()) {
 				ItemStack[] matrix = new ItemStack[9];
-				@SuppressWarnings("deprecation")
-				ShapedRecipe recipe = new ShapedRecipe(stack);
-				recipe.shape(configMaterial.shape[0], configMaterial.shape[1], configMaterial.shape[2]);
+	    NamespacedKey keyShape = keyForRecipe(loreMat, true);
+				ShapedRecipe recipe = new ShapedRecipe(keyShape, stack);
+
+				// Validate and sanitize shape to avoid Paper 1.21 crash on empty patterns
+				if (configMaterial.shape == null || configMaterial.shape.length == 0) {
+					CivLog.warning("Skipping shaped recipe for material '" + loreMat.getConfigId() + "' because shape is null/empty.");
+					continue;
+				}
+				// Trim and filter empty rows, ensure at least one non-space char exists
+				LinkedList<String> rows = new LinkedList<>();
+				for (String r : configMaterial.shape) {
+					if (r == null) continue;
+					String trimmed = r.replaceAll("^\\s+|\\s+$", "");
+					// keep original spaces in between but drop fully empty rows
+					if (trimmed.length() == 0) continue;
+					rows.add(r);
+				}
+				if (rows.isEmpty()) {
+					CivLog.warning("Skipping shaped recipe for material '" + loreMat.getConfigId() + "' because all shape rows are empty.");
+					continue;
+				}
+				// Ensure all rows have same length and max 3 rows
+				int width = rows.getFirst().length();
+				LinkedList<String> normalized = new LinkedList<>();
+				for (String r : rows) {
+					if (r.length() != width) {
+						CivLog.warning("Skipping shaped recipe for material '" + loreMat.getConfigId() + "' because shape rows have inconsistent widths.");
+						normalized.clear();
+						break;
+					}
+					if (normalized.size() < 3) normalized.add(r);
+				}
+				if (normalized.isEmpty()) {
+					continue;
+				}
+				recipe.shape(normalized.toArray(new String[0]));
+				// Collect used letters and ensure at least one non-space is used
+				java.util.HashSet<Character> used = new java.util.HashSet<>();
+				for (String r : normalized) {
+					for (int i = 0; i < r.length(); i++) {
+						char ch = r.charAt(i);
+						if (ch != ' ') used.add(ch);
+					}
+				}
+				if (used.isEmpty()) {
+					CivLog.warning("Skipping shaped recipe for material '" + loreMat.getConfigId() + "' because pattern contains only spaces.");
+					continue;
+				}
+				// Track provided ingredient symbols while we set ingredients next
+				java.util.HashSet<Character> provided = new java.util.HashSet<>();
 				
 				/* Setup the ingredients. */
 				for (ConfigIngredient ingred : configMaterial.ingredients.values()) {
 					ItemStack ingredStack = null;
 
 					if (ingred.custom_id == null) {
-						recipe.setIngredient(ingred.letter.charAt(0), ItemManager.getMaterialData(ingred.type_id, ingred.data));
+						org.bukkit.material.MaterialData md = ItemManager.getMaterialData(ingred.type_id, ingred.data);
+						Material mat = md.getItemType();
+						if (mat == null || mat == Material.AIR) {
+							CivLog.warning("Skipping AIR/null shaped ingredient "+ingred.type_id+":"+ingred.data+" for material:"+configMaterial.id);
+							continue;
+						}
+						recipe.setIngredient(ingred.letter.charAt(0), md);
+						provided.add(ingred.letter.charAt(0));
 						ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
+						if (ingredStack == null || ingredStack.getType() == Material.AIR) {
+							ingredStack = null;
+						}
 					} else{
 						LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
 						if (customLoreMat == null) {
 							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
+							continue;
 						}
 						
 						ConfigMaterial customMat = customLoreMat.configMaterial;
 						if (customMat != null) {
-							recipe.setIngredient(ingred.letter.charAt(0), ItemManager.getMaterialData(customMat.item_id, customMat.item_data));
+							org.bukkit.material.MaterialData md = ItemManager.getMaterialData(customMat.item_id, customMat.item_data);
+							Material mat = md.getItemType();
+							if (mat == null || mat == Material.AIR) {
+								CivLog.warning("Skipping AIR/null shaped custom ingredient "+ingred.custom_id+" for material:"+configMaterial.id);
+								continue;
+							}
+							recipe.setIngredient(ingred.letter.charAt(0), md);
 						} else {
 							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
+							continue;
 						}
 
 						ingredStack = LoreMaterial.spawn(customLoreMat);
+						if (ingredStack == null || ingredStack.getType() == Material.AIR) {
+							ingredStack = null;
+						}
 					}
-				
-					/* Add this incred to the shape. */
+					
+					/* Add this ingredient to the matrix based on normalized shape. */
 					int i = 0;
-					for (String row : configMaterial.shape) {
+					for (String row : normalized) {
 						for (int c = 0; c < row.length(); c++) {
-							if (row.charAt(c) == ingred.letter.charAt(0)) {
+							char ch = row.charAt(c);
+							if (ch == ingred.letter.charAt(0)) {
 								matrix[i] = ingredStack;
-							} else if (row.charAt(c) == ' '){
-								matrix[i] = new ItemStack(Material.AIR, 0, (short)-1);
+							} else if (ch == ' '){
+								matrix[i] = null; // leave empty slots as null
 							}
 							i++;
 						}
@@ -261,6 +345,19 @@ public class LoreCraftableMaterial extends LoreMaterial {
 				
 				}
 				
+				// Ensure every used shape symbol has a provided ingredient mapping
+				boolean missingSymbol = false;
+				for (Character ch : used) {
+					if (ch == ' ') continue;
+					if (!provided.contains(ch)) {
+						CivLog.warning("Skipping shaped recipe for material '" + loreMat.getConfigId() + "' because no ingredient is defined for symbol '"+ch+"'.");
+						missingSymbol = true;
+						break;
+					}
+				}
+				if (missingSymbol) {
+					continue;
+				}
 				shapedRecipes.put(loreMat, matrix);
 				String key = getShapedRecipeKey(matrix);
 				shapedKeys.put(key, loreMat);
@@ -270,8 +367,8 @@ public class LoreCraftableMaterial extends LoreMaterial {
 				Bukkit.getServer().addRecipe(recipe);
 			} else {
 				/* Shapeless Recipe */
-				@SuppressWarnings("deprecation")
-				ShapelessRecipe recipe = new ShapelessRecipe(stack);
+    NamespacedKey keyShapeless = keyForRecipe(loreMat, false);
+				ShapelessRecipe recipe = new ShapelessRecipe(keyShapeless, stack);
 				LinkedList<ItemStack> items = new LinkedList<ItemStack>();
 				ItemStack[] matrix = new ItemStack[9];
 				int matrixIndex = 0;
@@ -282,24 +379,44 @@ public class LoreCraftableMaterial extends LoreMaterial {
 					
 					try {
 					if (ingred.custom_id == null) {
-						recipe.addIngredient(ingred.count, ItemManager.getMaterialData(ingred.type_id, ingred.data));
+						org.bukkit.material.MaterialData md = ItemManager.getMaterialData(ingred.type_id, ingred.data);
+						Material mat = md.getItemType();
+						if (mat == null || mat == Material.AIR) {
+							CivLog.warning("Skipping AIR/null ingredient "+ingred.type_id+":"+ingred.data+" for material:"+configMaterial.id);
+							continue;
+						}
+						recipe.addIngredient(ingred.count, md);
 						ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
+						if (ingredStack == null || ingredStack.getType() == Material.AIR) {
+							ingredStack = null; // ensure no AIR entries in matrix/items
+						}
 					} else {
 						LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
 						if (customLoreMat == null) {
 							CivLog.error("Couldn't configure ingredient:"+ingred.custom_id+" in config mat:"+configMaterial.id);
+							continue;
 						}
 						ConfigMaterial customMat = customLoreMat.configMaterial;
 						if (customMat != null) {
-							recipe.addIngredient(ingred.count, ItemManager.getMaterialData(customMat.item_id, customMat.item_data));
+							org.bukkit.material.MaterialData md = ItemManager.getMaterialData(customMat.item_id, customMat.item_data);
+							Material mat = md.getItemType();
+							if (mat == null || mat == Material.AIR) {
+								CivLog.warning("Skipping AIR/null custom ingredient "+ingred.custom_id+" for material:"+configMaterial.id);
+								continue;
+							}
+							recipe.addIngredient(ingred.count, md);
 							ingredStack = LoreMaterial.spawn(customLoreMat);
+							if (ingredStack == null || ingredStack.getType() == Material.AIR) {
+								ingredStack = null;
+							}
 						} else {
 							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
+							continue;
 						}
 					}
 					} catch (IllegalArgumentException e) {
 						CivLog.warning("Trying to process ingredient:"+ingred.type_id+":"+ingred.custom_id+" for material:"+configMaterial.id);
-						throw e;
+						continue; // skip bad ingredient instead of failing plugin enable
 					}
 					
 					if (ingredStack != null) {
@@ -659,7 +776,7 @@ public class LoreCraftableMaterial extends LoreMaterial {
 	}
 
 	public static ItemStack deserializeEnhancements(ItemStack stack, String serial) {
-		String in = StringUtils.toAsciiString(Base64Coder.decode(serial));
+		String in = new String(Base64Coder.decode(serial), StandardCharsets.UTF_8);
 		String[] enhancementsStrs = in.split(",");
 		
 		for (String enhString : enhancementsStrs) {

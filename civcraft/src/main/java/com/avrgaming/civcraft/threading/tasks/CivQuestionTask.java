@@ -37,8 +37,9 @@ public class CivQuestionTask implements Runnable {
 	long timeout; /* Timeout after question expires. */
 	QuestionResponseInterface finishedFunction;
 	
-	private String response = new String(); /* Response to the question. */
-	private Boolean responded = new Boolean(false); /*Question was answered. */
+	private String response = ""; /* Response to the question. */
+	private volatile boolean responded = false; /* Question was answered. */
+	private final Object responseLock = new Object();
 	
 	public CivQuestionTask(Civilization askedciv, Civilization questionciv, String question, long timeout, 
 			QuestionResponseInterface finishedFunction) {
@@ -112,27 +113,23 @@ public class CivQuestionTask implements Runnable {
 	}
 	
 	public Boolean getResponded() {
-		synchronized(responded) {
-			return responded;
-		}
+		return responded;
 	}
 
 	public void setResponded(Boolean response) {
-		synchronized(this.responded) {
-			this.responded = response;
-		}
+		this.responded = (response != null && response);
 	}
 
 	public String getResponse() {
-		synchronized(response) {
+		synchronized(responseLock) {
 			return response;
 		}
 	}
 
 	public void setResponse(String response) {
-		synchronized(this.response) {
-			setResponded(true);
+		synchronized(responseLock) {
 			this.response = response;
+			this.responded = true;
 		}
 	}
 	

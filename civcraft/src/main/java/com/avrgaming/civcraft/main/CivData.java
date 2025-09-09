@@ -26,10 +26,11 @@ import com.avrgaming.civcraft.exception.InvalidBlockLocation;
 import com.avrgaming.civcraft.util.BlockSnapshot;
 import com.avrgaming.civcraft.util.ItemManager;
 
-import static com.sk89q.worldedit.blocks.BlockID.STATIONARY_LAVA;
-import static com.sk89q.worldedit.blocks.BlockID.STATIONARY_WATER;
 
 public class CivData {
+	// Legacy stationary IDs (formerly from WorldEdit BlockID)
+	public static final int STATIONARY_WATER = 9;
+	public static final int STATIONARY_LAVA = 11;
 	//TODO make this an enum
 	public static final int WALL_SIGN = 68;
 	public static final int SIGN = 63;
@@ -437,7 +438,7 @@ public class CivData {
 //		}
 		
 		
-		System.out.println("Warning, unknown sign post direction:"+data);
+		CivLog.warning("Warning, unknown sign post direction:"+data);
 		return CHEST_SOUTH;
 	}
 	

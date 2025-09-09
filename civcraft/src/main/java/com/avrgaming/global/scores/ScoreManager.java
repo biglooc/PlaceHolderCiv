@@ -35,15 +35,15 @@ public class ScoreManager {
 	public static String CIV_TABLE_NAME = "SCORES_CIVS";
 	
 	public static String getCivKey(Civilization civ) {
-		return Bukkit.getServerName()+":"+civ.getName();
+		return Bukkit.getServer().getName()+":"+civ.getName();
 	}
 	
 	public static String getTownKey(Town town) {
-		return Bukkit.getServerName()+":"+town.getName();
+		return Bukkit.getServer().getName()+":"+town.getName();
 	}
 
 	public static void init() throws SQLException {
-		System.out.println("================= SCORE_TOWN INIT ======================");
+		CivLog.info("================= SCORE_TOWN INIT ======================");
 		
 		// Check/Build SessionDB tables				
 		if (!SQL.hasGlobalTable(TOWN_TABLE_NAME)) {
@@ -63,9 +63,9 @@ public class ScoreManager {
 			CivLog.info(TOWN_TABLE_NAME+" table OK!");
 		}		
 				
-		System.out.println("==================================================");
+		CivLog.info("==================================================");
 
-		System.out.println("================= SCORE_CIV INIT ======================");
+		CivLog.info("================= SCORE_CIV INIT ======================");
 		
 		// Check/Build SessionDB tables				
 		if (!SQL.hasGlobalTable(CIV_TABLE_NAME)) {
@@ -85,7 +85,7 @@ public class ScoreManager {
 			CivLog.info(CIV_TABLE_NAME+" table OK!");
 		}		
 				
-		System.out.println("==================================================");
+		CivLog.info("==================================================");
 	}
 	
 	public static void UpdateScore(Civilization civ, int points) throws SQLException {
@@ -99,7 +99,7 @@ public class ScoreManager {
 			s = global_context.prepareStatement(query);
 		
 			s.setString(1, getCivKey(civ));
-			s.setString(2, Bukkit.getServerName());
+			s.setString(2, Bukkit.getServer().getName());
 			s.setInt(3, civ.getId());
 			s.setString(4, civ.getName());
 			s.setString(5, civ.getCapitolName());
@@ -130,7 +130,7 @@ public class ScoreManager {
 			s = global_context.prepareStatement(query);
 		
 			s.setString(1, getTownKey(town));
-			s.setString(2, Bukkit.getServerName());
+			s.setString(2, Bukkit.getServer().getName());
 			s.setInt(3, town.getId());
 			s.setString(4, town.getName());
 			s.setString(5, town.getCiv().getName());

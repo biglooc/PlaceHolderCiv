@@ -7,20 +7,28 @@ allprojects {
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://jitpack.io")
     }
 }
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
-}
-tasks.withType<JavaCompile> {
-    options.release.set(8)
 }
 subprojects {
     apply(plugin = "java")
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(providers.gradleProperty("javaVersion").get()))
+    }
+
+    // Exclude legacy NMS-heavy listener from civcraft module to allow 1.21 build
+    if (project.name == "civcraft") {
+        the<SourceSetContainer>().named("main") {
+            java.srcDir("src/main/java")
+            java.setSrcDirs(java.srcDirs)
+            // No exclusions; ensure all sources are compiled for 1.21
+            // java.exclude("com/avrgaming/civcraft/listener/BlockListener.java")
+        }
     }
 
     subprojects {

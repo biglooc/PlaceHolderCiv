@@ -363,7 +363,7 @@ public class Blacksmith extends Structure {
 	public void depositSmelt(Player player, ItemStack itemsInHand) throws CivException {
 		
 		// Make sure that the item is a valid smelt type.
-		if (!Blacksmith.canSmelt(itemsInHand.getTypeId())) {
+		if (!Blacksmith.canSmelt(ItemManager.getId(itemsInHand))) {
 			throw new CivException (CivSettings.localize.localizedString("blacksmith_smelt_onlyOres"));
 		}
 		
@@ -373,7 +373,7 @@ public class Blacksmith extends Structure {
 			throw new CivException (CivSettings.localize.localizedString("blacksmith_smelt_notMember"));
 		}
 		
-		String value = convertType(itemsInHand.getTypeId())+":"+(itemsInHand.getAmount()*Blacksmith.YIELD_RATE);
+		String value = convertType(ItemManager.getId(itemsInHand))+":"+(itemsInHand.getAmount()*Blacksmith.YIELD_RATE);
 		String key = getkey(player, this, "smelt");
 		
 		// Store entry in session DB
@@ -383,11 +383,26 @@ public class Blacksmith extends Structure {
 		player.getInventory().removeItem(itemsInHand);
 		//BukkitTools.sch
 		// Schedule a message to notify the player when the smelting is finished.
-		BukkitObjects.scheduleAsyncDelayedTask(new NotificationTask(player.getName(), 
-				CivColor.LightGreen+CivSettings.localize.localizedString("var_blacksmith_smelt_asyncNotify",itemsInHand.getAmount(),CivData.getDisplayName(itemsInHand.getTypeId()))), 
-				TimeTools.toTicks(SMELT_TIME_SECONDS));
+		BukkitObjects.scheduleAsyncDelayedTask(
+				new NotificationTask(
+						player.getName(),
+						CivColor.LightGreen + CivSettings.localize.localizedString(
+								"var_blacksmith_smelt_asyncNotify",
+								itemsInHand.getAmount(),
+								CivData.getDisplayName(ItemManager.getId(itemsInHand))
+						)
+				),
+				TimeTools.toTicks(SMELT_TIME_SECONDS)
+		);
 		
-		CivMessage.send(player,CivColor.LightGreen+ CivSettings.localize.localizedString("var_blacksmith_smelt_depositSuccess",itemsInHand.getAmount(),CivData.getDisplayName(itemsInHand.getTypeId())));
+		CivMessage.send(
+				player,
+				CivColor.LightGreen + CivSettings.localize.localizedString(
+						"var_blacksmith_smelt_depositSuccess",
+						itemsInHand.getAmount(),
+						CivData.getDisplayName(ItemManager.getId(itemsInHand))
+				)
+		);
 		
 		player.updateInventory();
 	}
@@ -442,7 +457,7 @@ public class Blacksmith extends Structure {
 				continue;
 			}
 			
-			ItemStack stack = new ItemStack(itemId, (int)amount, (short)0);
+			ItemStack stack = ItemManager.createItemStack(itemId, (int)amount);
 			if (stack != null)
 				leftovers = inv.addItem(stack);
 	

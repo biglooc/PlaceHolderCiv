@@ -1634,47 +1634,28 @@ public class CivGlobal {
 	}
 
 	public static boolean willInstantBreak(Material type) {
-
+		// Updated for 1.21: use modern material names and tags; keep semantics approximate.
+		if (type.isAir()) return true;
+		// Plants and flowers
+  if (org.bukkit.Tag.SMALL_FLOWERS.isTagged(type) || org.bukkit.Tag.TALL_FLOWERS.isTagged(type) || org.bukkit.Tag.SAPLINGS.isTagged(type)) return true;
+		// Redstone and utilities
 		switch (type) {
-		case BED_BLOCK:
-		case BROWN_MUSHROOM:
-		case CROPS:
-		case DEAD_BUSH:
-		case DIODE:
-		case DIODE_BLOCK_OFF:
-		case DIODE_BLOCK_ON:
-		case FIRE:
-		case FLOWER_POT:
-		case FLOWER_POT_ITEM:
-		case GLASS:
-		case GRASS:
-		case LEAVES:
-		case LEVER:
-		case LONG_GRASS:
-		case MELON_STEM:
-		case NETHER_STALK:
-		case NETHER_WARTS:
-		case PUMPKIN_STEM:
-		case REDSTONE:
-		case REDSTONE_TORCH_OFF:
-		case REDSTONE_TORCH_ON:
-		case REDSTONE_WIRE:
-		case SAPLING:
-		case SKULL:
-		case SKULL_ITEM:
-		case SNOW:
-		case SUGAR_CANE_BLOCK:
-		case THIN_GLASS:
-		case TNT:		
-		case TORCH:
-		case TRIPWIRE:
-		case TRIPWIRE_HOOK:
-		case VINE:
-		case WATER_LILY:
-		case YELLOW_FLOWER:
-			return true;
-		default:
-			return false;
+			case REDSTONE_WIRE:
+			case REDSTONE_TORCH:
+			case REDSTONE_WALL_TORCH:
+			case LEVER:
+			case TORCH:
+			case SOUL_TORCH:
+			case SOUL_WALL_TORCH:
+			case TRIPWIRE:
+			case TRIPWIRE_HOOK:
+			case VINE:
+			case LILY_PAD:
+			case SNOW:
+			case FIRE:
+				return true;
+			default:
+				return false;
 		}
 	}
 

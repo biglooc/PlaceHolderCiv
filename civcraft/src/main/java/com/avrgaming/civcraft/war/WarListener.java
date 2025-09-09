@@ -74,13 +74,13 @@ public class WarListener implements Listener {
 		}
 				
 		if (event.getBlock().getType().equals(Material.DIRT) || 
-			event.getBlock().getType().equals(Material.GRASS) ||
+			event.getBlock().getType().equals(Material.GRASS_BLOCK) ||
 			event.getBlock().getType().equals(Material.SAND) ||
 			event.getBlock().getType().equals(Material.GRAVEL) ||
 			event.getBlock().getType().equals(Material.TORCH) ||
-			event.getBlock().getType().equals(Material.REDSTONE_TORCH_OFF) ||
-			event.getBlock().getType().equals(Material.REDSTONE_TORCH_ON) ||
-			event.getBlock().getType().equals(Material.REDSTONE) ||
+			event.getBlock().getType().equals(Material.REDSTONE_TORCH) ||
+			event.getBlock().getType().equals(Material.REDSTONE_WALL_TORCH) ||
+			event.getBlock().getType().equals(Material.REDSTONE_WIRE) ||
 			event.getBlock().getType().equals(Material.TNT) ||
 			event.getBlock().getType().equals(Material.LADDER) ||
 			event.getBlock().getType().equals(Material.VINE) ||
@@ -119,13 +119,13 @@ public class WarListener implements Listener {
 		}
 				
 		if (event.getBlock().getType().equals(Material.DIRT) || 
-			event.getBlock().getType().equals(Material.GRASS) ||
+			event.getBlock().getType().equals(Material.GRASS_BLOCK) ||
 			event.getBlock().getType().equals(Material.SAND) ||
 			event.getBlock().getType().equals(Material.GRAVEL) ||
 			event.getBlock().getType().equals(Material.TORCH) ||
-			event.getBlock().getType().equals(Material.REDSTONE_TORCH_OFF) ||
-			event.getBlock().getType().equals(Material.REDSTONE_TORCH_ON) ||
-			event.getBlock().getType().equals(Material.REDSTONE) ||
+			event.getBlock().getType().equals(Material.REDSTONE_TORCH) ||
+			event.getBlock().getType().equals(Material.REDSTONE_WALL_TORCH) ||
+			event.getBlock().getType().equals(Material.REDSTONE_WIRE) ||
 			event.getBlock().getType().equals(Material.LADDER) ||
 			event.getBlock().getType().equals(Material.VINE) ||
 			event.getBlock().getType().equals(Material.TNT)) {
@@ -134,7 +134,7 @@ public class WarListener implements Listener {
 				return;
 			}
 			
-			event.getBlock().getWorld().spawnFallingBlock(event.getBlock().getLocation(), event.getBlock().getType(), ItemManager.getData(event.getBlock()));
+			event.getBlock().getWorld().spawnFallingBlock(event.getBlock().getLocation(), event.getBlock().getBlockData());
 			event.getBlock().setType(Material.AIR);
 			
 			return;
@@ -194,8 +194,8 @@ public class WarListener implements Listener {
 			return;
 		}
 
-		if (event.getEntityType().equals(EntityType.PRIMED_TNT) ||
-				event.getEntityType().equals(EntityType.MINECART_TNT) || event.getEntityType().equals(EntityType.CREEPER)) {
+		if (event.getEntityType().equals(EntityType.TNT) ||
+				event.getEntityType().equals(EntityType.TNT_MINECART) || event.getEntityType().equals(EntityType.CREEPER)) {
 
 			HashSet<Buildable> structuresHit = new HashSet<Buildable>();
 		

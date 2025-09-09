@@ -55,36 +55,36 @@ public class Library extends Structure {
 		
 		// Armor Enchantments
 		if (name.equalsIgnoreCase("protection")) {
-			return Enchantment.PROTECTION_ENVIRONMENTAL;
+			return Enchantment.PROTECTION;
 		}
 		if (name.equalsIgnoreCase("fire_protection")) {
-			return Enchantment.PROTECTION_FIRE;
+			return Enchantment.FIRE_PROTECTION;
 		}
 		if (name.equalsIgnoreCase("feather_falling")) {
-			return Enchantment.PROTECTION_FALL;
+			return Enchantment.FEATHER_FALLING;
 		}
 		if (name.equalsIgnoreCase("blast_protection")) {
-			return Enchantment.PROTECTION_EXPLOSIONS;
+			return Enchantment.BLAST_PROTECTION;
 		}
 		if (name.equalsIgnoreCase("projectile_protection")) {
-			return Enchantment.PROTECTION_PROJECTILE;
+			return Enchantment.PROJECTILE_PROTECTION;
 		}
 		if (name.equalsIgnoreCase("respiration")) {
-			return Enchantment.OXYGEN;
+			return Enchantment.RESPIRATION;
 		}
 		if (name.equalsIgnoreCase("aqua_affinity")) {
-			return Enchantment.WATER_WORKER;
+			return Enchantment.AQUA_AFFINITY;
 		}
 		
 		// Sword Enchantments
 		if (name.equalsIgnoreCase("sharpness")) {
-			return Enchantment.DAMAGE_ALL;
+			return Enchantment.SHARPNESS;
 		}
 		if (name.equalsIgnoreCase("smite")) {
-			return Enchantment.DAMAGE_UNDEAD;
+			return Enchantment.SMITE;
 		}
 		if (name.equalsIgnoreCase("bane_of_arthropods")) {
-			return Enchantment.DAMAGE_ARTHROPODS;
+			return Enchantment.BANE_OF_ARTHROPODS;
 		}
 		if (name.equalsIgnoreCase("knockback")) {
 			return Enchantment.KNOCKBACK;
@@ -93,35 +93,35 @@ public class Library extends Structure {
 			return Enchantment.FIRE_ASPECT;
 		}
 		if (name.equalsIgnoreCase("looting")) {
-			return Enchantment.LOOT_BONUS_MOBS;
+			return Enchantment.LOOTING;
 		}
 		
 		// Tool Enchantments
 		if (name.equalsIgnoreCase("efficiency")) {
-			return Enchantment.DIG_SPEED;
+			return Enchantment.EFFICIENCY;
 		}
 		if (name.equalsIgnoreCase("silk_touch")) {
 			return Enchantment.SILK_TOUCH;
 		}
 		if (name.equalsIgnoreCase("unbreaking")) {
-			return Enchantment.DURABILITY;
+			return Enchantment.UNBREAKING;
 		}
 		if (name.equalsIgnoreCase("fortune")) {
-			return Enchantment.LOOT_BONUS_BLOCKS;
+			return Enchantment.FORTUNE;
 		}
 		
 		// Bow Enchantments
 		if (name.equalsIgnoreCase("power")) {
-			return Enchantment.ARROW_DAMAGE;
+			return Enchantment.POWER;
 		}
 		if (name.equalsIgnoreCase("punch")) {
-			return Enchantment.ARROW_KNOCKBACK;
+			return Enchantment.PUNCH;
 		}
 		if (name.equalsIgnoreCase("flame")) {
-			return Enchantment.ARROW_FIRE;
+			return Enchantment.FLAME;
 		}
 		if (name.equalsIgnoreCase("infinity")) {
-			return Enchantment.ARROW_INFINITE;
+			return Enchantment.INFINITY;
 		}
 		
 		return null;

@@ -20,6 +20,7 @@ package com.avrgaming.civcraft.structure.farm;
 import java.util.concurrent.TimeUnit;
 
 import com.avrgaming.civcraft.main.CivGlobal;
+import com.avrgaming.civcraft.main.CivLog;
 import com.avrgaming.civcraft.threading.CivAsyncTask;
 
 public class FarmGrowthSyncTask extends CivAsyncTask {
@@ -34,14 +35,14 @@ public class FarmGrowthSyncTask extends CivAsyncTask {
 		//Queue<FarmChunk> regrow = new LinkedList<FarmChunk>();
 		for (FarmChunk fc : CivGlobal.getFarmChunks()) {
 			if (fc.getTown() == null || fc.getStruct() == null) {
-				System.out.println("FarmChunkError: Could not process farm chunk, town or struct was null. Orphan?");
+				CivLog.warning("FarmChunkError: Could not process farm chunk, town or struct was null. Orphan?");
 				continue;
 			}
 						
 			/* Since we're now async, we can wait on this lock. */
 			try {
 				if(!fc.lock.tryLock(TIMEOUT, TimeUnit.MILLISECONDS)) {
-					System.out.println("FarmChunkError: Lock Error");
+					CivLog.warning("FarmChunkError: Lock Error");
 					continue;
 				}
 			} catch (InterruptedException e1) {

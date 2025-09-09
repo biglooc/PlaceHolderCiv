@@ -1,766 +1,211 @@
 package gpl;
 
-import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 
 import com.avrgaming.civcraft.loreenhancements.LoreEnhancement;
-import com.avrgaming.civcraft.main.CivData;
-import com.avrgaming.civcraft.util.ItemManager;
-import com.avrgaming.civcraft.util.NBTStaticHelper;
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
 
-import net.minecraft.server.v1_12_R1.NBTBase;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.NBTTagInt;
-import net.minecraft.server.v1_12_R1.NBTTagList;
-import net.minecraft.server.v1_12_R1.NBTTagString;
- 
+import java.util.*;
+
+/**
+ * Modern, NMS-free replacement for the legacy 1.12 AttributeUtil used by CivCraft.
+ * This implementation stores custom data in PersistentDataContainer, manipulates
+ * display name and lore via ItemMeta, and offers minimal shims for the old
+ * Attribute/AttributeType API used by some components to build items.
+ */
 public class AttributeUtil {
-    public enum Operation {
-        ADD_NUMBER(0),
-        MULTIPLY_PERCENTAGE(1),
-        ADD_PERCENTAGE(2);
-        private int id;
-        
-        private Operation(int id) {
-            this.id = id;
-        }
-        
-        public int getId() {
-            return id;
-        }
-        
-        public static Operation fromId(int id) {
-            // Linear scan is very fast for small N
-            for (Operation op : values()) {
-                if (op.getId() == id) {
-                    return op;
-                }
-            }
-            throw new IllegalArgumentException("Corrupt operation ID " + id + " detected.");
+    // Backing item
+    private ItemStack stack;
+
+    public AttributeUtil(ItemStack stack) {
+        this.stack = stack == null ? new ItemStack(org.bukkit.Material.AIR) : stack.clone();
+    }
+
+    public ItemStack getStack() {
+        return stack;
+    }
+
+    // ===================== Utility =====================
+    private static Plugin getPlugin() { return Bukkit.getPluginManager().getPlugin("CivCraft"); }
+    private static NamespacedKey key(String k) {
+        Plugin p = getPlugin();
+        if (p != null) return new NamespacedKey(p, ("civ_"+k).toLowerCase());
+        return NamespacedKey.minecraft(("civcraft_"+k).toLowerCase());
+    }
+    private static NamespacedKey enhKey(String name, String subkey) {
+        String k = "enh_" + name + (subkey != null ? ("_" + subkey) : "");
+        return key(k);
+    }
+
+    // ===================== Name/Lore =====================
+    public void setName(String name) {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(name);
+            stack.setItemMeta(meta);
         }
     }
-    
-   // private List<String> lore = new LinkedList<String>();
-    
-    
+    public String getName() {
+        ItemMeta meta = stack.getItemMeta();
+        return meta != null ? meta.getDisplayName() : null;
+    }
+
+    public void addLore(String str) {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta == null) return;
+        List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
+        lore.add(str);
+        meta.setLore(lore);
+        stack.setItemMeta(meta);
+    }
+    public void addLore(String[] lore) { if (lore != null) for (String s : lore) addLore(s); }
+    public String[] getLore() {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta == null || !meta.hasLore()) return null;
+        List<String> lore = meta.getLore();
+        return lore == null ? null : lore.toArray(new String[0]);
+    }
+    public void setLore(String string) { setLore(new String[]{string}); }
+    public void setLore(String[] strings) {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta == null) return;
+        meta.setLore(strings == null ? null : Arrays.asList(strings));
+        stack.setItemMeta(meta);
+    }
+    public void setLore(java.util.LinkedList<String> strings) { setLore(strings == null ? null : strings.toArray(new String[0])); }
+
+    // ===================== CivCraft custom properties (PDC) =====================
+    public void setCivCraftProperty(String k, String value) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return;
+        meta.getPersistentDataContainer().set(key(k), PersistentDataType.STRING, value);
+        stack.setItemMeta(meta);
+    }
+    public String getCivCraftProperty(String k) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return null;
+        return meta.getPersistentDataContainer().get(key(k), PersistentDataType.STRING);
+    }
+    public void removeCivCraftProperty(String k) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return;
+        meta.getPersistentDataContainer().remove(key(k));
+        stack.setItemMeta(meta);
+    }
+    public void removeCivCraftCompound() { /* no-op in PDC model */ }
+
+    // ===================== Enhancements (PDC-backed) =====================
+    public void addEnhancement(String enhancementName, String k, String value) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return;
+        meta.getPersistentDataContainer().set(enhKey(enhancementName, "name"), PersistentDataType.STRING, enhancementName);
+        if (k != null) meta.getPersistentDataContainer().set(enhKey(enhancementName, k), PersistentDataType.STRING, value);
+        stack.setItemMeta(meta);
+    }
+    public void setEnhancementData(String enhancementName, String k, String value) { addEnhancement(enhancementName, k, value); }
+    public String getEnhancementData(String enhName, String k) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return null;
+        return meta.getPersistentDataContainer().get(enhKey(enhName, k), PersistentDataType.STRING);
+    }
+    public boolean hasEnhancement(String enhName) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return false;
+        return meta.getPersistentDataContainer().has(enhKey(enhName, "name"), PersistentDataType.STRING);
+    }
+    public boolean hasEnhancements() {
+        for (String name : com.avrgaming.civcraft.loreenhancements.LoreEnhancement.enhancements.keySet()) {
+            if (hasEnhancement(name)) return true;
+        }
+        return false;
+    }
+    public java.util.LinkedList<LoreEnhancement> getEnhancements() {
+        java.util.LinkedList<LoreEnhancement> list = new java.util.LinkedList<>();
+        for (Map.Entry<String, LoreEnhancement> e : com.avrgaming.civcraft.loreenhancements.LoreEnhancement.enhancements.entrySet()) {
+            if (hasEnhancement(e.getKey())) list.add(e.getValue());
+        }
+        return list;
+    }
+
+    // ===================== Leather armor color =====================
+    public void setColor(Long color) {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta instanceof LeatherArmorMeta lam) {
+            lam.setColor(Color.fromRGB(color.intValue()));
+            stack.setItemMeta(lam);
+        } else {
+            setCivCraftProperty("leather_color", Long.toString(color));
+        }
+    }
+    public int getColor() {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta instanceof LeatherArmorMeta lam) {
+            Color c = lam.getColor();
+            return c != null ? c.asRGB() : 0;
+        }
+        String v = getCivCraftProperty("leather_color");
+        return v != null ? Integer.parseInt(v) : 0;
+    }
+    public boolean hasColor() {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta instanceof LeatherArmorMeta lam) {
+            return lam.getColor() != null;
+        }
+        return getCivCraftProperty("leather_color") != null;
+    }
+
+    // ===================== Skull owner =====================
+    public void setSkullOwner(String name) {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta instanceof SkullMeta skull) {
+            skull.setOwningPlayer(Bukkit.getOfflinePlayer(name));
+            stack.setItemMeta(skull);
+        }
+    }
+
+    // ===================== Item flags =====================
+    public void setHideFlag(int flags) {
+        ItemMeta meta = stack.getItemMeta(); if (meta == null) return;
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_DYE);
+        stack.setItemMeta(meta);
+    }
+
+    // ===================== Legacy attribute shim =====================
+    public enum Operation { ADD_NUMBER(0), MULTIPLY_PERCENTAGE(1), ADD_PERCENTAGE(2); private final int id; Operation(int id){this.id=id;} public int getId(){return id;} public static Operation fromId(int id){ for (Operation o:values()) if (o.id==id) return o; throw new IllegalArgumentException(); } }
     public static class AttributeType {
-        private static ConcurrentMap<String, AttributeType> LOOKUP = Maps.newConcurrentMap();
+        private static final Map<String, AttributeType> LOOKUP = new HashMap<>();
         public static final AttributeType GENERIC_MAX_HEALTH = new AttributeType("generic.maxHealth").register();
         public static final AttributeType GENERIC_FOLLOW_RANGE = new AttributeType("generic.followRange").register();
         public static final AttributeType GENERIC_ATTACK_DAMAGE = new AttributeType("generic.attackDamage").register();
         public static final AttributeType GENERIC_MOVEMENT_SPEED = new AttributeType("generic.movementSpeed").register();
         public static final AttributeType GENERIC_KNOCKBACK_RESISTANCE = new AttributeType("generic.knockbackResistance").register();
-        
-        private final String minecraftId;
-        
-        /**
-         * Construct a new attribute type.
-         * <p>
-         * Remember to {@link #register()} the type.
-         * @param minecraftId - the ID of the type.
-         */
-        public AttributeType(String minecraftId) {
-            this.minecraftId = minecraftId;
-        }
-        
-        /**
-         * Retrieve the associated minecraft ID.
-         * @return The associated ID.
-         */
-        public String getMinecraftId() {
-            return minecraftId;
-        }
-        
-        /**
-         * Register the type in the central registry.
-         * @return The registered type.
-         */
-        // Constructors should have no side-effects!  
-        public AttributeType register() {
-            AttributeType old = LOOKUP.putIfAbsent(minecraftId, this);
-            return old != null ? old : this;
-        }
-        
-        /**
-         * Retrieve the attribute type associated with a given ID.
-         * @param minecraftId The ID to search for.
-         * @return The attribute type, or NULL if not found.
-         */
-        public static AttributeType fromId(String minecraftId) {
-            return LOOKUP.get(minecraftId);
-        }
-        
-        /**
-         * Retrieve every registered attribute type.
-         * @return Every type.
-         */
-        public static Iterable<AttributeType> values() {
-            return LOOKUP.values();
-        }
-    }
- 
+        private final String minecraftId; public AttributeType(String id){this.minecraftId=id;} public String getMinecraftId(){return minecraftId;} public AttributeType register(){LOOKUP.putIfAbsent(minecraftId,this); return this;} public static AttributeType fromId(String id){return LOOKUP.get(id);} }
     public static class Attribute {
-        private NBTTagCompound data;
- 
-        private Attribute(Builder builder) {
-            data = new NBTTagCompound();
-            setAmount(builder.amount);
-            setOperation(builder.operation);
-            setAttributeType(builder.type);
-            setName(builder.name);
-            setUUID(builder.uuid);
-        }
-        
-        private Attribute(NBTTagCompound data) {
-            this.data = data;
-        }
-        
-        public double getAmount() {
-            return data.getDouble("Amount");
-        }
- 
-        public void setAmount(double amount) {
-            data.setDouble("Amount", amount);
-        }
- 
-        public Operation getOperation() {
-            return Operation.fromId(data.getInt("Operation"));
-        }
- 
-        public void setOperation(@Nonnull Operation operation) {
-            Preconditions.checkNotNull(operation, "operation cannot be NULL.");
-            data.setInt("Operation", operation.getId());
-        }
- 
-        public AttributeType getAttributeType() {
-            return AttributeType.fromId(data.getString("AttributeName").replace("\"", ""));
-        }
- 
-        public void setAttributeType(@Nonnull AttributeType type) {
-            Preconditions.checkNotNull(type, "type cannot be NULL.");
-            data.setString("AttributeName", type.getMinecraftId());
-        }
- 
-        public String getName() {
-            return data.getString("Name").replace("\"", "");
-        }
- 
-        public void setName(@Nonnull String name) {
-            data.setString("Name", name);
-        }
- 
-        public UUID getUUID() {
-            return new UUID(data.getLong("UUIDMost"), data.getLong("UUIDLeast"));
-        }
- 
-        public void setUUID(@Nonnull UUID id) {
-            Preconditions.checkNotNull("id", "id cannot be NULL.");
-            data.setLong("UUIDLeast", id.getLeastSignificantBits());
-            data.setLong("UUIDMost", id.getMostSignificantBits());
-        }
- 
-        /**
-         * Construct a new attribute builder with a random UUID and default operation of adding numbers.
-         * @return The attribute builder.
-         */
-        public static Builder newBuilder() {
-            return new Builder().uuid(UUID.randomUUID()).operation(Operation.ADD_NUMBER);
-        }
-        
-        // Makes it easier to construct an attribute
-        public static class Builder {
-            private double amount;
-            private Operation operation = Operation.ADD_NUMBER;
-            private AttributeType type;
-            private String name;
-            private UUID uuid;
- 
-            private Builder() {
-                // Don't make this accessible
-            }
-            
-            public Builder amount(double amount) {
-                this.amount = amount;
-                return this;
-            }
-            public Builder operation(Operation operation) {
-                this.operation = operation;
-                return this;
-            }
-            public Builder type(AttributeType type) {
-                this.type = type;
-                return this;
-            }
-            public Builder name(String name) {
-                this.name = name;
-                return this;
-            }
-            public Builder uuid(UUID uuid) {
-                this.uuid = uuid;
-                return this;
-            }
-            public Attribute build() {
-                return new Attribute(this);
-            }
+        private double amount; private Operation operation; private AttributeType type; private String name; private UUID uuid;
+        private Attribute(){}
+        public double getAmount(){return amount;}
+        public void setAmount(double amount){this.amount=amount;}
+        public Operation getOperation(){return operation;}
+        public void setOperation(Operation o){this.operation=o;}
+        public AttributeType getAttributeType(){return type;}
+        public void setAttributeType(AttributeType t){this.type=t;}
+        public String getName(){return name;}
+        public void setName(String n){this.name=n;}
+        public UUID getUUID(){return uuid;}
+        public void setUUID(UUID id){this.uuid=id;}
+        public static Builder newBuilder(){return new Builder();}
+        public static class Builder{
+            private final Attribute a=new Attribute();
+            public Builder amount(double v){a.amount=v;return this;}
+            public Builder operation(Operation o){a.operation=o;return this;}
+            public Builder type(AttributeType t){a.type=t;return this;}
+            public Builder name(String n){a.name=n;return this;}
+            public Builder uuid(UUID id){a.uuid=id;return this;}
+            public Attribute build(){ if(a.uuid==null) a.uuid=UUID.randomUUID(); if(a.operation==null) a.operation=Operation.ADD_NUMBER; return a; }
         }
     }
-    
-    // This may be modified
-    public net.minecraft.server.v1_12_R1.ItemStack nmsStack;
-    
-    private NBTTagCompound parent;
-    private NBTTagList attributes;
-    
-    public AttributeUtil(ItemStack stack) {
-        // Create a CraftItemStack (under the hood)
-        this.nmsStack = CraftItemStack.asNMSCopy(stack);
-        
-        if (this.nmsStack == null) {
-        	return;
-        }
-        
-       // if (nmsStack == null) {
-        //	CivLog.error("Couldn't make NMS copyyy of:"+stack);
-        	//this.nmsStack = CraftItemStack.asNMSCopy(ItemManager.createItemStack(CivData.WOOL, 1));
-        //	if (this.nmsStack == null) {
-        	//	return;
-        	//}
-      //  }
-        
-        // Load NBT
-        if (nmsStack.getTag() == null) {
-        	parent = new NBTTagCompound();        	
-            nmsStack.setTag(parent);
-        } else {
-            parent = nmsStack.getTag();
-        }
-        
-        // Load attribute list
-        if (parent.hasKey("AttributeModifiers")) {
-            attributes = parent.getList("AttributeModifiers", NBTStaticHelper.TAG_COMPOUND);
-        } else {
-        	/* No attributes on this item detected. */
-            attributes = new NBTTagList();
-            parent.set("AttributeModifiers", attributes);
-        }
-    }
-    
-    /**
-     * Retrieve the modified item stack.
-     * @return The modified item stack.
-     */
-    public ItemStack getStack() {
-    	if (nmsStack == null) {
-    		return ItemManager.createItemStack(CivData.WOOL, 0);
-    	}
-    	
-    	if (nmsStack.getTag() != null) {
-    		if (attributes.size() == 0) {
-    			parent.remove("AttributeModifiers");
-    		}
-    	}
-    	
-        return CraftItemStack.asCraftMirror(nmsStack);
-    }
-    
-    /**
-     * Retrieve the number of attributes.
-     * @return Number of attributes.
-     */
-    public int size() {
-        return attributes.size();
-    }
-    
-    /**
-     * Add a new attribute to the list.
-     * @param attribute - the new attribute.
-     */
-    public void add(Attribute attribute) {
-        attributes.add(attribute.data);
-    }
-    
-    /**
-     * Remove the first instance of the given attribute.
-     * <p>
-     * The attribute will be removed using its UUID.
-     * @param attribute - the attribute to remove.
-     * @return TRUE if the attribute was removed, FALSE otherwise.
-     */
-    public boolean remove(Attribute attribute) {
-        UUID uuid = attribute.getUUID();
-        
-        for (Iterator<Attribute> it = values().iterator(); it.hasNext(); ) {
-            if (Objects.equal(it.next().getUUID(), uuid)) {
-                it.remove();
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public void removeAll() {
-    	 attributes = new NBTTagList();
-    	 if (parent != null) {
-    		 parent.set("AttributeModifiers", attributes);
-    	 }
-    }
-    
-    
-    public void clear() {
-        parent.set("AttributeModifiers", attributes = new NBTTagList());
-    }
-    
-    /**
-     * Retrieve the attribute at a given index.
-     * @param index - the index to look up.
-     * @return The attribute at that index.
-     */
-    public Attribute get(int index) {
-        return new Attribute((NBTTagCompound) attributes.get(index));
-    }
- 
-    // We can't make Attributes itself iterable without splitting it up into separate classes
-    public Iterable<Attribute> values() {
-        final List<NBTBase> list = getList();
- 
-        return new Iterable<Attribute>() {
-            @Override
-            public Iterator<Attribute> iterator() {
-                // Generics disgust me sometimes
-                return Iterators.transform(
-                    list.iterator(), new Function<NBTBase, Attribute>() {
-                        
-                    @Override
-                    public Attribute apply(@Nullable NBTBase data) {
-                        return new Attribute((NBTTagCompound) data);
-                    }
-                });
-            }
-        };
-    }
- 
-    @SuppressWarnings("unchecked")
-    private <T> List<T> getList() {
-        try {
-            Field listField = NBTTagList.class.getDeclaredField("list");
-            listField.setAccessible(true);
-            return (List<T>) listField.get(attributes);
-            
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to access reflection.", e);
-        }
-    }
-    
-    public void addLore(String str) {
-    	if (nmsStack == null) {
-    		return;
-    	}
-    	
-    	if (nmsStack.getTag() == null) {
-    		nmsStack.setTag(new NBTTagCompound());
-    	}
-    	//this.lore.add(str);
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    
-    	if (displayCompound == null) {
-    		displayCompound = new NBTTagCompound();
-    	}
-    	
-    	NBTTagList loreList = displayCompound.getList("Lore", NBTStaticHelper.TAG_STRING);
-    	if (loreList == null) {
-    		loreList = new NBTTagList();
-    	} 
-    	
-    	loreList.add(new NBTTagString(str));
-    	displayCompound.set("Lore", loreList);
-    	nmsStack.getTag().set("display", displayCompound);    	 
-    }
-    
-    public String[] getLore() {
-    	if (nmsStack == null) {
-    		return null;
-    	}
-    	
-    	if (nmsStack.getTag() == null) {
-    		return null;
-    	}
-    	
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    	
-    	if (displayCompound == null) {
-    		return null;
-    	}
-
-    	NBTTagList loreList = displayCompound.getList("Lore", NBTStaticHelper.TAG_STRING);
-    	if (loreList == null) {
-    		return null;
-    	}
-    	
-    	if (loreList.size() < 1) {
-    		return null;
-    	}
-    	
-    	String[] lore = new String[loreList.size()];
-    	for (int i = 0; i < loreList.size(); i++) {
-    		lore[i] = loreList.getString(i).replace("\"", "");;
-    	}
-    	
-    	return lore;
-    }
-    
-    public void setLore(String string) {
-    	String[] strings = new String[1];
-    	strings[0] = string;
-    	setLore(strings);
-    }
-    
-    public void setLore(String[] strings) {
-    	//this.lore.add(str);
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    
-    	if (displayCompound == null) {
-    		displayCompound = new NBTTagCompound();
-    	}
-    	
-    	NBTTagList loreList = new NBTTagList();
-    	
-    	for (String str : strings) {
-        	loreList.add(new NBTTagString(str));
-    	}
-    	
-    	displayCompound.set("Lore", loreList);
-    	nmsStack.getTag().set("display", displayCompound);    	 
-    }
-    
-    public void addEnhancement(String enhancementName, String key, String value) {
-    	if (enhancementName.equalsIgnoreCase("name")) {
-    		throw new IllegalArgumentException();
-    	}
-    	
-    	NBTTagCompound compound = nmsStack.getTag().getCompound("item_enhancements");
-    	
-    	if (compound == null) {
-    		compound = new NBTTagCompound();
-    	}
-    	
-    	NBTTagCompound enhCompound = compound.getCompound(enhancementName);
-    	if (enhCompound == null) {
-    		enhCompound = new NBTTagCompound();
-    	}
-    	
-    	if (key != null) {
-    		_setEnhancementData(enhCompound, key, value);
-    	}
-    	enhCompound.set("name", new NBTTagString(enhancementName));
-    	
-    	compound.set(enhancementName, enhCompound);
-    	nmsStack.getTag().set("item_enhancements", compound);
-    }
-    
-//	not used yet...
-//	public void removeEnhancement(String enhName) {
-//    	NBTTagCompound compound = nmsStack.tag.getCompound("item_enhancements");
-//    	if (compound == null) {
-//    		return;
-//    	}
-//    	
-//    	NBTTagCompound enhCompound = compound.getCompound(enhName);
-//    	if (enhCompound == null) {
-//    		return;
-//    	}
-//    	
-//    	compound.remove(enhName);
-//    	nmsStack.tag.set("item_enhancements", compound);
-//	}
-//	
-    
-    
-    private void _setEnhancementData(NBTTagCompound enhCompound, String key, String value) {
-    	if (key.equalsIgnoreCase("name")) {
-    		throw new IllegalArgumentException();
-    	}
-    	
-    	enhCompound.set(key, new NBTTagString(value));
-    }
-    
-
-	public void setEnhancementData(String enhancementName, String key, String value) {
-		addEnhancement(enhancementName, key, value);
-	
-	}
-    
-	public String getEnhancementData(String enhName, String key) {
-		if (!hasEnhancement(enhName)) {
-			return null;
-		}
-    	
-		NBTTagCompound compound = nmsStack.getTag().getCompound("item_enhancements");
-		NBTTagCompound enhCompound = compound.getCompound(enhName);
-		
-		if (!enhCompound.hasKey(key)) {
-			return null;
-		}
-				
-		return enhCompound.getString(key);
-	}
-	
-	public LinkedList<LoreEnhancement> getEnhancements() {
-		LinkedList<LoreEnhancement> returnList = new LinkedList<LoreEnhancement>();
-		
-		if (!hasEnhancements()) {
-			return returnList;
-		}
-		
-    	NBTTagCompound compound = nmsStack.getTag().getCompound("item_enhancements");
-
-    	for (Object keyObj : compound.c()) {
-    		if (!(keyObj instanceof String)) {
-    			continue;
-    		}
-    		
-    		String key = (String)keyObj;
-    		Object obj = compound.get(key);
-    		
-    		if (obj instanceof NBTTagCompound) {
-    			NBTTagCompound enhCompound = (NBTTagCompound)obj;
-    			String name = enhCompound.getString("name").replace("\"", "");
-    			
-    			if (name != null) {
-    				LoreEnhancement enh = LoreEnhancement.enhancements.get(name);
-    				if (enh != null) {
-    					returnList.add(enh);
-    				}
-    			}
-    		}
-    	}
-    	
-    	return returnList;
-	}
-	
-    public boolean hasEnhancement(String enhName) {
-    	NBTTagCompound compound = nmsStack.getTag().getCompound("item_enhancements");
-    	if (compound == null) {
-    		return false;
-    	}
-    	
-    	return compound.hasKey(enhName);
-	}
-    
-	public boolean hasEnhancements() {
-		if (nmsStack == null) {
-			return false;
-		}
-		
-		if (nmsStack.getTag() == null) {
-			return false;
-		}
-		
-		return nmsStack.getTag().hasKey("item_enhancements");
-	}
-    
-    public void setCivCraftProperty(String key, String value) {
-    	
-    	if (nmsStack == null) {
-    		return;
-    	}
-    	
-    	if (nmsStack.getTag() == null) {
-    		nmsStack.setTag(new NBTTagCompound());
-    	}
-    	
-    	NBTTagCompound civcraftCompound = nmsStack.getTag().getCompound("civcraft");
-    	
-    	if (civcraftCompound == null) {
-    		civcraftCompound = new NBTTagCompound();
-    	}
-    	
-    	civcraftCompound.set(key, new NBTTagString(value));
-    	nmsStack.getTag().set("civcraft", civcraftCompound);
-    }
-    
-    public String getCivCraftProperty(String key) {
-    	if (nmsStack == null) {
-    		return null;
-    	}
-    	NBTTagCompound civcraftCompound = nmsStack.getTag().getCompound("civcraft");
-    	
-    	if (civcraftCompound == null) {
-    		return null;
-    	}
-    	
-    	NBTTagString strTag = (NBTTagString) civcraftCompound.get(key);
-    	if (strTag == null) {
-    		return null;
-    	}
-    	
-    	return strTag.toString().replace("\"", "");
-    }
-
-	public void removeCivCraftProperty(String string) {
-		if (nmsStack == null) {
-    		return;
-    	}
-    
-		NBTTagCompound civcraftCompound = nmsStack.getTag().getCompound("civcraft");
-    	if (civcraftCompound == null) {
-    		return;
-    	}
-    	
-    	civcraftCompound.remove(string);
-    	
-    	if (civcraftCompound.isEmpty()) {
-			removeCivCraftCompound();
-    	}
-	}
-	
-	public void setName(String name) {
-		if (nmsStack == null) {
-    		return;
-    	}
-    	
-    	if (nmsStack.getTag() == null) {
-    		nmsStack.setTag(new NBTTagCompound());
-    	}
-		
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    	
-		if (displayCompound == null) {
-    		displayCompound = new NBTTagCompound();
-    	}
-		
-		displayCompound.set("Name", new NBTTagString(ChatColor.RESET+name));
-    	nmsStack.getTag().set("display", displayCompound);    	 
-	}
-	
-	public String getName() {
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    	
-		if (displayCompound == null) {
-    		displayCompound = new NBTTagCompound();
-    	}
-		
-		String name = displayCompound.getString("Name").toString();
-		name = name.replace("\"", "");
-		return name;
-	}
-
-
-	public void setColor(Long long1) {
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    	
-		if (displayCompound == null) {
-    		displayCompound = new NBTTagCompound();
-    	}
-				
-		displayCompound.set("color", new NBTTagInt(long1.intValue()));
-    	nmsStack.getTag().set("display", displayCompound); 
-	}
-	
-	public void setSkullOwner(String string) {
-		if (nmsStack == null) {
-			return;
-		}
-		
-		NBTTagCompound skullCompound = nmsStack.getTag().getCompound("SkullOwner");
-		if (skullCompound == null) {
-			skullCompound = new NBTTagCompound();
-		}
-		
-		skullCompound.set("Name", new NBTTagString(string));
-		nmsStack.getTag().set("SkullOwner", skullCompound);		
-	}
-	
-	public void setHideFlag(int flags) {
-		if (nmsStack == null) {
-			return;
-		}
-		
-		nmsStack.getTag().setInt("HideFlags", flags);
-	}
-	
-	public int getColor() {
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    	if (displayCompound == null) {
-    		return 0;
-    	}
-    	
-    	return displayCompound.getInt("color");
-	}
-	
-	public boolean hasColor() {
-		if (nmsStack == null) {
-			return false;
-		}
-		
-		if (nmsStack.getTag() == null) {
-			return false;
-		}
-		
-    	NBTTagCompound displayCompound = nmsStack.getTag().getCompound("display");
-    	if (displayCompound == null) {
-    		return false;
-    	}
-    	
-    	return displayCompound.hasKey("color");
-	}
-	
-	
-	public void setLore(LinkedList<String> lore) {
-		String[] strs = new String[lore.size()];
-		
-		for (int i = 0; i < lore.size(); i++) {
-			strs[i] = lore.get(i);
-		}
-		
-		setLore(strs);
-	}
-
-	public void removeCivCraftCompound() {
-		if (nmsStack == null) {
-    		return;
-    	}
-    
-		NBTTagCompound civcraftCompound = nmsStack.getTag().getCompound("civcraft");
-    	if (civcraftCompound == null) {
-    		return;
-    	}
-    	
-    	nmsStack.getTag().remove("civcraft");		
-	}
-
-	public boolean hasLegacyEnhancements() {
-		if (nmsStack == null) {
-			return false;
-		}
-		
-		if (nmsStack.getTag() == null) {
-			return false;
-		}
-		
-        return nmsStack.getTag().hasKey("civ_enhancements");
-	}
-
-	public void addLore(String[] lore) {
-		for (String str : lore) {
-			addLore(str);
-		}
-	}
-
-
+    // Accepts legacy attributes but does nothing (Paper handles attributes via ItemMeta now)
+    public void add(Attribute attribute) { /* no-op: preserved for API compatibility */ }
 }

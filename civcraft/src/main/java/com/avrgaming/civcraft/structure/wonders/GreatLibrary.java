@@ -145,7 +145,7 @@ public class GreatLibrary extends Wonder {
 			hand.addEnchantment(Enchantment.FIRE_ASPECT, 2);			
 			break;
 		case "1": /* fire protection */
-			if (!Enchantment.PROTECTION_FIRE.canEnchantItem(hand)) {
+			if (!Enchantment.FIRE_PROTECTION.canEnchantItem(hand)) {
 				CivMessage.sendError(player, CivSettings.localize.localizedString("library_enchant_cannotEnchant"));
 				return;	
 			}
@@ -157,10 +157,10 @@ public class GreatLibrary extends Wonder {
 			}
 			
 			resident.getTreasury().withdraw(configEnchant.cost);
-			hand.addEnchantment(Enchantment.PROTECTION_FIRE, 3);			
+			hand.addEnchantment(Enchantment.FIRE_PROTECTION, 3);			
 			break;
 		case "2": /* flame */
-			if (!Enchantment.ARROW_FIRE.canEnchantItem(hand)) {
+			if (!Enchantment.FLAME.canEnchantItem(hand)) {
 				CivMessage.sendError(player, CivSettings.localize.localizedString("library_enchant_cannotEnchant"));
 				return;	
 			}
@@ -172,7 +172,7 @@ public class GreatLibrary extends Wonder {
 			}
 			
 			resident.getTreasury().withdraw(configEnchant.cost);
-			hand.addEnchantment(Enchantment.ARROW_FIRE, 1);	
+   hand.addEnchantment(Enchantment.FLAME, 1);
 			break;
 		case "3":
 			switch (ItemManager.getId(hand)) {

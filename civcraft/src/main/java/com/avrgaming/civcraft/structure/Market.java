@@ -199,7 +199,7 @@ public class Market extends Structure {
 	private void buildSign(String action, Integer id, BlockCoord absCoord, ConfigMarketItem item, SimpleBlock commandBlock) {
 		Block b = absCoord.getBlock();
 		
-		ItemManager.setTypeIdAndData(b, ItemManager.getId(Material.WALL_SIGN), (byte)commandBlock.getData(), false);
+  ItemManager.setTypeIdAndData(b, ItemManager.getId(Material.OAK_WALL_SIGN), (byte)commandBlock.getData(), false);
 		
 		StructureSign structSign = CivGlobal.getStructureSign(absCoord);
 		if (structSign == null) {

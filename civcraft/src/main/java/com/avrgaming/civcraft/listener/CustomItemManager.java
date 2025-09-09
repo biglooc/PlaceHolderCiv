@@ -52,8 +52,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -114,7 +112,7 @@ public class CustomItemManager implements Listener {
 
 				int min = CivSettings.getInteger(CivSettings.materialsConfig, "tungsten_min_drop");
 				int max;
-				if (event.getPlayer().getInventory().getItemInMainHand().containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
+				if (event.getPlayer().getInventory().getItemInMainHand().containsEnchantment(Enchantment.FORTUNE)) {
 					max = CivSettings.getInteger(CivSettings.materialsConfig, "tungsten_max_drop_with_fortune");
 				} else {
 					max = CivSettings.getInteger(CivSettings.materialsConfig, "tungsten_max_drop");
@@ -641,19 +639,15 @@ public class CustomItemManager implements Listener {
 				return;
 			}
 
-			// RAW_FISH (clownfish)
-			if (ItemManager.getId(picked) == ItemManager.getId(Material.RAW_FISH) &&
-					ItemManager.getData(picked) ==
-							ItemManager.getData(ItemManager.getMaterialData(CivData.FISH_RAW, CivData.CLOWNFISH)) &&
+			// Tropical fish (was legacy clownfish)
+			if (ItemManager.getId(picked) == ItemManager.getId(Material.TROPICAL_FISH) &&
 					LoreCraftableMaterial.getCraftMaterial(picked) == null) {
 				replacePickup(event, player, "mat_vanilla_clownfish", picked.getAmount());
 				return;
 			}
 
-			// RAW_FISH (pufferfish)
-			if (ItemManager.getId(picked) == ItemManager.getId(Material.RAW_FISH) &&
-					ItemManager.getData(picked) ==
-							ItemManager.getData(ItemManager.getMaterialData(CivData.FISH_RAW, CivData.PUFFERFISH)) &&
+			// Pufferfish
+			if (ItemManager.getId(picked) == ItemManager.getId(Material.PUFFERFISH) &&
 					LoreCraftableMaterial.getCraftMaterial(picked) == null) {
 				replacePickup(event, player, "mat_vanilla_pufferfish", picked.getAmount());
 			}
@@ -699,9 +693,7 @@ public class CustomItemManager implements Listener {
 			}
 		}
 		
-		if (ItemManager.getId(event.getCurrentItem()) == ItemManager.getId(Material.RAW_FISH)
-				&& ItemManager.getData(event.getCurrentItem()) == 
-					ItemManager.getData(ItemManager.getMaterialData(CivData.FISH_RAW, CivData.CLOWNFISH))) {
+		if (ItemManager.getId(event.getCurrentItem()) == ItemManager.getId(Material.TROPICAL_FISH)) {
 			LoreCraftableMaterial craftMat = LoreCraftableMaterial.getCraftMaterial(event.getCurrentItem());
 			if (craftMat == null) {
 				/* Found a vanilla slime ball. */
@@ -712,9 +704,7 @@ public class CustomItemManager implements Listener {
 			}
 		}
 		
-		if (ItemManager.getId(event.getCurrentItem()) == ItemManager.getId(Material.RAW_FISH)
-				&& ItemManager.getData(event.getCurrentItem()) == 
-					ItemManager.getData(ItemManager.getMaterialData(CivData.FISH_RAW, CivData.PUFFERFISH))) {
+		if (ItemManager.getId(event.getCurrentItem()) == ItemManager.getId(Material.PUFFERFISH)) {
 			LoreCraftableMaterial craftMat = LoreCraftableMaterial.getCraftMaterial(event.getCurrentItem());
 			if (craftMat == null) {
 				/* Found a vanilla slime ball. */
@@ -879,22 +869,22 @@ public class CustomItemManager implements Listener {
 		ConfigRemovedRecipes removed = CivSettings.removedRecipies.get(ItemManager.getId(stack));
 		if (removed == null && !stack.getType().equals(Material.ENCHANTED_BOOK)) {
 			/* Check for badly enchanted tools */
-			if (stack.containsEnchantment(Enchantment.DAMAGE_ALL) ||
-				stack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS) ||
+			if (stack.containsEnchantment(Enchantment.SHARPNESS) ||
+				stack.containsEnchantment(Enchantment.BANE_OF_ARTHROPODS) ||
 				stack.containsEnchantment(Enchantment.KNOCKBACK) ||
-				stack.containsEnchantment(Enchantment.DAMAGE_UNDEAD) ||
-				stack.containsEnchantment(Enchantment.DURABILITY)) {					
+				stack.containsEnchantment(Enchantment.SMITE) ||
+				stack.containsEnchantment(Enchantment.UNBREAKING)) {					
 			} else if (stack.containsEnchantment(Enchantment.FIRE_ASPECT) && 
 					   stack.getEnchantmentLevel(Enchantment.FIRE_ASPECT) > 2) {
 				// Remove any fire aspect above this amount
-			} else if (stack.containsEnchantment(Enchantment.LOOT_BONUS_MOBS) &&
-					   stack.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS) > 1) {
+			} else if (stack.containsEnchantment(Enchantment.LOOTING) &&
+					   stack.getEnchantmentLevel(Enchantment.LOOTING) > 1) {
 				// Only allow looting 1
-			} else if (stack.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS) &&
-				   stack.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS) > 1) {
+			} else if (stack.containsEnchantment(Enchantment.FORTUNE) &&
+			   	   stack.getEnchantmentLevel(Enchantment.FORTUNE) > 1) {
 				// Only allow fortune 1
-			} else if (stack.containsEnchantment(Enchantment.DIG_SPEED) &&
-					   stack.getEnchantmentLevel(Enchantment.DIG_SPEED) > 5) {
+			} else if (stack.containsEnchantment(Enchantment.EFFICIENCY) &&
+					   stack.getEnchantmentLevel(Enchantment.EFFICIENCY) > 5) {
 				// only allow effiencey 5
 			} else {
 				/* Not in removed list, so allow it. */
@@ -944,7 +934,7 @@ public class CustomItemManager implements Listener {
 					continue;
 				}
 				
-				ConfigRemovedRecipes removed = CivSettings.removedRecipies.get(stack.getTypeId());
+    ConfigRemovedRecipes removed = CivSettings.removedRecipies.get(ItemManager.getId(stack));
 				if (removed == null && !stack.getType().equals(Material.ENCHANTED_BOOK)) {
 					/* Not in removed list, so allow it. */
 					continue;

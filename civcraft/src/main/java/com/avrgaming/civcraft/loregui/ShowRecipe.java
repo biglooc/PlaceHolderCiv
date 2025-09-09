@@ -41,7 +41,7 @@ public class ShowRecipe implements GuiAction {
 			if (cmat.isCraftable()) {
 				message = CivSettings.localize.localizedString("loreGui_recipes_clickForRecipe");
 				entryStack = LoreGuiItem.setAction(entryStack, "ShowRecipe");
-				entryStack = LoreGuiItem.setActionData(entryStack, "backInventory", recInv.getName());
+				entryStack = LoreGuiItem.setActionData(entryStack, "backInventory", recInv.getViewers().isEmpty() ? "" : "");
 			} else {
 				message = CivSettings.localize.localizedString("loreGui_recipes_notCraftable");	
 			}
@@ -56,7 +56,7 @@ public class ShowRecipe implements GuiAction {
 		int offset = 2;
 		ItemStack stack;
 	
-		stack = LoreGuiItem.build("Craft Table Border", ItemManager.getId(Material.WORKBENCH), 0, "");
+		stack = LoreGuiItem.build("Craft Table Border", ItemManager.getId(Material.CRAFTING_TABLE), 0, "");
 		
 		for (int y = 0; y <= 4; y++) {
 			for (int x = 0; x <= 4; x++) {
@@ -152,12 +152,12 @@ public class ShowRecipe implements GuiAction {
 		}
 		
 		String backInventory = LoreGuiItem.getActionData(stack, "backInventory");
-		if (backInventory != null) {
+		if (backInventory != null && !backInventory.isEmpty()) {
 			Inventory inv = LoreGuiItemListener.guiInventories.get(backInventory);
 			ItemStack backButton = LoreGuiItem.build(CivSettings.localize.localizedString("loreGui_recipes_back"), ItemManager.getId(Material.MAP), 0, CivSettings.localize.localizedString("loreGui_recipes_back"));
 			backButton = LoreGuiItem.setAction(backButton, "OpenInventory");
 			backButton = LoreGuiItem.setActionData(backButton, "invType", "showGuiInv");
-			backButton = LoreGuiItem.setActionData(backButton, "invName", inv.getName());
+			backButton = LoreGuiItem.setActionData(backButton, "invName", backInventory);
 			recInv.setItem(LoreGuiItem.MAX_INV_SIZE-1, backButton);
 		} else {
 			ConfigMaterialCategory cat = ConfigMaterialCategory.getCategory(craftMat.getConfigMaterial().categoryCivColortripped); 
@@ -170,7 +170,7 @@ public class ShowRecipe implements GuiAction {
 			}
 		}
 		
-		LoreGuiItemListener.guiInventories.put(recInv.getName(), recInv);
+		LoreGuiItemListener.guiInventories.put(title, recInv);
 		buildCraftTableBorder(recInv);
 		buildInfoBar(craftMat, recInv, player);
 		player.openInventory(recInv);

@@ -170,7 +170,7 @@ public class AdminCommand extends CommandBase {
 			for (ConfigMaterialCategory cat : ConfigMaterialCategory.getCategories()) {
 				int identifier;
 				if (cat.name.contains("Fish")) {
-					identifier = ItemManager.getId(Material.RAW_FISH);
+     identifier = ItemManager.getId(Material.COD);
 				}
 				else if (cat.name.contains("Catalyst")) {
 					identifier = ItemManager.getId(Material.BOOK);
@@ -179,13 +179,13 @@ public class AdminCommand extends CommandBase {
 					identifier = ItemManager.getId(Material.IRON_SWORD);
 				}
 				else if (cat.name.contains("Materials")) {
-					identifier = ItemManager.getId(Material.WOOD_STEP);
+     identifier = ItemManager.getId(Material.OAK_SLAB);
 				}
 				else if (cat.name.contains("Tools")) {
-					identifier = ItemManager.getId(Material.IRON_SPADE);
+     identifier = ItemManager.getId(Material.IRON_SHOVEL);
 				}
 				else if (cat.name.contains("Eggs")) {
-					identifier = ItemManager.getId(Material.MONSTER_EGG);
+    identifier = ItemManager.getId(Material.VILLAGER_SPAWN_EGG);
 				}
 				else {
 					identifier = ItemManager.getId(Material.WRITTEN_BOOK);
@@ -208,7 +208,7 @@ public class AdminCommand extends CommandBase {
 					stack = LoreGuiItem.asGuiItem(stack);
 					stack = LoreGuiItem.setAction(stack, "SpawnItem");
 					inv.addItem(stack);
-					LoreGuiItemListener.guiInventories.put(inv.getName(), inv);			
+     LoreGuiItemListener.guiInventories.put(cat.name+" Spawn", inv);
 				}
 			}
 			
@@ -312,7 +312,7 @@ public class AdminCommand extends CommandBase {
 	}
 	
 	public void server_cmd() {
-		CivMessage.send(sender, Bukkit.getServerName());
+  CivMessage.send(sender, Bukkit.getServer().getName());
 	}
 	
 	

@@ -269,78 +269,21 @@ public class FisheryAsyncTask extends CivAsyncTask {
 	
 	private int getBiome() {
 		Biome biome = this.fishHatchery.getBiome();
-		
-		if (biome.equals(Biome.BIRCH_FOREST_HILLS) ||
-				biome.equals(Biome.MUTATED_BIRCH_FOREST) ||
-				biome.equals(Biome.MUTATED_BIRCH_FOREST_HILLS) ||
-				biome.equals(Biome.MUTATED_TAIGA_COLD) ||
-				biome.equals(Biome.MUTATED_EXTREME_HILLS) ||
-				biome.equals(Biome.MUTATED_EXTREME_HILLS_WITH_TREES ) ||
-				biome.equals(Biome.ICE_MOUNTAINS) ||
-				biome.equals(Biome.MUTATED_JUNGLE_EDGE) ||
-				biome.equals(Biome.JUNGLE_HILLS) ||
-				biome.equals(Biome.MUTATED_JUNGLE) ||
-				biome.equals(Biome.MUTATED_MESA) ||
-				biome.equals(Biome.MUTATED_MESA_CLEAR_ROCK) ||
-				biome.equals(Biome.MUTATED_MESA_CLEAR_ROCK) ||
-				biome.equals(Biome.MUTATED_MESA_ROCK) ||
-				biome.equals(Biome.MUTATED_SAVANNA) ||
-				biome.equals(Biome.MUTATED_SAVANNA_ROCK) ||
-				biome.equals(Biome.SMALLER_EXTREME_HILLS) ||
-				biome.equals(Biome.MUTATED_SWAMPLAND) ||
-				biome.equals(Biome.MUTATED_TAIGA))
-		{
+		String name = biome.name();
+		name = name.toUpperCase(java.util.Locale.ROOT);
+		// Group 1: mountainous/windswept/badlands/jungle hills-like
+		if (name.contains("WINDSWEPT") || name.contains("MOUNTAIN") || name.contains("HILLS") || name.contains("BADLANDS") || (name.contains("JUNGLE") && name.contains("HILL"))) {
 			return 1;
 		}
-		else if (biome.equals(Biome.BIRCH_FOREST) ||
-				biome.equals(Biome.EXTREME_HILLS) ||
-				biome.equals(Biome.FOREST) ||
-				biome.equals(Biome.FOREST_HILLS) ||
-				biome.equals(Biome.ICE_FLATS) ||
-				biome.equals(Biome.ICE_MOUNTAINS) ||
-				biome.equals(Biome.MUTATED_ICE_FLATS) ||
-				biome.equals(Biome.JUNGLE) ||
-				biome.equals(Biome.JUNGLE_EDGE) ||
-				biome.equals(Biome.MUTATED_REDWOOD_TAIGA) ||
-				biome.equals(Biome.MUTATED_REDWOOD_TAIGA_HILLS) ||
-				biome.equals(Biome.REDWOOD_TAIGA) ||
-				biome.equals(Biome.REDWOOD_TAIGA_HILLS) ||
-				biome.equals(Biome.ROOFED_FOREST) ||
-				biome.equals(Biome.MESA) ||
-				biome.equals(Biome.MESA_CLEAR_ROCK) ||
-				biome.equals(Biome.MESA_ROCK ) ||
-				biome.equals(Biome.EXTREME_HILLS_WITH_TREES) ||
-				biome.equals(Biome.ROOFED_FOREST) ||
-				biome.equals(Biome.SAVANNA) ||
-				biome.equals(Biome.SAVANNA_ROCK) ||
-				biome.equals(Biome.TAIGA) ||
-				biome.equals(Biome.TAIGA_HILLS))
-		{
+		// Group 2: common land biomes: forests, plains, savanna, taiga, birch, wooded, etc.
+		if (name.contains("FOREST") || name.contains("PLAINS") || name.contains("SAVANNA") || name.contains("TAIGA") || name.contains("BIRCH") || name.contains("WOODED")) {
 			return 2;
 		}
-		else if (biome.equals(Biome.BEACHES) ||
-				biome.equals(Biome.COLD_BEACH) ||
-				biome.equals(Biome.TAIGA_COLD) ||
-				biome.equals(Biome.DEEP_OCEAN) ||
-				biome.equals(Biome.DESERT) ||
-				biome.equals(Biome.DESERT_HILLS) ||
-				biome.equals(Biome.MUTATED_DESERT) ||
-				biome.equals(Biome.FROZEN_OCEAN) ||
-				biome.equals(Biome.FROZEN_RIVER) ||
-				biome.equals(Biome.MUSHROOM_ISLAND) ||
-				biome.equals(Biome.MUSHROOM_ISLAND_SHORE) ||
-				biome.equals(Biome.OCEAN) ||
-				biome.equals(Biome.PLAINS) ||
-				biome.equals(Biome.RIVER) ||
-				biome.equals(Biome.STONE_BEACH) ||
-				biome.equals(Biome.SWAMPLAND) )
-		{
+		// Group 3: oceans, rivers, beaches, swamps, mushroom, snowy/ice, and deserts
+		if (name.contains("OCEAN") || name.contains("RIVER") || name.contains("BEACH") || name.contains("SWAMP") || name.contains("MUSHROOM") || name.contains("SNOW") || name.contains("FROZEN") || name.contains("DESERT")) {
 			return 3;
 		}
-		else
-		{
-			return 0;
-		}
+		return 0;
 	}
 	
 	private ItemStack getFishForBiome() {

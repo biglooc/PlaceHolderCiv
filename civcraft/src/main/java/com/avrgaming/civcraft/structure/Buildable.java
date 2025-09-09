@@ -97,8 +97,6 @@ import com.avrgaming.civcraft.util.SimpleBlock;
 import com.avrgaming.civcraft.util.SimpleBlock.Type;
 import com.avrgaming.civcraft.war.War;
 import com.avrgaming.global.perks.Perk;
-import com.wimbli.WorldBorder.BorderData;
-import com.wimbli.WorldBorder.Config;
 
 public abstract class Buildable extends SQLObject {
 
@@ -769,10 +767,10 @@ public abstract class Buildable extends SQLObject {
 		}
 		
 		if (this.getConfigId().equals("s_shipyard") || this.getConfigId().equals("s_arrowship") || this.getConfigId().equals("s_scoutship") || this.getConfigId().equals("s_cannonship") || this.getConfigId().equals("ti_tradeship") || this.getConfigId().equals("w_grand_ship_ingermanland")) {
-			if (!centerBlock.getBiome().equals(Biome.OCEAN) && 
-				!centerBlock.getBiome().equals(Biome.BEACHES) &&
-				!centerBlock.getBiome().equals(Biome.STONE_BEACH) &&
-				!centerBlock.getBiome().equals(Biome.COLD_BEACH) &&
+ 		if (!centerBlock.getBiome().equals(Biome.OCEAN) && 
+				!centerBlock.getBiome().equals(Biome.BEACH) &&
+				!centerBlock.getBiome().equals(Biome.STONY_SHORE) &&
+				!centerBlock.getBiome().equals(Biome.SNOWY_BEACH) &&
 				!centerBlock.getBiome().equals(Biome.DEEP_OCEAN) &&
 				!centerBlock.getBiome().equals(Biome.RIVER) &&
 				!centerBlock.getBiome().equals(Biome.FROZEN_OCEAN) &&
@@ -917,12 +915,7 @@ public abstract class Buildable extends SQLObject {
 						deletedRoadBlocks.add(rb);
 					}
 				
-					BorderData border = Config.Border(b.getWorld().getName());
-					if (border != null) {
-						if(!border.insideBorder(b.getLocation().getX(), b.getLocation().getZ(), Config.ShapeRound())) {
-							throw new CivException(CivSettings.localize.localizedString("cannotBuild_outsideBorder"));
-						}
-					}
+					// WorldBorder check removed for 1.21 compatibility; implement via optional API if needed.
 				}
 			}
 		}

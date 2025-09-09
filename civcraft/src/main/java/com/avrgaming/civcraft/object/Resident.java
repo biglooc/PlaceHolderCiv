@@ -753,76 +753,45 @@ public class Resident extends SQLObject {
 		this.permOverride = permOverride;
 	}
 
-	@SuppressWarnings("deprecation")
 	public int takeItemsInHand(int itemId, int itemData) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
-		Inventory inv = player.getInventory();
-		if (!inv.contains(itemId)) {
+		if (!com.avrgaming.civcraft.util.ItemManager.isItemInMainHandLegacy(player, itemId, itemData)) {
 			return 0;
 		}
-
-		if ((player.getInventory().getItemInMainHand().getTypeId() != itemId) &&
-				(player.getInventory().getItemInMainHand().getTypeId() != itemData)) {
-			return 0;
-		}
-
 		ItemStack stack = player.getInventory().getItemInMainHand();
 		int count = stack.getAmount();
-		inv.removeItem(stack);
-
-		player.updateInventory();
+		player.getInventory().setItemInMainHand(null);
 		return count;
 	}
 
 
-	@SuppressWarnings("deprecation")
 	public boolean takeItemInHand(int itemId, int itemData, int amount) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
-		Inventory inv = player.getInventory();
-
-		if (!inv.contains(itemId)) {
+		if (!com.avrgaming.civcraft.util.ItemManager.isItemInMainHandLegacy(player, itemId, itemData)) {
 			return false;
 		}
-
-		if ((player.getInventory().getItemInMainHand().getTypeId() != itemId) &&
-				(player.getInventory().getItemInMainHand().getTypeId() != itemData)) {
-			return false;
-		}
-
 		ItemStack stack = player.getInventory().getItemInMainHand();
-
 		if (stack.getAmount() < amount) {
 			return false;
 		} else if (stack.getAmount() == amount) {
-			inv.removeItem(stack);
+			player.getInventory().setItemInMainHand(null);
 		} else {
 			stack.setAmount(stack.getAmount() - amount);
 		}
-
-		player.updateInventory();
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	public boolean takeItem(int itemId, int itemData, int amount) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
 		Inventory inv = player.getInventory();
 
-		if (!inv.contains(itemId)) {
+		if (!com.avrgaming.civcraft.util.ItemManager.inventoryContainsLegacy(inv, itemId, itemData)) {
 			return false;
 		}
 
-		HashMap<Integer, ? extends ItemStack> stacks;
-		stacks = inv.all(itemId);
-
+		java.util.Map<Integer, ItemStack> stacks = com.avrgaming.civcraft.util.ItemManager.allLegacy(inv, itemId);
 		for (ItemStack stack : stacks.values()) {
-			if (stack.getData().getData() != (byte) itemData) {
-				continue;
-			}
-
-			if (stack.getAmount() <= 0)
-				continue;
-
+			if (stack.getAmount() <= 0) continue;
 			if (stack.getAmount() < amount) {
 				amount -= stack.getAmount();
 				stack.setAmount(0);
@@ -833,16 +802,13 @@ public class Resident extends SQLObject {
 				break;
 			}
 		}
-
-		player.updateInventory();
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	public int giveItem(int itemId, short damage, int amount) throws CivException {
 		Player player = CivGlobal.getPlayer(this);
 		Inventory inv = player.getInventory();
-		ItemStack stack = new ItemStack(itemId, amount, damage);
+		ItemStack stack = com.avrgaming.civcraft.util.ItemManager.createItemStack(itemId, amount, damage);
 		HashMap<Integer, ItemStack> leftovers = null;
 		leftovers = inv.addItem(stack);
 
@@ -850,7 +816,6 @@ public class Resident extends SQLObject {
 		for (ItemStack i : leftovers.values()) {
 			leftoverAmount += i.getAmount();
 		}
-		player.updateInventory();
 		return amount - leftoverAmount;
 	}
 
@@ -1445,93 +1410,6 @@ public class Resident extends SQLObject {
 
 	public void setTimezone(String timezone) {
 		this.timezone = timezone;
-	}
-
-	public Inventory startTradeWith(Resident resident) {
-		try {
-			Player player = CivGlobal.getPlayer(this);
-			if (player.isDead()) {
-				throw new CivException(CivSettings.localize.localizedString("resident_tradeErrorPlayerDead"));
-			}
-			Inventory inv = Bukkit.createInventory(player, 9 * 5, this.getName() + " : " + resident.getName());
-
-			/*
-			 * Set up top and bottom layer with buttons.
-			 */
-
-			/* Top part which is for the other resident. */
-			ItemStack signStack = LoreGuiItem.build("", CivData.WOOL, CivData.DATA_WOOL_WHITE, "");
-			int start = 0;
-			for (int i = start; i < (9 + start); i++) {
-				if ((i - start) == 8) {
-					ItemStack guiStack = LoreGuiItem.build(resident.getName() + " Confirm",
-							CivData.WOOL, CivData.DATA_WOOL_RED,
-							CivColor.LightGreen + CivSettings.localize.localizedString("var_resident_tradeWait1", CivColor.LightBlue + resident.getName()),
-							CivColor.LightGray + " " + CivSettings.localize.localizedString("resident_tradeWait2"));
-					inv.setItem(i, guiStack);
-				} else if ((i - start) == 7) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.CURRENCY_NAME + " " + CivSettings.localize.localizedString("resident_tradeOffered"),
-							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0,
-							CivColor.Yellow + "0 " + CivSettings.CURRENCY_NAME);
-					inv.setItem(i, guiStack);
-				} else {
-					inv.setItem(i, signStack);
-				}
-			}
-
-			start = 4 * 9;
-			for (int i = start; i < (9 + start); i++) {
-				if ((i - start) == 8) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeYourConfirm"),
-							CivData.WOOL, CivData.DATA_WOOL_RED,
-							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeClicktoConfirm"));
-					inv.setItem(i, guiStack);
-
-				} else if ((i - start) == 0) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeRemove") + " " + CivSettings.CURRENCY_NAME,
-							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0,
-							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeRemove100") + " " + CivSettings.CURRENCY_NAME,
-							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeRemove1000") + " " + CivSettings.CURRENCY_NAME);
-					inv.setItem(i, guiStack);
-				} else if ((i - start) == 1) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.localize.localizedString("resident_tradeAdd") + " " + CivSettings.CURRENCY_NAME,
-							ItemManager.getId(Material.GOLD_INGOT), 0,
-							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeAdd100") + " " + CivSettings.CURRENCY_NAME,
-							CivColor.Gold + CivSettings.localize.localizedString("resident_tradeAdd1000") + " " + CivSettings.CURRENCY_NAME);
-					inv.setItem(i, guiStack);
-				} else if ((i - start) == 7) {
-					ItemStack guiStack = LoreGuiItem.build(CivSettings.CURRENCY_NAME + " " + CivSettings.localize.localizedString("resident_tradeOffered"),
-							ItemManager.getId(Material.NETHER_BRICK_ITEM), 0,
-							CivColor.Yellow + "0 " + CivSettings.CURRENCY_NAME);
-					inv.setItem(i, guiStack);
-				} else {
-					inv.setItem(i, signStack);
-				}
-			}
-
-			/*
-			 * Set up middle divider.
-			 */
-			start = 2 * 9;
-			for (int i = start; i < (9 + start); i++) {
-				inv.setItem(i, signStack);
-			}
-
-			player.openInventory(inv);
-			return inv;
-		} catch (CivException e) {
-			try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("possibleCheaters.txt", true)))) {
-				out.println("trade:" + this.getName() + " WITH " + resident.getName() + " and was dead");
-			} catch (IOException e1) {
-				//exception handling left as an exercise for the reader
-			}
-
-
-			CivMessage.sendError(this, CivSettings.localize.localizedString("resident_tradeCouldNotTrade") + " " + e.getMessage());
-			CivMessage.sendError(resident, CivSettings.localize.localizedString("resident_tradeCouldNotTrade") + " " + e.getMessage());
-			return null;
-		}
-
 	}
 
 	public boolean hasTechForItem(ItemStack stack) {

@@ -113,12 +113,12 @@ public class ReportChestsTask implements Runnable {
 		for (Entity e : chunk.getEntities()) {
 			Inventory inv = null;
 			
-			if (e.getType() == EntityType.MINECART_CHEST) {
+			if (e.getType() == EntityType.CHEST_MINECART) {
 				StorageMinecart chest = (StorageMinecart)e;
 				inv = chest.getInventory();
 			}
 			
-			if (e.getType() == EntityType.MINECART_HOPPER) {
+			if (e.getType() == EntityType.HOPPER_MINECART) {
 				HopperMinecart chest = (HopperMinecart)e;
 				inv = chest.getInventory();
 			}

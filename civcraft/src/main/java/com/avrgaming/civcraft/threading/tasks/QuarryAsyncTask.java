@@ -56,10 +56,10 @@ public class QuarryAsyncTask extends CivAsyncTask {
 
 		if (stack.hasItemMeta()) {
 			ItemMeta testEnchantMeta = stack.getItemMeta();
-			if (testEnchantMeta.hasEnchant(Enchantment.DIG_SPEED)) {
+			if (testEnchantMeta.hasEnchant(Enchantment.EFFICIENCY)) {
 
-				debug(quarry, "Pickaxe has DIG_SPEED lvl: "+testEnchantMeta.getEnchantLevel(Enchantment.DIG_SPEED));
-				return testEnchantMeta.getEnchantLevel(Enchantment.DIG_SPEED)+1;
+				debug(quarry, "Pickaxe has EFFICIENCY lvl: "+testEnchantMeta.getEnchantLevel(Enchantment.EFFICIENCY));
+				return testEnchantMeta.getEnchantLevel(Enchantment.EFFICIENCY)+1;
 				
 			}
 		}

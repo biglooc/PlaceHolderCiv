@@ -1,8 +1,9 @@
 name: CivCraft
 main: com.avrgaming.civcraft.main.CivCraft
-softdepends: [TitleAPI]
-version: 1.0.0 ALPHA
+version: ${version}
 depend: [MythicMobs]
+softdepend: [TitleAPI, Vault]
+api-version: 1.21
 
 commands:
     town:

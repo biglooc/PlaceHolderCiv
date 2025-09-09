@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.8">
+    <bytecodeTargetLevel target="21">
       <module name="civcraft-monorepo.civcraft-common" target="21" />
       <module name="civcraft-monorepo.civcraft-common.main" target="21" />
       <module name="civcraft-monorepo.civcraft-common.test" target="21" />
@@ -9,12 +9,5 @@
       <module name="civcraft-monorepo.civcraft-threading.main" target="21" />
       <module name="civcraft-monorepo.civcraft-threading.test" target="21" />
     </bytecodeTargetLevel>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="civcraft-monorepo.civcraft" options="-Xlint:deprecation -Xlint:unchecked" />
-      <module name="civcraft-monorepo.civcraft.main" options="-Xlint:deprecation -Xlint:unchecked" />
-      <module name="civcraft-monorepo.civcraft.test" options="-Xlint:deprecation -Xlint:unchecked" />
-    </option>
   </component>
 </project>

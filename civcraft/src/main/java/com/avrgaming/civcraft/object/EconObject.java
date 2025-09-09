@@ -22,9 +22,11 @@ package com.avrgaming.civcraft.object;
 public class EconObject {
 
 	private String econName;
-	private Double coins = 0.0;
-	protected Double debt = 0.0;
-	protected Double principalAmount = 0.0;
+	private double coins = 0.0;
+	protected double debt = 0.0;
+	protected double principalAmount = 0.0;
+	protected final Object coinsLock = new Object();
+	protected final Object principalLock = new Object();
 	protected SQLObject holder;
 	
 	public EconObject(SQLObject holder) {
@@ -40,10 +42,9 @@ public class EconObject {
 	}
 	
 	public double getBalance() {
-		coins = Math.floor(coins);
-
-		synchronized (coins) {
-			return coins;
+		// Return a floored view of the balance without mutating the field.
+		synchronized (coinsLock) {
+			return Math.floor(coins);
 		}
 	}
 	
@@ -58,7 +59,7 @@ public class EconObject {
 		}
 		amount = Math.floor(amount);
 		
-		synchronized (coins) {
+		synchronized (coinsLock) {
 			coins = amount;
 		}
 		
@@ -81,7 +82,7 @@ public class EconObject {
 		}
 		amount = Math.floor(amount);
 		
-		synchronized (coins) {
+		synchronized (coinsLock) {
 			coins += amount;
 		}
 		
@@ -111,7 +112,7 @@ public class EconObject {
 		 * if our current balance dips below the principal,
 		 * then we subtract from the principal.
 		 */
-		synchronized(principalAmount) {
+		synchronized(principalLock) {
 			if (principalAmount > 0) {
 				double currentBalance = this.getBalance();
 				double diff = currentBalance - principalAmount;
@@ -123,7 +124,7 @@ public class EconObject {
 			}
 		}
 		
-		synchronized(coins) {
+		synchronized(coinsLock) {
 			coins -= amount;
 		}
 		
@@ -142,7 +143,7 @@ public class EconObject {
 	public boolean hasEnough(double amount) {
 		amount = Math.floor(amount);
 
-		synchronized (coins) {
+		synchronized (coinsLock) {
 			if (coins >= amount) {
 				return true;
 			} else {

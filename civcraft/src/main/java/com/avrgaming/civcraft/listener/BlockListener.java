@@ -31,9 +31,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -66,7 +63,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityCreatePortalEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -136,13 +132,6 @@ import com.avrgaming.civcraft.war.War;
 import com.avrgaming.civcraft.war.WarRegen;
 
 import gpl.HorseModifier;
-import net.minecraft.server.v1_12_R1.AttributeInstance;
-import net.minecraft.server.v1_12_R1.AxisAlignedBB;
-import net.minecraft.server.v1_12_R1.DamageSource;
-import net.minecraft.server.v1_12_R1.EntityInsentient;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
-import net.minecraft.server.v1_12_R1.GenericAttributes;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
 
 public class BlockListener implements Listener {
 
@@ -499,9 +488,7 @@ public class BlockListener implements Listener {
 			return;
 		}
 		/* prevent ender dragons from breaking blocks. */
-		if (event.getEntityType().equals(EntityType.COMPLEX_PART)) {
-			event.setCancelled(true);
-		} else if (event.getEntityType().equals(EntityType.ENDER_DRAGON)) {
+		if (event.getEntityType().equals(EntityType.ENDER_DRAGON)) {
 			event.setCancelled(true);
 		}
 
@@ -965,7 +952,7 @@ public class BlockListener implements Listener {
 				}
 			}
 
-			if (event.getItem().getType().equals(Material.INK_SACK)) {
+			if (event.getItem().getType().equals(Material.BONE_MEAL)) {
 				//if (event.getItem().getDurability() == 15) { 
 					event.setCancelled(true);
 					return;
@@ -1006,7 +993,7 @@ public class BlockListener implements Listener {
 				}
 			}
 
-			if (event.getItem().getType().equals(Material.INK_SACK) && event.getItem().getDurability() == 15) {
+			if (event.getItem().getType().equals(Material.BONE_MEAL)) {
 				Block clickedBlock = event.getClickedBlock();
 				if (ItemManager.getId(clickedBlock) == CivData.WHEAT || 
 					ItemManager.getId(clickedBlock) == CivData.CARROTS || 
@@ -1021,11 +1008,10 @@ public class BlockListener implements Listener {
 		Block soilBlock = event.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN);
 
 		// prevent players trampling crops
-		if ((event.getAction() == Action.PHYSICAL)) {
-			if ((soilBlock.getType() == Material.SOIL) || (soilBlock.getType() == Material.CROPS)) {
-				//CivLog.debug("no crop cancel.");
+		if (event.getAction() == Action.PHYSICAL) {
+			if (soilBlock.getType() == Material.FARMLAND) {
 				event.setCancelled(true);
-				return;	
+				return;
 			}
 		}
 		/* 
@@ -1152,7 +1138,6 @@ public class BlockListener implements Listener {
 				if(tc.getTown().getCiv().getDiplomacyManager().atWarWith(resident.getTown().getCiv())) {
 
 					switch (event.getClickedBlock().getType()) {
-					case WOODEN_DOOR:
 					case IRON_DOOR:
 					case SPRUCE_DOOR:
 					case BIRCH_DOOR:
@@ -1162,9 +1147,9 @@ public class BlockListener implements Listener {
                     case ACACIA_FENCE_GATE:
                     case BIRCH_FENCE_GATE:
                     case DARK_OAK_FENCE_GATE: 
-                    case FENCE_GATE:
-                    case SPRUCE_FENCE_GATE:
-                    case JUNGLE_FENCE_GATE: 
+                    case SPRUCE_FENCE_GATE: 
+                        case JUNGLE_FENCE_GATE:
+                            case OAK_DOOR:
 						return;
 					default:
 						break;
@@ -1247,13 +1232,13 @@ public class BlockListener implements Listener {
 				switch (event.getRightClicked().getType()) {
 				case COW:
 				case SHEEP:
-				case MUSHROOM_COW:
+				case MOOSHROOM:
 					if (inHand.getType().equals(Material.WHEAT)) {
 						denyBreeding = true;
 					}
 					break;
 				case PIG:
-					if (inHand.getType().equals(Material.CARROT_ITEM)) {
+					if (inHand.getType().equals(Material.CARROT)) {
 						denyBreeding = true;
 					}
 					break;
@@ -1266,7 +1251,7 @@ public class BlockListener implements Listener {
 					}
 					break;
 				case CHICKEN:
-					if (inHand.getType().equals(Material.SEEDS) ||
+					if (inHand.getType().equals(Material.WHEAT_SEEDS) ||
 						inHand.getType().equals(Material.MELON_SEEDS) ||
 						inHand.getType().equals(Material.PUMPKIN_SEEDS)) {
 						denyBreeding = true;
@@ -1275,7 +1260,7 @@ public class BlockListener implements Listener {
 				case RABBIT:
 					if (inHand.getType().equals(Material.CARROT) ||
 						inHand.getType().equals(Material.GOLDEN_CARROT) ||
-						inHand.getType().equals(Material.YELLOW_FLOWER)) {
+						inHand.getType().equals(Material.DANDELION)) {
 						denyBreeding = true;
 					}
 					break;
@@ -1291,18 +1276,9 @@ public class BlockListener implements Listener {
 						CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorNoWildBreeding"));
 						event.setCancelled(true);
 					} else {
-							int loveTicks;
-							NBTTagCompound tag = new NBTTagCompound();
-							((CraftEntity)event.getRightClicked()).getHandle().c(tag);
-							loveTicks = tag.getInt("InLove");
-
-							if (loveTicks == 0) {	
-								if(!pasture.processMobBreed(event.getPlayer(), event.getRightClicked().getType())) {
-									event.setCancelled(true);
-								}
-							} else {
-								event.setCancelled(true);
-							}
+ 						if(!pasture.processMobBreed(event.getPlayer(), event.getRightClicked().getType())) {
+ 							event.setCancelled(true);
+ 						}
 					}
 
 					return;			
@@ -1405,7 +1381,8 @@ public class BlockListener implements Listener {
 	public void onChunkUnloadEvent(ChunkUnloadEvent event) {
 		Boolean persist = CivGlobal.isPersistChunk(event.getChunk());		
 		if (persist != null && persist == true) {
-			event.setCancelled(true);
+			Chunk chunk = event.getChunk();
+			chunk.getWorld().setChunkForceLoaded(chunk.getX(), chunk.getZ(), true);
 		}
 	}
 
@@ -1496,17 +1473,13 @@ public class BlockListener implements Listener {
 			}
 		}
 		
-		if (event.getEntity().getType().equals(EntityType.CHICKEN)) {
-			if (event.getSpawnReason().equals(SpawnReason.EGG)) {
-				event.setCancelled(true);
-				return;
+			if (event.getEntity().getType().equals(EntityType.CHICKEN)) {
+				if (event.getSpawnReason().equals(SpawnReason.EGG)) {
+					event.setCancelled(true);
+					return;
+				}
+				// Removed NMS-based chicken jockey detection for 1.21 compatibility.
 			}
-			NBTTagCompound compound = new NBTTagCompound();
-			if (compound.getBoolean("IsChickenJockey")) {
-				event.setCancelled(true);
-				return;			
-			}
-		}
 
 		if (event.getEntity().getType().equals(EntityType.IRON_GOLEM) &&
 			event.getSpawnReason().equals(SpawnReason.BUILD_IRONGOLEM)) {
@@ -1672,12 +1645,15 @@ public class BlockListener implements Listener {
 			if (potion.getShooter() instanceof LivingEntity) {
 				entityName = shooter.getCustomName();
 			}
-			if (entityName != null && entityName.endsWith(" Ruffian")) {
-				EntityInsentient nmsEntity = (EntityInsentient) ((CraftLivingEntity) shooter).getHandle();
-		    	AttributeInstance attribute = nmsEntity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE);
-		    	Double damage = attribute.getValue();
-				
-				class RuffianProjectile {
+				if (entityName != null && entityName.endsWith(" Ruffian")) {
+					double damage = 1.0D;
+					if (shooter != null) {
+						org.bukkit.attribute.AttributeInstance attr = shooter.getAttribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE);
+						if (attr != null) {
+							damage = attr.getValue();
+						}
+					}
+					class RuffianProjectile {
 					Location loc;
 					Location target;
 					org.bukkit.entity.Entity attacker;
@@ -1744,27 +1720,16 @@ public class BlockListener implements Listener {
 						//setFireAt(loc, spread);		
 					}
 					
-					@SuppressWarnings("deprecation")
 					private void damagePlayers(Location loc, int radius) {
-						double x = loc.getX()+0.5;
-						double y = loc.getY()+0.5;
-						double z = loc.getZ()+0.5;
-						double r = (double)radius;
-						
-						CraftWorld craftWorld = (CraftWorld)attacker.getWorld();
-						
-						AxisAlignedBB bb = AxisAlignedBB(x-r, y-r, z-r, x+r, y+r, z+r);
-						
-						List<net.minecraft.server.v1_12_R1.Entity> entities = craftWorld.getHandle().getEntities(((CraftEntity)attacker).getHandle(), bb);
-						
-						for (net.minecraft.server.v1_12_R1.Entity e : entities) {
-							if (e instanceof EntityPlayer) {
-								EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(attacker, ((EntityPlayer)e).getBukkitEntity(), DamageCause.ENTITY_ATTACK, damage);
-								Bukkit.getServer().getPluginManager().callEvent(event);
-								e.damageEntity(DamageSource.GENERIC, (float) event.getDamage());
+						if (loc.getWorld() == null) return;
+						for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius, ent -> ent instanceof Player)) {
+							Player target = (Player) e;
+							EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(attacker, target, DamageCause.ENTITY_ATTACK, damage);
+							Bukkit.getServer().getPluginManager().callEvent(event);
+							if (!event.isCancelled()) {
+								target.damage(event.getDamage(), attacker);
 							}
 						}
-						
 					}
 					
 					
@@ -1783,11 +1748,6 @@ public class BlockListener implements Listener {
 //						}
 //					}
 
-					private AxisAlignedBB AxisAlignedBB(double d, double e,
-							double f, double g, double h, double i) {
-						 return new AxisAlignedBB(d, e, f, g, h, i);
-//						return null;
-					}
 
 					private void launchExplodeFirework(Location loc) {
 						FireworkEffect fe = FireworkEffect.builder().withColor(Color.ORANGE).withColor(Color.YELLOW).flicker(true).with(Type.BURST).build();		
@@ -1843,11 +1803,11 @@ public class BlockListener implements Listener {
 		boolean protect = false;
 		for (PotionEffect effect : potion.getEffects()) {
 			if (effect.getType().equals(PotionEffectType.BLINDNESS) ||
-				effect.getType().equals(PotionEffectType.CONFUSION) ||
-				effect.getType().equals(PotionEffectType.HARM) ||
+				effect.getType().equals(PotionEffectType.INSTANT_DAMAGE) ||
+				effect.getType().equals(PotionEffectType.NAUSEA) ||
 				effect.getType().equals(PotionEffectType.POISON) ||
-				effect.getType().equals(PotionEffectType.SLOW) ||
-				effect.getType().equals(PotionEffectType.SLOW_DIGGING) ||
+				effect.getType().equals(PotionEffectType.SLOWNESS) ||
+				effect.getType().equals(PotionEffectType.MINING_FATIGUE) ||
 				effect.getType().equals(PotionEffectType.WEAKNESS) ||
 				effect.getType().equals(PotionEffectType.WITHER)) {
 
@@ -1974,9 +1934,5 @@ public class BlockListener implements Listener {
 		return reason;
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
-	public void onEntityPortalCreate(EntityCreatePortalEvent event) {
-		event.setCancelled(true);
-	}
 
 }

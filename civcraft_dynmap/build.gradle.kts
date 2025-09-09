@@ -1,37 +1,18 @@
-plugins {
-    java
-}
+plugins { java }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
-}
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(21)) }
 
 repositories {
     mavenCentral()
-
-    // Dynmap API mirrors (niet altijd op Central):
     maven(url = "https://maven.elmakers.com/repository/")
     maven(url = "https://repo.minebench.de/")
     maven(url = "https://mvn.lumine.io/repository/maven-public/")
-    maven(url = "https://www.iani.de/nexus/content/repositories/releases/")
+    maven(url = "https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    testImplementation("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
-    // Verwijder deze als je 'm had (conflicteert met Paper):
-    // compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
-
-    // Dynmap API – exclude de oude Bukkit/Spigot om capability-conflict te voorkomen
-    compileOnly("org.dynmap:dynmap-api:1.9") {
-    }
-
-    // Jouw CivCraft core als compileOnly (server levert 'm runtime mee)
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("org.dynmap:dynmap-api:3.6") // check de exacte versie die je dynmap plugin gebruikt
     compileOnly(project(":civcraft"))
-}
-
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
 }
 

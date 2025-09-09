@@ -297,7 +297,7 @@ public class ConfigMarketItem {
 		
 		ItemStack newStack;
 		if (this.custom_id == null) {
-			newStack = new ItemStack(this.type_id, amount, (short)this.data);
+			newStack = com.avrgaming.civcraft.util.ItemManager.createItemStack(this.type_id, amount, (short)this.data);
 		} else {
 			newStack = LoreMaterial.spawn(LoreMaterial.materialMap.get(this.custom_id));
 			newStack.setAmount(amount);
@@ -309,7 +309,6 @@ public class ConfigMarketItem {
 		}
 		
 		CivMessage.sendSuccess(player, CivSettings.localize.localizedString("var_market_buy",total_items,this.name,cost,CivSettings.CURRENCY_NAME));
-		player.updateInventory();
 	}
 	
 	public void sell(Resident resident, Player player, int amount) throws CivException {

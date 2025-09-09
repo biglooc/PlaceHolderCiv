@@ -68,7 +68,6 @@ import com.avrgaming.civcraft.listener.armor.ArmorListener;
 import com.avrgaming.civcraft.loreenhancements.LoreEnhancementArenaItem;
 import com.avrgaming.civcraft.lorestorage.LoreCraftableMaterialListener;
 import com.avrgaming.civcraft.lorestorage.LoreGuiItemListener;
-import com.avrgaming.civcraft.nocheat.NoCheatPlusSurvialFlyHandler;
 import com.avrgaming.civcraft.populators.TradeGoodPopulator;
 import com.avrgaming.civcraft.randomevents.RandomEventSweeper;
 import com.avrgaming.civcraft.sessiondb.SessionDBAsyncTimer;
@@ -236,7 +235,7 @@ public final class CivCraft extends JavaPlugin {
 	}
 	
 	private void registerNPCHooks() {
-		NoCheatPlusSurvialFlyHandler.init();
+		// NoCheatPlus hooks removed/incompatible on modern Paper 1.21. Keep method for backward compat.
 	}
 	
 	@Override
@@ -305,11 +304,7 @@ public final class CivCraft extends JavaPlugin {
 	
 		registerEvents();
 		
-		if (hasPlugin("NoCheatPlus")) {
-			registerNPCHooks();
-		} else {
-			CivLog.warning("NoCheatPlus not found, not registering NCP hooks. This is fine if you're not using NCP.");
-		}
+		// NoCheatPlus hooks are disabled on 1.21; nothing to register here.
 		
 		startTimers();
 				
@@ -318,9 +313,34 @@ public final class CivCraft extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		super.onDisable();
+		// Mark disable early so long-running async loops can exit gracefully
 		isDisable = true;
+
+		// Cancel all scheduled tasks created via our TaskMaster (both async and timers)
+		try {
+			TaskMaster.stopAll();
+		} catch (Throwable t) {
+			getLogger().warning("Failed to stop TaskMaster tasks: " + t.getMessage());
+		}
+
+		// Also ask Bukkit to cancel any remaining tasks for this plugin (extra safety)
+		try {
+			BukkitObjects.getScheduler().cancelTasks(this);
+		} catch (Throwable t) {
+			getLogger().warning("Failed to cancel Bukkit tasks: " + t.getMessage());
+		}
+
+		// Flush any pending session DB requests synchronously before closing
+		try {
+			com.avrgaming.civcraft.sessiondb.SessionDBAsyncTimer.flushAll();
+		} catch (Throwable t) {
+			getLogger().warning("Failed to flush session DB queue: " + t.getMessage());
+		}
+
+		// Flush any pending SQL object saves synchronously
 		SQLUpdate.save();
+
+		super.onDisable();
 	}
 	
 	public boolean hasPlugin(String name) {

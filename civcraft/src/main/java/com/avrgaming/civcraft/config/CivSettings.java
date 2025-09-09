@@ -502,7 +502,7 @@ public class CivSettings {
 		restrictedSpawns.put(EntityType.ENDERMAN, 0);
 		restrictedSpawns.put(EntityType.GHAST, 0);
 		restrictedSpawns.put(EntityType.GIANT, 0);
-		restrictedSpawns.put(EntityType.PIG_ZOMBIE, 0);
+		restrictedSpawns.put(EntityType.ZOMBIFIED_PIGLIN, 0);
 		restrictedSpawns.put(EntityType.SILVERFISH, 0);
 		restrictedSpawns.put(EntityType.SKELETON, 0);
 		restrictedSpawns.put(EntityType.SLIME, 0);
@@ -523,47 +523,34 @@ public class CivSettings {
 		restrictedItems.put(Material.BUCKET, 0);
 		restrictedItems.put(Material.WATER_BUCKET, 0);
 		restrictedItems.put(Material.LAVA_BUCKET, 0);
-		restrictedItems.put(Material.CAKE_BLOCK, 0);
+		restrictedItems.put(Material.CAKE, 0);
 		restrictedItems.put(Material.CAULDRON, 0);
-		restrictedItems.put(Material.DIODE, 0);
-		restrictedItems.put(Material.INK_SACK, 0);
 		restrictedItems.put(Material.ITEM_FRAME, 0);
 		restrictedItems.put(Material.PAINTING, 0);
 		restrictedItems.put(Material.SHEARS, 0);
-		restrictedItems.put(Material.STATIONARY_LAVA, 0);
-		restrictedItems.put(Material.STATIONARY_WATER, 0);
 		restrictedItems.put(Material.TNT, 0);
 	}
 
 	private static void initRestrictedUndoBlocks() {
-		restrictedUndoBlocks.add(Material.CROPS);
-		restrictedUndoBlocks.add(Material.CARROT);
-		restrictedUndoBlocks.add(Material.POTATO);
-		restrictedUndoBlocks.add(Material.REDSTONE);
+		restrictedUndoBlocks.add(Material.WHEAT);
+		restrictedUndoBlocks.add(Material.CARROTS);
+		restrictedUndoBlocks.add(Material.POTATOES);
 		restrictedUndoBlocks.add(Material.REDSTONE_WIRE);
-		restrictedUndoBlocks.add(Material.REDSTONE_TORCH_OFF);
-		restrictedUndoBlocks.add(Material.REDSTONE_TORCH_ON);
-		restrictedUndoBlocks.add(Material.DIODE_BLOCK_OFF);
-		restrictedUndoBlocks.add(Material.DIODE_BLOCK_ON);
-		restrictedUndoBlocks.add(Material.REDSTONE_COMPARATOR_OFF);
-		restrictedUndoBlocks.add(Material.REDSTONE_COMPARATOR_ON);
-		restrictedUndoBlocks.add(Material.REDSTONE_COMPARATOR);
+		restrictedUndoBlocks.add(Material.REDSTONE_TORCH);
+		restrictedUndoBlocks.add(Material.REPEATER);
+		restrictedUndoBlocks.add(Material.COMPARATOR);
 		restrictedUndoBlocks.add(Material.STRING);
 		restrictedUndoBlocks.add(Material.TRIPWIRE);
-		restrictedUndoBlocks.add(Material.SUGAR_CANE_BLOCK);
-		restrictedUndoBlocks.add(Material.BEETROOT_SEEDS);
-		restrictedUndoBlocks.add(Material.LONG_GRASS);
-		restrictedUndoBlocks.add(Material.RED_ROSE);
+		restrictedUndoBlocks.add(Material.SUGAR_CANE);
+		restrictedUndoBlocks.add(Material.BEETROOTS);
+		restrictedUndoBlocks.add(Material.POPPY);
 		restrictedUndoBlocks.add(Material.RED_MUSHROOM);
-		restrictedUndoBlocks.add(Material.DOUBLE_PLANT);
-		restrictedUndoBlocks.add(Material.CAKE_BLOCK);
+		restrictedUndoBlocks.add(Material.CAKE);
 		restrictedUndoBlocks.add(Material.CACTUS);
-		restrictedUndoBlocks.add(Material.PISTON_BASE);
-		restrictedUndoBlocks.add(Material.PISTON_EXTENSION);
-		restrictedUndoBlocks.add(Material.PISTON_MOVING_PIECE);
-		restrictedUndoBlocks.add(Material.PISTON_STICKY_BASE);
+		restrictedUndoBlocks.add(Material.PISTON);
+		restrictedUndoBlocks.add(Material.STICKY_PISTON);
 		restrictedUndoBlocks.add(Material.TRIPWIRE_HOOK);
-		restrictedUndoBlocks.add(Material.SAPLING);
+		restrictedUndoBlocks.add(Material.OAK_SAPLING);
 		restrictedUndoBlocks.add(Material.PUMPKIN_STEM);
 		restrictedUndoBlocks.add(Material.MELON_STEM);
 	}
@@ -572,71 +559,50 @@ public class CivSettings {
 		playerEntityWeapons.add(EntityType.PLAYER);
 		playerEntityWeapons.add(EntityType.ARROW);
 		playerEntityWeapons.add(EntityType.SPECTRAL_ARROW);
-		playerEntityWeapons.add(EntityType.TIPPED_ARROW);
 		playerEntityWeapons.add(EntityType.EGG);
 		playerEntityWeapons.add(EntityType.SNOWBALL);
-		playerEntityWeapons.add(EntityType.SPLASH_POTION);
-		playerEntityWeapons.add(EntityType.LINGERING_POTION);
-		playerEntityWeapons.add(EntityType.FISHING_HOOK);
+		playerEntityWeapons.add(EntityType.POTION);
+		playerEntityWeapons.add(EntityType.FISHING_BOBBER);
 	}
 
 	private static void initSwitchItems() {
 		switchItems.add(Material.ANVIL);
 		switchItems.add(Material.BEACON);
 		switchItems.add(Material.BREWING_STAND);
-		switchItems.add(Material.BURNING_FURNACE);
-		switchItems.add(Material.CAKE_BLOCK);
+		switchItems.add(Material.CAKE);
 		switchItems.add(Material.CAULDRON);
 		switchItems.add(Material.CHEST);
 		switchItems.add(Material.TRAPPED_CHEST);
-		switchItems.add(Material.COMMAND);
-		switchItems.add(Material.DIODE);
-		switchItems.add(Material.DIODE_BLOCK_OFF);
-		switchItems.add(Material.DIODE_BLOCK_ON);
 		switchItems.add(Material.DISPENSER);
-		switchItems.add(Material.FENCE_GATE);
 		switchItems.add(Material.FURNACE);
 		switchItems.add(Material.JUKEBOX);
 		switchItems.add(Material.LEVER);
 		switchItems.add(Material.STONE_BUTTON);
-		switchItems.add(Material.STONE_PLATE);
+		switchItems.add(Material.STONE_PRESSURE_PLATE);
 		switchItems.add(Material.IRON_DOOR);
 		switchItems.add(Material.TNT);
-		switchItems.add(Material.TRAP_DOOR);
-		switchItems.add(Material.WOOD_DOOR);
-		switchItems.add(Material.WOODEN_DOOR);
-		switchItems.add(Material.WOOD_PLATE);
+		switchItems.add(Material.OAK_TRAPDOOR);
+		switchItems.add(Material.OAK_DOOR);
+		switchItems.add(Material.OAK_PRESSURE_PLATE);
 
-		// 1.5 additions.
+		// modern additions
 		switchItems.add(Material.HOPPER);
-		switchItems.add(Material.HOPPER_MINECART);
 		switchItems.add(Material.DROPPER);
-		switchItems.add(Material.REDSTONE_COMPARATOR);
-		switchItems.add(Material.REDSTONE_COMPARATOR_ON);
-		switchItems.add(Material.REDSTONE_COMPARATOR_OFF);
-		switchItems.add(Material.TRAPPED_CHEST);
-		switchItems.add(Material.GOLD_PLATE);
-		switchItems.add(Material.IRON_PLATE);
+		switchItems.add(Material.COMPARATOR);
 		switchItems.add(Material.IRON_TRAPDOOR);
 
-		// 1.6 additions.
-		switchItems.add(Material.SPRUCE_DOOR);
-		switchItems.add(Material.BIRCH_DOOR);
-		switchItems.add(Material.JUNGLE_DOOR);
-		switchItems.add(Material.ACACIA_DOOR);
-		switchItems.add(Material.DARK_OAK_DOOR);
-
-		// 1.7 additions
+		// fence gates
 		switchItems.add(Material.ACACIA_FENCE_GATE);
 		switchItems.add(Material.BIRCH_FENCE_GATE);
 		switchItems.add(Material.DARK_OAK_FENCE_GATE);
 		switchItems.add(Material.SPRUCE_FENCE_GATE);
 		switchItems.add(Material.JUNGLE_FENCE_GATE);
+		switchItems.add(Material.OAK_FENCE_GATE);
 	}
 
 	private static void initBlockPlaceExceptions() {
 		blockPlaceExceptions.put(Material.FIRE, 0);
-		blockPlaceExceptions.put(Material.PORTAL, 0);
+		blockPlaceExceptions.put(Material.NETHER_PORTAL, 0);
 	}
 
 	// ---------- GETTERS / HELPERS ----------

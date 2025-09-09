@@ -93,45 +93,46 @@ public class TradeGoodPopulator extends BlockPopulator {
     		}
     	}
 
-    	Block signBlock = top.getRelative(direction);
-    	signBlock.setType(Material.WALL_SIGN);
-    	//TODO make sign a structure sign?
-    			//          Civ.protectedBlockTable.put(Civ.locationHash(signBlock.getLocation()), 
-    	//          		new ProtectedBlock(signBlock, null, null, null, ProtectedBlock.Type.TRADE_MARKER));
+     Block signBlock = top.getRelative(direction);
+        signBlock.setType(Material.OAK_WALL_SIGN, false);
+        // Set facing using modern BlockData API
+        org.bukkit.block.data.BlockData bd = signBlock.getBlockData();
+        if (bd instanceof org.bukkit.block.data.type.WallSign ws) {
+            ws.setFacing(direction);
+            signBlock.setBlockData(ws, false);
+        }
 
-    	BlockState state = signBlock.getState();
+        BlockState state = signBlock.getState();
 
-    	if (state instanceof Sign) {
-    		Sign sign = (Sign)state;
-    		org.bukkit.material.Sign data = (org.bukkit.material.Sign)state.getData();
+        if (state instanceof Sign) {
+            Sign sign = (Sign) state;
 
-    		data.setFacingDirection(direction);
-    		sign.setLine(0, CivSettings.localize.localizedString("TradeGoodSign_Heading"));
-    		sign.setLine(1, "----");
-    		sign.setLine(2, good.name);
-    		sign.setLine(3, "");
-    		sign.update(true);
+            sign.setLine(0, CivSettings.localize.localizedString("TradeGoodSign_Heading"));
+            sign.setLine(1, "----");
+            sign.setLine(2, good.name);
+            sign.setLine(3, "");
+            sign.update(true);
 
-    		StructureSign structSign = new StructureSign(new BlockCoord(signBlock), null);
-    		structSign.setAction("");
-    		structSign.setType("");
-    		structSign.setText(sign.getLines());
-    		structSign.setDirection(ItemManager.getData(sign.getData()));
-    		CivGlobal.addStructureSign(structSign);
+            StructureSign structSign = new StructureSign(new BlockCoord(signBlock), null);
+            structSign.setAction("");
+            structSign.setType("");
+            structSign.setText(sign.getLines());
+            structSign.setDirection((byte) 0);
+            CivGlobal.addStructureSign(structSign);
             ProtectedBlock pbsign = new ProtectedBlock(new BlockCoord(signBlock), ProtectedBlock.Type.TRADE_MARKER);
             CivGlobal.addProtectedBlock(pbsign);
             if (sync) {
                 try {
-                	pbsign.saveNow();
+                    pbsign.saveNow();
                     structSign.saveNow();
                 } catch (SQLException e) {
-                	e.printStackTrace();
+                    e.printStackTrace();
                 }
             } else {
-            	pbsign.save();
+                pbsign.save();
                 structSign.save();
             }
-    	}
+        }
         
     	if (sync) {
 	    	try {
@@ -187,7 +188,7 @@ public class TradeGoodPopulator extends BlockPopulator {
 			
 			// Randomly choose a land or water good.
 			if (good == null) {
-				System.out.println("Could not find suitable good type during populate! aborting.");
+				CivLog.warning("Could not find suitable good type during populate! aborting.");
 				return;
 			}
 			

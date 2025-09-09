@@ -49,7 +49,7 @@ public class FishingListener implements Listener {
 			 event.getCaught().remove();
 
 			 if (dropped.size() == 0) {
-				 stack = ItemManager.createItemStack(ItemManager.getId(Material.RAW_FISH), 1);
+				 stack = ItemManager.createItemStack(ItemManager.getId(Material.COD), 1);
 				 HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(stack);
 				 for (ItemStack is : leftovers.values()) {
 					 player.getWorld().dropItem(player.getLocation(), is);

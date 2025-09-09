@@ -476,7 +476,7 @@ public class Camp extends Buildable {
 			switch (sb.command) {
 			case "/gardensign":
 				if (!this.gardenEnabled) {
-					ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.SIGN_POST));
+					ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.OAK_SIGN));
 					ItemManager.setData(absCoord.getBlock(), sb.getData());
 					
 					Sign sign = (Sign)absCoord.getBlock().getState();
@@ -543,7 +543,7 @@ public class Camp extends Buildable {
 					ItemManager.setData(absCoord.getBlock(), data2);
 				} else {
 					try {
-					ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.SIGN_POST));
+					ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.OAK_SIGN));
 					ItemManager.setData(absCoord.getBlock(), sb.getData());
 					
 					Sign sign = (Sign)absCoord.getBlock().getState();
@@ -565,7 +565,7 @@ public class Camp extends Buildable {
 					byte data3 = CivData.convertSignDataToChestData((byte)sb.getData());
 					ItemManager.setData(absCoord.getBlock(), data3);
 				} else {
-					ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.SIGN_POST));
+					ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.OAK_SIGN));
 					ItemManager.setData(absCoord.getBlock(), sb.getData());
 					
 					Sign sign = (Sign)absCoord.getBlock().getState();
@@ -589,8 +589,8 @@ public class Camp extends Buildable {
 				bottomData |= doorDirection;
 				
 				
-				ItemManager.setTypeIdAndData(doorBlock, ItemManager.getId(Material.WOODEN_DOOR), bottomData, false);
-				ItemManager.setTypeIdAndData(doorBlock2, ItemManager.getId(Material.WOODEN_DOOR), topData, false);
+				ItemManager.setTypeIdAndData(doorBlock, ItemManager.getId(Material.OAK_DOOR), bottomData, false);
+				ItemManager.setTypeIdAndData(doorBlock2, ItemManager.getId(Material.OAK_DOOR), topData, false);
 
 				this.addCampBlock(new BlockCoord(doorBlock));
 				this.addCampBlock(new BlockCoord(doorBlock2));
@@ -600,7 +600,7 @@ public class Camp extends Buildable {
 				break;
 			case "/literal":
 				/* Unrecognized command... treat as a literal sign. */
-				ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.WALL_SIGN));
+				ItemManager.setTypeId(absCoord.getBlock(), ItemManager.getId(Material.OAK_WALL_SIGN));
 				ItemManager.setData(absCoord.getBlock(), sb.getData());
 				
 				Sign sign = (Sign)absCoord.getBlock().getState();

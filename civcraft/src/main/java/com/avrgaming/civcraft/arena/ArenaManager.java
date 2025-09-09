@@ -382,8 +382,8 @@ public class ArenaManager implements Runnable {
 			Location loc = coord.getCenteredLocation();
 			loc.setWorld(world);
 			
-			if (loc.getBlock().getType().equals(Material.SIGN_POST) ||
-			    loc.getBlock().getType().equals(Material.WALL_SIGN)) {
+ 		if (loc.getBlock().getType().equals(Material.OAK_SIGN) ||
+			    loc.getBlock().getType().equals(Material.OAK_WALL_SIGN)) {
 				Sign sign = (Sign)loc.getBlock().getState();
 				sign.setLine(0, "");
 				sign.setLine(1, "Respawn");
@@ -433,8 +433,8 @@ public class ArenaManager implements Runnable {
     		//if directory not exists, create it
     		if(!dest.exists()){
     		   dest.mkdir();
-    		   System.out.println("Directory copied from " 
-                              + src + "  to " + dest);
+    		   CivLog.info("Directory copied from " 
+                                 + src + "  to " + dest);
     		}
  
     		//list all the directory contents
@@ -463,8 +463,8 @@ public class ArenaManager implements Runnable {
     	        }
  
     	        in.close();
-    	        out.close();
-    	        System.out.println("File copied from " + src + " to " + dest);
+   		        out.close();
+   		        CivLog.info("File copied from " + src + " to " + dest);
     	}
     }
 

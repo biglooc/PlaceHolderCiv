@@ -218,7 +218,7 @@ public class TradeInventoryListener implements Listener {
 		ItemStack guiStack;
 		if (pair.coins == 0) {
 			guiStack = LoreGuiItem.build(""+CivSettings.CURRENCY_NAME+" "+CivSettings.localize.localizedString("resident_tradeOffered"), 
-					ItemManager.getId(Material.NETHER_BRICK_ITEM), 0, 
+					ItemManager.getId(Material.NETHER_BRICK), 0, 
 					CivColor.Yellow+"0 "+CivSettings.CURRENCY_NAME);
 		} else {
 			guiStack = LoreGuiItem.build(""+CivSettings.CURRENCY_NAME+" "+CivSettings.localize.localizedString("resident_tradeOffered"), 
@@ -283,10 +283,10 @@ public class TradeInventoryListener implements Listener {
 			return;
 		}
 		
-		if (!savedTradeInventory.getName().equals(event.getInventory().getName())) {
+		if (event.getInventory() != savedTradeInventory) {
 			return;
 		}
-	
+		
 		/* Check to see if we've clicked on a button. */
 		if (event.getRawSlot() == MY_SLOT_BUTTON) {
 			ItemStack button = event.getInventory().getItem(MY_SLOT_BUTTON);
@@ -525,7 +525,7 @@ public class TradeInventoryListener implements Listener {
 			return;
 		}
 		
-		if (!savedTradeInventory.getName().equals(event.getInventory().getName())) {
+		if (event.getInventory() != savedTradeInventory) {
 			return;
 		}
 		
@@ -560,7 +560,7 @@ public class TradeInventoryListener implements Listener {
 			return;
 		}
 		
-		if (!savedTradeInventory.getName().equals(event.getInventory().getName())) {
+		if (event.getInventory() != savedTradeInventory) {
 			return;
 		}
 		

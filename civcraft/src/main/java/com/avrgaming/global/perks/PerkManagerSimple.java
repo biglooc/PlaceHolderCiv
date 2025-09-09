@@ -24,7 +24,7 @@ public class PerkManagerSimple extends PerkManager {
 	
 	@Override
 	public void init() throws SQLException {
-		System.out.println("================= USER_PERKS INIT ======================");
+		CivLog.info("================= USER_PERKS INIT ======================");
 		
 		// Check/Build SessionDB tables				
 		if (!SQL.hasGlobalTable(USER_PERKS_TABLE_NAME)) {
@@ -41,9 +41,9 @@ public class PerkManagerSimple extends PerkManager {
 			CivLog.info(USER_PERKS_TABLE_NAME+" table OK!");
 		}		
 				
-		System.out.println("==================================================");	
+		CivLog.info("==================================================");	
 		
-		System.out.println("================= USER_PLATINUM INIT ======================");
+		CivLog.info("================= USER_PLATINUM INIT ======================");
 		
 		// Check/Build SessionDB tables				
 		if (!SQL.hasGlobalTable(USER_PLATINUM_TABLE_NAME)) {
@@ -60,7 +60,7 @@ public class PerkManagerSimple extends PerkManager {
 			CivLog.info(USER_PLATINUM_TABLE_NAME+" table OK!");
 		}		
 				
-		System.out.println("==================================================");	
+		CivLog.info("==================================================");	
 	}
 	
 	@Override

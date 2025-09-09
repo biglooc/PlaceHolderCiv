@@ -1,86 +1,61 @@
-plugins{
+plugins {
     java
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 java {
-    // Eén duidelijke Java 8-config
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
-
-val civLibs = rootProject.file("civcraft/libs")
 
 repositories {
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/groups/public/")
-    flatDir { dirs(civLibs) } // lokale jars
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
-dependencies {
-
-    // --- Spigot/CraftBukkit 1.12.2 (NMS/CraftBukkit nodig!) ---
-    // Optie A: via BuildTools (aanrader – zet dan craftbukkit in je lokale maven):
-    // compileOnly("org.bukkit:craftbukkit:1.12.2-R0.1-SNAPSHOT")
-    // (óf compileOnly("org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT"))
-
-    // Optie B: via lokale server-jar (moet de **server** zijn, niet alleen API!)
-    // Zet de daadwerkelijke bestandsnaam goed (meestal ~30–50 MB groot):
-    compileOnly(files("$civLibs/spigot-1.12.2.jar"))
-
-    // Alle overige plugin-jars uit libs/, spigot-*.jar uitsluiten
-    compileOnly(fileTree(civLibs) {
-        include("*.jar")
-        exclude("spigot-*.jar")
-    })
-
-    // --- Runtime/Compile libs ---
-    // MySQL 5.1.x voor com.mysql.jdbc.StringUtils (Connector/J 8.x heeft deze niet meer)
-    implementation("mysql:mysql-connector-java:8.0.33")
-
-    // Apache Commons IO voor FileUtils
-    implementation("commons-io:commons-io:2.6")
-
-    // Logging + Hikari (zoals je had)
-    implementation("com.zaxxer:HikariCP:3.4.5")
-    implementation("org.slf4j:slf4j-api:1.7.36")
-    implementation("org.slf4j:slf4j-simple:1.7.36")
-
-    // Annotations voor @Nonnull/@Nullable
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-
-    // --- Tests ---
-    testImplementation("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.hamcrest:hamcrest:2.2")
-    testImplementation("org.mockito:mockito-core:4.11.0")
-    testImplementation("org.mockito:mockito-inline:4.11.0")
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:unchecked"))
-}
-
-// Tests (JUnit 4)
-tasks.test {
-    useJUnit()
-    testLogging {
-        events("passed", "failed", "skipped", "standardOut", "standardError")
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-        showCauses = true
-        showExceptions = true
-        showStackTraces = true
+sourceSets {
+    named("main") {
+        java {
+            // Exclude legacy NoCheatPlus hooks that are incompatible with 1.21
+            exclude("com/avrgaming/civcraft/nocheat/**")
+        }
     }
 }
 
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar"){
-    archiveClassifier.set("")         // publiceer alleen shadow
-    // minimize() // optioneel; uitzetten als je iets mist
-    relocate("com.zaxxer.hikari", "com.avrgaming.shaded.hikari")
+dependencies {
+    // Use Paper API at compile-time only
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+
+    // Additional libraries
+    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("org.slf4j:slf4j-api:2.0.13")
+    implementation("org.slf4j:slf4j-simple:2.0.13")
+
+    // Database driver
+    implementation("mysql:mysql-connector-java:8.0.33")
+
+    // Compile-only APIs used by the plugin at runtime from the server
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+    compileOnly("commons-io:commons-io:2.15.1")
+    // Code uses org.apache.commons.lang.*, which is Commons Lang 2.x
+    compileOnly("commons-lang:commons-lang:2.6")
+
+    compileOnly("org.jetbrains:annotations:24.1.0")
+
+    testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    // Support legacy JUnit4 tests and Mockito
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.12.0")
+    // JUnit 5 (may be used by newer tests)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+// Shadow jar zoals je al had
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveClassifier.set("")
 }
 
 tasks.build { dependsOn(tasks.named("shadowJar")) }
-tasks.jar { enabled = false }

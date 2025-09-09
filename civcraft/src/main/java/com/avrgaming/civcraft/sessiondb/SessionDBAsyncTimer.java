@@ -187,4 +187,77 @@ public class SessionDBAsyncTimer implements Runnable {
 		return;		
 	}
 
+
+	public static void flushAll() {
+		Connection gameConnection = null;
+		Connection globalConnection = null;
+		SessionDBAsyncTimer worker = new SessionDBAsyncTimer();
+		try {
+			while (true) {
+				SessionAsyncRequest request;
+				lock.lock();
+				try {
+					request = requestQueue.poll();
+				} finally {
+					lock.unlock();
+				}
+				if (request == null) {
+					break;
+				}
+				try {
+					Connection cntx;
+					switch (request.database) {
+						case GAME:
+							if (gameConnection == null || gameConnection.isClosed()) {
+								gameConnection = SQL.getGameConnection();
+							}
+							cntx = gameConnection;
+							break;
+						case GLOBAL:
+							if (globalConnection == null || globalConnection.isClosed()) {
+								globalConnection = SQL.getGlobalConnection();
+							}
+							cntx = globalConnection;
+							break;
+						default:
+							continue;
+					}
+					switch (request.op) {
+						case ADD:
+							worker.performAdd(request, cntx);
+							break;
+						case DELETE:
+							worker.performDelete(request, cntx);
+							break;
+						case DELETE_ALL:
+							worker.performDeleteAll(request, cntx);
+							break;
+						case UPDATE:
+							worker.performUpdate(request, cntx);
+							break;
+						case UPDATE_INSERT:
+							worker.performUpdateInsert(request, cntx);
+							break;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			try {
+				if (gameConnection != null) {
+					gameConnection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (globalConnection != null) {
+					globalConnection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

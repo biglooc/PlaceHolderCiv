@@ -39,6 +39,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
 
 import com.avrgaming.civcraft.main.CivData;
+import com.avrgaming.civcraft.main.CivLog;
 import com.avrgaming.civcraft.object.Town;
 import com.avrgaming.civcraft.util.BukkitObjects;
 import com.avrgaming.civcraft.util.ItemManager;
@@ -96,7 +97,6 @@ public class WarRegen {
 				inv = ((Dispenser)blk.getState()).getInventory();
 				str += blockInventoryString(inv);
 				break;
-			case BURNING_FURNACE:
 			case FURNACE:
 				inv = ((Furnace)blk.getState()).getInventory();
 				str += blockInventoryString(inv);
@@ -109,9 +109,8 @@ public class WarRegen {
 				inv = ((Hopper)blk.getState()).getInventory();
 				str += blockInventoryString(inv);
 				break;
-			case SIGN:
-			case SIGN_POST:
-			case WALL_SIGN:
+			case OAK_SIGN:
+			case OAK_WALL_SIGN:
 				Sign sign = (Sign)blk.getState();
 				str += blockSignString(sign);
 				break;
@@ -153,7 +152,6 @@ public class WarRegen {
 			inv = ((Dispenser)block.getState()).getInventory();
 			InventorySerializer.StringToInventory(inv, split[6]);
 			break;
-		case BURNING_FURNACE:
 		case FURNACE:
 			inv = ((Furnace)block.getState()).getInventory();
 			InventorySerializer.StringToInventory(inv, split[6]);
@@ -166,9 +164,8 @@ public class WarRegen {
 			inv = ((Hopper)block.getState()).getInventory();
 			InventorySerializer.StringToInventory(inv, split[6]);
 			break;
-		case SIGN:
-		case SIGN_POST:
-		case WALL_SIGN:
+		case OAK_SIGN:
+		case OAK_WALL_SIGN:
 			Sign sign = (Sign)block.getState();
 			String[] messages = split[6].split(",");
 			for (int i = 0; i < 4; i++) {
@@ -187,9 +184,9 @@ public class WarRegen {
 	public static void explodeThisBlock(Block blk, String file) {
 
 		switch (blk.getType()) {
-		case SIGN_POST:
+		case OAK_SIGN:
 			return;
-		case WALL_SIGN:
+		case OAK_WALL_SIGN:
 			return;
 		case TNT:
 			return;
@@ -209,7 +206,7 @@ public class WarRegen {
 		case DISPENSER:
 			((Dispenser)blk.getState()).getInventory().clear();
 			break;
-		case BURNING_FURNACE:
+            case BLAST_FURNACE:
 		case FURNACE:
 			((Furnace)blk.getState()).getInventory().clear();
 			break;
@@ -242,7 +239,7 @@ public class WarRegen {
 		case DISPENSER:
 			((Dispenser)blk.getState()).getInventory().clear();
 			break;
-		case BURNING_FURNACE:
+            case BLAST_FURNACE:
 		case FURNACE:
 			((Furnace)blk.getState()).getInventory().clear();
 			break;
@@ -322,7 +319,7 @@ public class WarRegen {
 			}
 			reader.close();
 			warLog.delete();
-			System.out.println("[CivCraft] Restored "+count+" blocks for town "+name);
+			CivLog.info("[CivCraft] Restored "+count+" blocks for town "+name);
 
 		} catch (IOException e) {
 			e.printStackTrace();

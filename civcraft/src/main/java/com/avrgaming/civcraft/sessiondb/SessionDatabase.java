@@ -51,7 +51,7 @@ public class SessionDatabase {
 	public static String TABLE_NAME = "SESSIONS";
 	public static String GLOBAL_TABLE_NAME = "GLOBAL_SESSIONS";
 	public static void init() throws SQLException {
-		System.out.println("================= SESSION DB INIT ======================");
+		CivLog.info("================= SESSION DB INIT ======================");
 		// Check/Build SessionDB tables				
 		if (!SQL.hasTable(TABLE_NAME)) {
 			String table_create = "CREATE TABLE " + SQL.tb_prefix + TABLE_NAME+" (" + 
@@ -69,9 +69,9 @@ public class SessionDatabase {
 		} else {
 			CivLog.info(TABLE_NAME+" table OK!");
 		}			
-		System.out.println("==================================================");
+		CivLog.info("==================================================");
 		
-		System.out.println("================= GLOBAL SESSION DB INIT ======================");
+		CivLog.info("================= GLOBAL SESSION DB INIT ======================");
 		// Check/Build SessionDB tables				
 		if (!SQL.hasGlobalTable(GLOBAL_TABLE_NAME)) {
 			String table_create = "CREATE TABLE " + GLOBAL_TABLE_NAME+" (" + 
@@ -89,7 +89,7 @@ public class SessionDatabase {
 		} else {
 			CivLog.info(GLOBAL_TABLE_NAME+" table OK!");
 		}			
-		System.out.println("==================================================");
+		CivLog.info("==================================================");
 	}
 	
 	public boolean add(String key, String value, int civ_id, int town_id, int struct_id) {
@@ -253,7 +253,7 @@ public class SessionDatabase {
 		add("ThisTestKey", "ThisTestData", 0, 0, 0);		
 
 		for (SessionEntry se : lookup("ThisTestKey")) {
-			System.out.println("GOT ME SOME:"+se.value);
+			CivLog.info("GOT ME SOME:"+se.value);
 		}
 	
 	}

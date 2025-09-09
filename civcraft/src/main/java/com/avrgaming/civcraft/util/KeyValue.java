@@ -5,7 +5,7 @@ import java.util.HashMap;
  
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
  
-import com.mysql.jdbc.StringUtils;
+import org.apache.commons.lang.StringUtils;
  
 /*
  * Utility class that implements serialization/deserialization for key-value pairs into a single string.
@@ -59,7 +59,7 @@ public class KeyValue {
                                 decodedValue = "";
                         } else {                       
                                 String encodedValue = data[2];
-                                decodedValue =  StringUtils.toAsciiString(Base64Coder.decode(encodedValue));
+                           					decodedValue =  new String(Base64Coder.decode(encodedValue), java.nio.charset.StandardCharsets.UTF_8);
                         }
                        
                         try {

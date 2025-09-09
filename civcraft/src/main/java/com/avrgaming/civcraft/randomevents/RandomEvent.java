@@ -27,7 +27,7 @@ import com.avrgaming.civcraft.randomevents.components.Happiness;
 import com.avrgaming.civcraft.randomevents.components.Unhappiness;
 import com.avrgaming.civcraft.sessiondb.SessionEntry;
 import com.avrgaming.civcraft.util.CivColor;
-import com.mysql.jdbc.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class RandomEvent extends SQLObject {
 	
@@ -121,8 +121,8 @@ public class RandomEvent extends SQLObject {
 			String keyEncoded = split[0];
 			String valueEncoded = split[1];
 			
-			String key = StringUtils.toAsciiString(Base64Coder.decode(keyEncoded));
-			String value = StringUtils.toAsciiString(Base64Coder.decode(valueEncoded));
+			String key = new String(Base64Coder.decode(keyEncoded), java.nio.charset.StandardCharsets.UTF_8);
+			String value = new String(Base64Coder.decode(valueEncoded), java.nio.charset.StandardCharsets.UTF_8);
 		
 			this.componentVars.put(key, value);
 		}
@@ -132,7 +132,7 @@ public class RandomEvent extends SQLObject {
 		String[] messages = input.split(",");
 		
 		for (String encodedMessage : messages) {
-			String message = StringUtils.toAsciiString(Base64Coder.decode(encodedMessage));
+			String message = new String(Base64Coder.decode(encodedMessage), java.nio.charset.StandardCharsets.UTF_8);
 			this.savedMessages.add(message);
 		}
 	}

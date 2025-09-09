@@ -119,7 +119,7 @@ public class VaultEconObject extends EconObject {
 		 * if our current balance dips below the principal,
 		 * then we subtract from the principal.
 		 */
-        synchronized(principalAmount) {
+        synchronized(principalLock) {
             if (principalAmount > 0) {
                 double currentBalance = this.getBalance();
                 double diff = currentBalance - principalAmount;

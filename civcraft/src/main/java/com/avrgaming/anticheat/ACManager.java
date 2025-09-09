@@ -49,8 +49,10 @@ public class ACManager implements PluginMessageListener {
 	static boolean enabled = true;
 	
 	public static void init() {
-        Bukkit.getMessenger().registerOutgoingPluginChannel(CivCraft.getPlugin(), "CAC");
-        Bukkit.getMessenger().registerIncomingPluginChannel(CivCraft.getPlugin(), "CAC", new ACManager());
+        // Use a modern, namespaced plugin messaging channel to comply with Paper/Spigot requirements
+        String channel = "civcraft:cac";
+        Bukkit.getMessenger().registerOutgoingPluginChannel(CivCraft.getPlugin(), channel);
+        Bukkit.getMessenger().registerIncomingPluginChannel(CivCraft.getPlugin(), channel, new ACManager());
         
         try {
 			versionNumber = CivSettings.getString(CivSettings.nocheatConfig, "civcraft_ac_version");
@@ -103,7 +105,7 @@ public class ACManager implements PluginMessageListener {
 					generateIvSpec(player, buffer);
 					writeKey(buffer);
 					
-					player.sendPluginMessage(CivCraft.getPlugin(), "CAC", buffer.array());
+					player.sendPluginMessage(CivCraft.getPlugin(), "civcraft:cac", buffer.array());
 				} catch (CivException e) {
 				}
 			}

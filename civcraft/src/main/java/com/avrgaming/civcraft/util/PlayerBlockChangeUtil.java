@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import com.avrgaming.civcraft.exception.CivException;
 import com.avrgaming.civcraft.main.CivGlobal;
 
-import net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange;
 
 public class PlayerBlockChangeUtil {
 	/*
@@ -26,13 +25,9 @@ public class PlayerBlockChangeUtil {
 	 * This hashmap contains the blocks in each chunk to update. The Simple block's x, y, and z value are now chunk offsets.
 	 */
 	HashMap<String, HashMap<ChunkCoord, LinkedList<SimpleBlock>>> blocksInChunkToUpdate = new HashMap<String, HashMap<ChunkCoord, LinkedList<SimpleBlock>>>();
-	
-	
-	TreeMap<String, PacketPlayOutMultiBlockChange> preparedPackets = new TreeMap<String, PacketPlayOutMultiBlockChange>();
+
 	//private static ReentrantLock taskLock = new ReentrantLock();
 
-	
-	
 	public void addUpdateBlock(String playerName, BlockCoord bcoord, int type_id, int data) {
 //		HashMap<BlockCoord, SimpleBlock> blocks = blocksToUpdate.get(playerName);
 //		if (blocks == null) {

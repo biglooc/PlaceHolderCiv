@@ -37,8 +37,9 @@ public class PlayerQuestionTask extends QuestionBaseTask implements Runnable {
 //	RunnableWithArg finishedTask; /* Task to run when a response has been generated. */
 	QuestionResponseInterface finishedFunction;
 	
-	protected String response = new String(); /* Response to the question. */
-	protected Boolean responded = new Boolean(false); /*Question was answered. */
+	protected String response = ""; /* Response to the question. */
+	protected volatile boolean responded = false; /* Question was answered. */
+	private final Object responseLock = new Object();
 	
 	public PlayerQuestionTask() {
 	}
@@ -81,27 +82,23 @@ public class PlayerQuestionTask extends QuestionBaseTask implements Runnable {
 	}
 
 	public Boolean getResponded() {
-		synchronized(responded) {
-			return responded;
-		}
+		return responded;
 	}
 
 	public void setResponded(Boolean response) {
-		synchronized(this.responded) {
-			this.responded = response;
-		}
+		this.responded = (response != null && response);
 	}
 
 	public String getResponse() {
-		synchronized(response) {
+		synchronized(responseLock) {
 			return response;
 		}
 	}
 
 	public void setResponse(String response) {
-		synchronized(this.response) {
-			setResponded(true);
+		synchronized(responseLock) {
 			this.response = response;
+			this.responded = true;
 		}
 	}
 	
