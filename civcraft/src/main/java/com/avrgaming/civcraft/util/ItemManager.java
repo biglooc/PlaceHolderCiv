@@ -11,7 +11,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.MaterialData;
 
 
 /*
@@ -27,7 +26,7 @@ import org.bukkit.material.MaterialData;
 public class ItemManager {
 
 	// Minimal legacy ID -> Material mapping to support common items; extend as needed
-	private static Material fromLegacyId(int id, int data) {
+	public static Material fromLegacyId(int id, int data) {
 		switch (id) {
 			case 261: return Material.BOW;
 			case 297: return Material.BREAD;
@@ -86,113 +85,102 @@ public class ItemManager {
 		return createItemStack(typeId, amount, (short)0);
 	}
 
-	public static MaterialData getMaterialData(int type_id, int data) {
-		// MaterialData is deprecated; provide minimal shim for legacy callers
-		return new MaterialData(fromLegacyId(type_id, data) == null ? Material.AIR : fromLegacyId(type_id, data));
-	}
-	
+
 	public static Enchantment getEnchantById(int id) {
 		// No direct ID mapping in 1.21; return null to indicate unsupported
 		return null;
 	}
-	
+
 	public static int getId(Material material) {
 		// Legacy numeric IDs removed; return ordinal as stable placeholder (not Mojang ID)
 		return material.ordinal();
 	}
-	
+
 	public static int getId(Enchantment e) {
 		// Unsupported in 1.21; return -1
 		return -1;
 	}
-	
+
 	public static int getId(ItemStack stack) {
 		// Return a pseudo id via material ordinal
 		return stack.getType().ordinal();
 	}
-	
+
 	public static int getId(Block block) {
 		return block.getType().ordinal();
 	}
-	
+
 	public static void setTypeId(Block block, int typeId) {
 		Material m = fromLegacyId(typeId, 0);
 		block.setType(m == null ? Material.AIR : m);
 	}
-	
+
 	public static void setTypeId(BlockState block, int typeId) {
 		Material m = fromLegacyId(typeId, 0);
 		block.setType(m == null ? Material.AIR : m);
 	}
-	
+
 	public static byte getData(Block block) {
 		// BlockData no longer fits into a byte; return 0 to keep legacy methods compiling
 		return 0;
 	}
-	
+
 	public static short getData(ItemStack stack) {
 		// Durability concept changed; return 0 for compatibility
-		return 0;
-	}
-	
-	public static byte getData(MaterialData data) {
 		return 0;
 	}
 
 	public static byte getData(BlockState state) {
 		return 0;
 	}
-	
+
 	public static void setData(Block block, int data) {
 		// No-op on modern API
 	}
-	
+
 	public static void setData(Block block, int data, boolean update) {
 		// No-op on modern API
 	}
-	
+
 	public static Material getMaterial(int material) {
 		// Translate int legacy id to Material using our mapping
 		Material m = fromLegacyId(material, 0);
 		return m == null ? Material.AIR : m;
 	}
-	
+
 	public static int getBlockTypeId(ChunkSnapshot snapshot, int x, int y, int z) {
 		return snapshot.getBlockType(x, y, z).ordinal();
 	}
-	
+
 	public static int getBlockData(ChunkSnapshot snapshot, int x, int y, int z) {
 		// BlockData is complex; return 0 as placeholder
 		return 0;
 	}
-	
+
 	public static void sendBlockChange(Player player, Location loc, int type, int data) {
 		Material m = fromLegacyId(type, data);
 		if (m == null) m = Material.AIR;
 		player.sendBlockChange(loc, m.createBlockData());
 	}
-	
+
 	public static int getBlockTypeIdAt(World world, int x, int y, int z) {
 		return world.getBlockAt(x, y, z).getType().ordinal();
 	}
-	
+
 	public static int getId(BlockState newState) {
 		return newState.getType().ordinal();
 	}
-	
+
 	public static short getId(EntityType entity) {
 		// Numeric type IDs removed; return ordinal
 		return (short) entity.ordinal();
 	}
-	
-	public static void setData(MaterialData data, byte chestData) {
-		// No-op; legacy API
-	}
-	
+
+
 	public static void setTypeIdAndData(Block block, int type, int data, boolean update) {
 		setTypeId(block, type);
 	}
-	
+
 	public static ItemStack spawnPlayerHead(String playerName, String itemDisplayName) {
 		ItemStack skull = new ItemStack(Material.PLAYER_HEAD, 1);
 		SkullMeta meta = (SkullMeta) skull.getItemMeta();
@@ -218,5 +206,5 @@ public class ItemManager {
 		}
 		return false;
 	}
-	
+
 }

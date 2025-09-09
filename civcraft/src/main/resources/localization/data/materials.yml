@@ -75,6 +75,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carved_leather'
+          material: LEATHER
           item_id: 334
           item_data: 0
           name: 'T1 Carved Leather'
@@ -83,11 +84,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 334
+                material: LEATHER
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_stone'
+          material: STONE
           item_id: 1
           item_data: 0
           name: 'T1 Refined Stone'
@@ -96,11 +99,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 4
+                material: COBBLESTONE
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_stone_alt0'
+          material: STONE
           item_id: 1
           item_data: 0
           name: 'T1 Refined Stone'
@@ -109,11 +114,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 1
+                material: GRANITE
                 data: 1
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_stone_alt1'
+          material: STONE
           item_id: 1
           item_data: 0
           name: 'T1 Refined Stone'
@@ -122,11 +129,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 1
+                material: DIORITE
                 data: 3
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_stone_alt2'
+          material: STONE
           item_id: 1
           item_data: 0
           name: 'T1 Refined Stone'
@@ -135,6 +144,7 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 1
+                material: ANDESITE
                 data: 5
                 count: 9
 
@@ -153,6 +163,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_refined_feathers'
+          material: FEATHER
           item_id: 406
           item_data: 0
           name: 'T1 Packed Feathers'
@@ -161,11 +172,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 288
+                material: FEATHER
                 data: 0
                 count: 9
         
         # Checked 10/8/13
         - id: 'mat_crafted_string'
+          material: STRING
           item_id: 287
           item_data: 0
           name: 'T1 Crafted String'
@@ -174,11 +187,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 287
+                material: STRING
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_slime'
+          material: SLIME_BALL
           item_id: 341
           item_data: 0
           name: 'T1 Refined Slime'
@@ -186,7 +201,8 @@ materials:
           shaped: false
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
-              - type_id: 341 
+              - type_id: 341
+                material: SLIME_BALL
                 custom_id: 'mat_vanilla_slime'
                 data: 0
                 count: 2
@@ -206,6 +222,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_crafted_reeds'
+          material: SUGAR_CANE
           item_id: 338
           item_data: 0
           name: 'T1 Crafted Reeds'
@@ -216,6 +233,7 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 338
+                material: SUGAR_CANE
                 data: 0
                 count: 9
 
@@ -234,6 +252,7 @@ materials:
   
         # Checked 10/8/13
         - id: 'mat_crafted_sticks'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T1 Crafted Sticks'
@@ -242,11 +261,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 280
+                material: STICK
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_sulphur'
+          material: GUNPOWDER
           item_id: 289
           item_data: 0
           name: 'T1 Refined Sulphur'
@@ -255,10 +276,12 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 289
+                material: GUNPOWDER
                 data: 0
                 count: 9
 
         - id: 'mat_compacted_sand'
+          material: SAND
           item_id: 24
           item_data: 1
           name: 'T1 Compacted Sand'
@@ -267,11 +290,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 12
+                material: SAND
                 data: -1
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_forged_clay'
+          material: BRICK
           item_id: 336
           item_data: 0
           name: 'T1 Forged Clay'
@@ -280,11 +305,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 337
+                material: CLAY_BALL
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_sugar'
+          material: SUGAR
           item_id: 353
           item_data: 0
           name: 'T1 Refined Sugar'
@@ -293,11 +320,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 353
+                material: SUGAR
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_refined_wart'
+          material: NETHER_WART
           item_id: 372
           item_data: 0
           name: 'T1 Refined Wart'
@@ -306,11 +335,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 372
+                material: NETHER_WART
                 data: 0
                 count: 9
         
         # Checked 10/8/13
         - id: 'mat_forged_chromium'
+          material: IRON_INGOT
           item_id: 265
           item_data: 0
           name: 'T1 Forged Chromium'
@@ -325,6 +356,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_forged_tungsten'
+          material: FIRE_CHARGE
           item_id: 133
           item_data: 0
           name: 'T1 Forged Tungsten'
@@ -339,6 +371,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_refined_wood'
+          material: OAK_SLAB
           item_id: 126
           item_data: 0
           name: 'T1 Refined Wood'
@@ -347,11 +380,13 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 17
+                material: OAK_LOG
                 data: -1
                 count: 9
 
         # # Checked 10/8/13
         - id: 'mat_refined_wood_alt2'
+          material: OAK_SLAB
           item_id: 126
           item_data: 0
           name: 'T1 Refined Wood'
@@ -360,6 +395,7 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 162
+                material: ACACIA_LOG
                 data: -1
                 count: 9
 
@@ -379,6 +415,7 @@ materials:
           # XXX Statically coded to drop from lapis.        
         # Checked 10/8/13
         - id: 'mat_tungsten_ore'
+          material: LAPIS_LAZULI
           item_id: 385
           item_data: 0
           tradeable: true
@@ -393,6 +430,7 @@ materials:
           # XXX Statically coded to drop from trommel 
         # Checked 10/8/13
         - id: 'mat_chromium_ore'
+          material: GHAST_TEAR
           item_id: 370
           item_data: 0
           tradeable: true
@@ -409,6 +447,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_crafted_leather'
+          material: LEATHER
           item_id: 31
           item_data: 0
           name: 'T2 Crafted Leather'
@@ -429,6 +468,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_decorative_jewels'
+          material: NETHER_WART
           item_id: 372
           item_data: 0
           name: 'T2 Decorative Jewels'
@@ -439,11 +479,13 @@ materials:
           category: '<lightblue>Tier 2 Materials'
           ingredients:
               - type_id: 57
+                material: DIAMOND_BLOCK
                 data: 0
                 count: 2
 
         # Checked 10/8/13
         - id: 'mat_crushed_stone'
+          material: STONE_SLAB
           item_id: 44
           item_data: 0
           name: 'T2 Crushed Stone'
@@ -461,6 +503,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_jewelry_grade_gold'
+          material: GOLDEN_APPLE
           item_id: 322
           item_data: 0
           name: 'T2 Jewelry Grade Gold'
@@ -471,11 +514,13 @@ materials:
           category: '<lightblue>Tier 2 Materials'
           ingredients:
               - type_id: 41
+                material: GOLD_BLOCK
                 data: 0
                 count: 9
 
         # Checked 10/8/13
         - id: 'mat_milled_lumber'
+          material: OAK_STAIRS
           item_id: 53
           item_data: 0
           name: 'T2 Milled Lumber'
@@ -492,6 +537,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_woven_mesh_patch'
+          material: FILLED_MAP
           item_id: 358
           item_data: 0
           name: 'T2 Woven Mesh Patch'
@@ -516,6 +562,7 @@ materials:
   
         # Checked 10/8/13
         - id: 'mat_steel_ingot'
+          material: IRON_INGOT
           item_id: 265
           item_data: 0
           name: 'T2 Steel Ingot'
@@ -526,9 +573,11 @@ materials:
           category: '<lightblue>Tier 2 Materials'
           ingredients:
               - type_id: 42
+                material: IRON_BLOCK
                 data: 0
                 count: 3
               - type_id: 173
+                material: COAL_BLOCK
                 data: 0
                 count: 3
               - type_id: 0
@@ -538,6 +587,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_varnish'
+          material: EXPERIENCE_BOTTLE
           item_id: 384
           item_data: 0
           name: 'T2 Varnish'
@@ -564,6 +614,7 @@ materials:
 
         # Changed 10/02/2016 (Item ID to Glass bottle instead of stew)
         - id: 'mat_sticky_resin'
+          material: GLASS_BOTTLE
           item_id: 374
           item_data: 0
           name: 'T2 Sticky Resin'
@@ -584,11 +635,13 @@ materials:
                 data: 0
                 count: 1
               - type_id: 281
+                material: BOWL
                 data: 0
                 count: 1
 
         # Checked 10/8/13
         - id: 'mat_clay_molding'
+          material: BRICKS
           item_id: 45
           item_data: 0
           name: 'T2 Clay Molding'
@@ -614,6 +667,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_chromium_ingot'
+          material: NETHER_STAR
           item_id: 399
           item_data: 0
           name: 'T2 Chromium Ingot'
@@ -632,15 +686,18 @@ materials:
                 data: 0
                 count: 2
               - type_id: 173
+                material: COAL_BLOCK
                 data: 0
                 count: 3
               - type_id: 264
+                material: DIAMOND
                 data: 0
                 count: 1
 
 
         # Checked 10/8/13
         - id: 'mat_aged_wood_stave'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T2 Aged Wood Stave'
@@ -665,6 +722,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_woven_threading'
+          material: LEAD
           item_id: 420
           item_data: 0
           name: 'T2 Woven Threading'
@@ -687,6 +745,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_steel_sword_blade'
+          material: IRON_INGOT
           item_id: 265
           item_data: 0
           name: 'T2 Steel Sword Blade'
@@ -705,6 +764,7 @@ materials:
         
         # Checked 10/8/13
         - id: 'mat_steel_sword_hilt'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T2 Steel Sword Hilt'
@@ -731,6 +791,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_steel_plate'
+          material: HEAVY_WEIGHTED_PRESSURE_PLATE
           item_id: 148
           item_data: 0
           name: 'T2 Steel Plate'
@@ -760,6 +821,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_leather_straps'
+          material: DEAD_BUSH
           item_id: 32
           item_data: 0
           name: 'T3 Leather Straps'
@@ -780,6 +842,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_clay_steel_cast'
+          material: FURNACE_MINECART
           item_id: 343
           item_data: 0
           name: 'T3 Clay Steel Casting'
@@ -810,6 +873,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_reinforced_braid'
+          material: STRING
           item_id: 287
           item_data: 0
           name: 'T3 Reinforced Braid'
@@ -834,6 +898,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_ingot'
+          material: FLINT
           item_id: 318
           item_data: 0
           name: 'T3 Carbide Steel Ingot'
@@ -858,6 +923,7 @@ materials:
         
         # Checked 10/8/13
         - id: 'mat_longbow_stave'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T3 Longbow Stave'
@@ -876,6 +942,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_feathered_lining'
+          material: FEATHER
           item_id: 288
           item_data: 0
           name: 'T3 Feathered Lining'
@@ -900,6 +967,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_molding'
+          material: CAULDRON
           item_id: 380
           item_data: 0
           name: 'T3 Carbide Molding'
@@ -926,6 +994,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_smithy_resin'
+          material: MAGMA_CREAM
           item_id: 378
           item_data: 0
           name: 'T3 Smithy Resin'
@@ -944,11 +1013,13 @@ materials:
                 data: 0
                 count: 2
               - type_id: 173
+                material: COAL_BLOCK
                 data: 0
                 count: 1
 
         # Checked 10/8/13
         - id: 'mat_tungsten_ingot'
+          material: ENDER_PEARL
           item_id: 368
           item_data: 0
           name: 'T3 Tungsten Ingot'
@@ -969,11 +1040,13 @@ materials:
                 data: 0
                 count: 2
               - type_id: 173
+                material: COAL_BLOCK
                 data: 0
                 count: 2
 
         # Checked 10/8/13
         - id: 'mat_clay_tungsten_casting'
+          material: ENDER_PEARL
           item_id: 368
           item_data: 0
           name: 'T3 Clay Tungsten Casting'
@@ -1001,6 +1074,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_masonry_mortar'
+          material: BRICKS
           item_id: 45
           item_data: 0
           name: 'T3 Masonry Mortar'
@@ -1021,6 +1095,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_royal_crown'
+          material: GOLDEN_HELMET
           item_id: 314
           item_data: 0
           name: 'Royal Crown'
@@ -1044,6 +1119,7 @@ materials:
                 count: 1
 
         - id: 'mat_proof_of_leadership'
+          material: CLOCK
           item_id: 347
           item_data: 0
           name: 'Proof Of Leadership'
@@ -1059,6 +1135,7 @@ materials:
                 count: 4
 
         - id: 'mat_badge_of_leadership'
+          material: NAME_TAG
           item_id: 421
           item_data: 0
           name: 'Badge Of Leadership'
@@ -1074,6 +1151,7 @@ materials:
                 count: 9
 
         - id: 'mat_token_of_leadership'
+          material: GHAST_TEAR
           item_id: 370
           item_data: 0
           name: 'Token Of Leadership'
@@ -1085,6 +1163,7 @@ materials:
          
         # Checked 10/8/13
         - id: 'mat_chieftains_headdress'
+          material: CHAINMAIL_HELMET
           item_id: 302
           item_data: 0
           name: 'Chieftains Headdress'
@@ -1105,6 +1184,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_compacted_stone'
+          material: STONE_BRICKS
           item_id: 98
           item_data: 0
           name: 'T3 Compacted Stone'
@@ -1121,6 +1201,7 @@ materials:
         
          # Checked 10/8/13
         - id: 'mat_carbide_steel_sword_hilt'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T3 Carbide Steel Sword Hilt'
@@ -1148,6 +1229,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_sword_blade'
+          material: IRON_INGOT
           item_id: 265
           item_data: 0
           name: 'T3 Carbide Steel Sword Blade'
@@ -1170,6 +1252,7 @@ materials:
         
         # Checked 10/8/13
         - id: 'mat_carbide_steel_plate'
+          material: IRON_INGOT
           item_id: 265
           item_data: 0
           name: 'T3 Carbide Steel Plate'
@@ -1197,6 +1280,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_artisan_leather'
+          material: DEAD_BUSH
           item_id: 31
           item_data: 0
           name: 'T4 Artisan Leather'
@@ -1217,6 +1301,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_plate'
+          material: NETHER_BRICK
           item_id: 405
           item_data: 0
           name: 'T4 Tungsten Plate'
@@ -1241,6 +1326,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_sword_blade'
+          material: DIAMOND_BLOCK
           item_id: 57
           item_data: 0
           name: 'T4 Tungsten Sword Blade'
@@ -1263,6 +1349,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_sword_hilt'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T4 Tungsten Sword Hilt'
@@ -1289,6 +1376,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_composite_bow_stave'
+          material: STICK
           item_id: 280
           item_data: 0
           name: 'T4 Composite Bow Stave'
@@ -1311,6 +1399,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_composite_bow_string'
+          material: STRING
           item_id: 287
           item_data: 0
           name: 'T4 Composite Bow String'
@@ -1329,6 +1418,7 @@ materials:
 
         # Checked 10/8/13 RJ
         - id: 'mat_cannon_wheel'
+          material: OAK_STAIRS
           item_id: 163
           item_data: 0
           name: 'T4 Cannon Wheel'
@@ -1344,6 +1434,7 @@ materials:
                 count: 9
 
         - id: 'mat_cannon_barrel_part'
+          material: WHITE_CARPET
           item_id: 171
           item_data: 15
           name: 'T4 Cannon Barrel Part'
@@ -1365,6 +1456,7 @@ materials:
 # Special Recipes  ===========================================            
         # Checked 10/8/13
         - id: 'mat_found_civ'
+          material: BLAZE_ROD
           item_id: 369
           item_data: 0
           name: 'Founding Civilization Flag'
@@ -1395,6 +1487,7 @@ materials:
           # XXX mat ID hard coded for camp refund. with /camp undo 
         # Checked 10/8/13
         - id: 'mat_found_camp'
+          material: OAK_DOOR
           item_id: 324
           item_data: 0
           name: 'Camp'
@@ -1409,6 +1502,7 @@ materials:
                 custom_id: 'mat_milled_lumber'
                 letter: 'l'
               - type_id: 173
+                material: COAL_BLOCK
                 data: 0
                 letter: 'c'
               - type_id: 0
@@ -1421,6 +1515,7 @@ materials:
               - "ccc"
         
         - id: 'mat_found_warcamp'
+          material: BEDROCK
           item_id: 7
           item_data: 0
           name: 'War Camp'
@@ -1448,6 +1543,7 @@ materials:
               - "ccc"
         
         - id: 'mat_build_cannon'
+          material: HOPPER
           item_id: 154
           item_data: 0
           name: 'War Cannon'
@@ -1475,6 +1571,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_wood_sword'
+          material: WOODEN_SWORD
           item_id: 268
           item_data: 0
           name: 'Training Sword'
@@ -1489,9 +1586,11 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 5
+                material: OAK_PLANKS
                 data: -1
                 letter: 'p'
               - type_id: 280
+                material: STICK
                 data: 0
                 letter: 's'
           shape:
@@ -1501,6 +1600,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_leather_helmet'
+          material: LEATHER_HELMET
           item_id: 298
           item_data: 0
           name: 'Leather Helmet'
@@ -1513,6 +1613,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 334
+                material: LEATHER
                 data: 0
                 letter: 'l'
           shape:
@@ -1522,6 +1623,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_leather_chestplate'
+          material: LEATHER_CHESTPLATE
           item_id: 299
           item_data: 0
           name: 'Leather Jacket'
@@ -1534,6 +1636,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 334
+                material: LEATHER
                 data: 0
                 letter: 'l'
           shape:
@@ -1543,6 +1646,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_leather_leggings'
+          material: LEATHER_LEGGINGS
           item_id: 300
           item_data: 0
           name: 'Leather Pants'
@@ -1555,6 +1659,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 334
+                material: LEATHER
                 data: 0
                 letter: 'l'
           shape:
@@ -1564,6 +1669,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_leather_Boots'
+          material: LEATHER_BOOTS
           item_id: 301
           item_data: 0
           name: 'Leather Moccasins'
@@ -1576,6 +1682,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 334
+                material: LEATHER
                 data: 0
                 letter: 'l'
           shape:
@@ -1587,6 +1694,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_refined_leather_helmet'
+          material: LEATHER_HELMET
           item_id: 298
           item_data: 0
           name: 'Refined Leather Cap'
@@ -1615,6 +1723,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_refined_leather_chestplate'
+          material: LEATHER_CHESTPLATE
           item_id: 299
           item_data: 0
           name: 'Refined Leather Chestplate'
@@ -1643,6 +1752,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_refined_leather_leggings'
+          material: LEATHER_LEGGINGS
           item_id: 300
           item_data: 0
           name: 'Refined Leather Leggings'
@@ -1671,6 +1781,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_refined_leather_boots'
+          material: LEATHER_BOOTS
           item_id: 301
           item_data: 0
           name: 'Refined Leather Moccasins'
@@ -1701,6 +1812,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_hardened_leather_helmet'
+          material: LEATHER_HELMET
           item_id: 298
           item_data: 0
           name: 'Hardened Leather Cap'
@@ -1729,6 +1841,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_hardened_leather_chestplate'
+          material: LEATHER_CHESTPLATE
           item_id: 299
           item_data: 0
           name: 'Hardened Leather Jacket'
@@ -1757,6 +1870,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_hardened_leather_leggings'
+          material: LEATHER_LEGGINGS
           item_id: 300
           item_data: 0
           name: 'Hardened Leather Pants'
@@ -1785,6 +1899,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_hardened_leather_boots'
+          material: LEATHER_BOOTS
           item_id: 301
           item_data: 0
           name: 'Hardened Leather Moccasins'
@@ -1815,6 +1930,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_composite_leather_helmet'
+          material: LEATHER_HELMET
           item_id: 298
           item_data: 0
           name: 'Composite Leather Cap'
@@ -1843,6 +1959,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_composite_leather_chestplate'
+          material: LEATHER_CHESTPLATE
           item_id: 299
           item_data: 0
           name: 'Composite Leather Jacket'
@@ -1871,6 +1988,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_composite_leather_leggings'
+          material: LEATHER_LEGGINGS
           item_id: 300
           item_data: 0
           name: 'Composite Leather Pants'
@@ -1899,6 +2017,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_composite_leather_boots'
+          material: LEATHER_BOOTS
           item_id: 301
           item_data: 0
           name: 'Composite Leather Moccasins'
@@ -1929,6 +2048,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_hunting_bow'
+          material: BOW
           item_id: 261
           item_data: 0
           name: 'Hunting Bow'
@@ -1944,9 +2064,11 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 287
+                material: STRING
                 data: 0
                 letter: 's'
               - type_id: 280
+                material: STICK
                 data: 0
                 letter: 'w'
           shape:
@@ -1956,6 +2078,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_recurve_bow'
+          material: BOW
           item_id: 261
           item_data: 0
           name: 'Recurve Bow'
@@ -1985,6 +2108,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_longbow'
+          material: BOW
           item_id: 261
           item_data: 0
           name: 'Longbow'
@@ -2014,6 +2138,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_marksmen_bow'
+          material: BOW
           item_id: 261
           item_data: 0
           name: 'Marksmen Bow'
@@ -2045,6 +2170,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_stone_sword'
+          material: STONE_SWORD
           item_id: 272
           item_data: 0
           name: 'Stone Shank'
@@ -2059,9 +2185,11 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 4
+                material: COBBLESTONE
                 data: 0
                 letter: 'c'
               - type_id: 280
+                material: STICK
                 data: 0
                 letter: 's'
           shape:
@@ -2073,6 +2201,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_iron_sword'
+          material: IRON_SWORD
           item_id: 267
           item_data: 0
           name: 'Iron Shortsword'
@@ -2088,9 +2217,11 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'i'
               - type_id: 280
+                material: STICK
                 data: 0
                 letter: 's'
           shape:
@@ -2100,6 +2231,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_iron_helmet'
+          material: IRON_HELMET
           item_id: 306
           item_data: 0
           name: 'Iron Helmet'
@@ -2115,6 +2247,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'i'
           shape:
@@ -2124,6 +2257,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_iron_chestplate'
+          material: IRON_CHESTPLATE
           item_id: 307
           item_data: 0
           name: 'Iron Chestplate'
@@ -2139,6 +2273,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'i'
           shape:
@@ -2148,6 +2283,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_iron_leggings'
+          material: IRON_LEGGINGS
           item_id: 308
           item_data: 0
           name: 'Iron Leggings'
@@ -2163,6 +2299,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
 
                 letter: 'i'
@@ -2173,6 +2310,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_iron_boots'
+          material: IRON_BOOTS
           item_id: 309
           item_data: 0
           name: 'Iron Boots'
@@ -2188,6 +2326,7 @@ materials:
                 value: '0.1'
           ingredients:
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'i'
           shape:
@@ -2200,6 +2339,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_steel_helmet'
+          material: CHAINMAIL_HELMET
           item_id: 302
           item_data: 0
           name: 'Steel Helmet'
@@ -2225,6 +2365,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_steel_boots'
+          material: CHAINMAIL_BOOTS
           item_id: 305
           item_data: 0
           name: 'Steel Assault Boots'
@@ -2250,6 +2391,7 @@ materials:
         
         # Checked 10/8/13
         - id: 'mat_steel_chestplate'
+          material: CHAINMAIL_CHESTPLATE
           item_id: 303
           item_data: 0
           name: 'Steel Chestplate'
@@ -2275,6 +2417,7 @@ materials:
         
         # Checked 10/8/13
         - id: 'mat_steel_leggings'
+          material: CHAINMAIL_LEGGINGS
           item_id: 304
           item_data: 0
           name: 'Steel Leggings'
@@ -2300,6 +2443,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_steel_sword'
+          material: IRON_SWORD
           item_id: 267
           item_data: 0
           name: 'Steel Longsword'
@@ -2331,6 +2475,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_sword'
+          material: GOLDEN_SWORD
           item_id: 283
           item_data: 0
           name: 'Carbide Steel sword'
@@ -2360,6 +2505,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_helmet'
+          material: GOLDEN_HELMET
           item_id: 314
           item_data: 0
           name: 'Carbide Steel Helmet'
@@ -2385,6 +2531,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_chestplate'
+          material: GOLDEN_CHESTPLATE
           item_id: 315
           item_data: 0
           name: 'Carbide Steel Chestplate'
@@ -2410,6 +2557,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_leggings'
+          material: GOLDEN_LEGGINGS
           item_id: 316
           item_data: 0
           name: 'Carbide Steel leggings'
@@ -2435,6 +2583,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_carbide_steel_boots'
+          material: GOLDEN_BOOTS
           item_id: 317
           item_data: 0
           name: 'Carbide Steel Boots'
@@ -2463,6 +2612,7 @@ materials:
         
         # Checked 10/8/13
         - id: 'mat_tungsten_sword'
+          material: DIAMOND_SWORD
           item_id: 276
           item_data: 0
           name: 'Tungsten Broadsword'
@@ -2492,6 +2642,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_boots'
+          material: DIAMOND_BOOTS
           item_id: 313
           item_data: 0
           name: 'Tungsten Boots'
@@ -2517,6 +2668,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_chestplate'
+          material: DIAMOND_CHESTPLATE
           item_id: 311 
           item_data: 0
           name: 'Tungsten Chestplate'
@@ -2542,6 +2694,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_leggings'
+          material: DIAMOND_LEGGINGS
           item_id: 312
           item_data: 0
           name: 'Tungsten Leggings'
@@ -2567,6 +2720,7 @@ materials:
 
         # Checked 10/8/13
         - id: 'mat_tungsten_helmet'
+          material: DIAMOND_HELMET
           item_id: 310
           item_data: 0
           name: 'Tungsten Helmet'
@@ -2594,6 +2748,7 @@ materials:
 
 # Catalyst/Crystal ingredients
         - id: 'mat_metallic_crystal_fragment_1'
+          material: GHAST_TEAR
           item_id: 370
           item_data: 0
           name: 'Common Metallic Crystal Fragment'
@@ -2606,10 +2761,12 @@ materials:
                 data: 0
                 count: 2
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 count: 2
         
         - id: 'mat_metallic_crystal_1'
+          material: NETHER_STAR
           item_id: 399
           item_data: 0
           name: 'T1 Common Metallic Crystal'
@@ -2625,6 +2782,7 @@ materials:
                 count: 9
 
         - id: 'mat_metallic_crystal_fragment_2'
+          material: GHAST_TEAR
           item_id: 370
           item_data: 0
           name: 'Uncommon Metallic Crystal Fragment'
@@ -2637,10 +2795,12 @@ materials:
                 data: 0
                 count: 1
               - type_id: 42
+                material: IRON_BLOCK
                 data: 0
                 count: 1
 
         - id: 'mat_metallic_crystal_2'
+          material: NETHER_STAR
           item_id: 399
           item_data: 0
           name: 'T2 Uncommon Metallic Crystal'
@@ -2656,6 +2816,7 @@ materials:
                 count: 9
 
         - id: 'mat_metallic_crystal_fragment_3'
+          material: GHAST_TEAR
           item_id: 370
           item_data: 0
           name: 'Rare Metallic Crystal Fragment'
@@ -2668,10 +2829,12 @@ materials:
                 data: 0
                 count: 2
               - type_id: 42
+                material: IRON_BLOCK
                 data: 0
                 count: 2
 
         - id: 'mat_metallic_crystal_3'
+          material: NETHER_STAR
           item_id: 399
           item_data: 0
           name: 'T3 Rare Metallic Crystal'
@@ -2687,6 +2850,7 @@ materials:
                 count: 9
 
         - id: 'mat_metallic_crystal_fragment_4'
+          material: GHAST_TEAR
           item_id: 370
           item_data: 0
           name: 'Legendary Metallic Crystal Fragment'
@@ -2699,10 +2863,12 @@ materials:
                 data: 0
                 count: 3
               - type_id: 42
+                material: IRON_BLOCK
                 data: 0
                 count: 6
 
         - id: 'mat_metallic_crystal_4'
+          material: NETHER_STAR
           item_id: 399
           item_data: 0
           name: 'T4 Legendary Metallic Crystal'
@@ -2718,6 +2884,7 @@ materials:
                 count: 9
 
         - id: 'mat_ionic_crystal_fragment_1'
+          material: BLAZE_POWDER
           item_id: 377
           item_data: 0
           name: 'Common Ionic Crystal Fragment'
@@ -2732,10 +2899,12 @@ materials:
                 data: 0
                 count: 2
               - type_id: 266
+                material: GOLD_INGOT
                 data: 0
                 count: 2
         
         - id: 'mat_ionic_crystal_1'
+          material: MAGMA_CREAM
           item_id: 378
           item_data: 0
           name: 'T1 Common Ionic Crystal'
@@ -2752,6 +2921,7 @@ materials:
         
           
         - id: 'mat_ionic_crystal_fragment_2'
+          material: BLAZE_POWDER
           item_id: 377
           item_data: 0
           name: 'Uncommon Ionic Crystal Fragment'
@@ -2766,10 +2936,12 @@ materials:
                 data: 0
                 count: 1
               - type_id: 41
+                material: GOLD_BLOCK
                 data: 0
                 count: 1
         
         - id: 'mat_ionic_crystal_2'
+          material: MAGMA_CREAM
           item_id: 378
           item_data: 0
           name: 'T2 Uncommon Ionic Crystal'
@@ -2785,6 +2957,7 @@ materials:
                 count: 9
           
         - id: 'mat_ionic_crystal_fragment_3'
+          material: BLAZE_POWDER
           item_id: 377
           item_data: 0
           name: 'Rare Ionic Crystal Fragment'
@@ -2799,10 +2972,12 @@ materials:
                 data: 0
                 count: 2
               - type_id: 41
+                material: GOLD_BLOCK
                 data: 0
                 count: 2
         
         - id: 'mat_ionic_crystal_3'
+          material: MAGMA_CREAM
           item_id: 378
           item_data: 0
           name: 'T3 Rare Ionic Crystal'
@@ -2818,6 +2993,7 @@ materials:
                 count: 9
 
         - id: 'mat_ionic_crystal_fragment_4'
+          material: BLAZE_POWDER
           item_id: 377
           item_data: 0
           name: 'Legendary Ionic Crystal Fragment'
@@ -2832,10 +3008,12 @@ materials:
                 data: 0
                 count: 3
               - type_id: 41
+                material: GOLD_BLOCK
                 data: 0
                 count: 3
 
         - id: 'mat_ionic_crystal_4'
+          material: MAGMA_CREAM
           item_id: 378
           item_data: 0
           name: 'T4 Legendary Ionic Crystal'
@@ -2851,6 +3029,7 @@ materials:
                 count: 9
 # Hostile Mob Eggs (Metallic)
         - id: 'mat_creeper_egg'
+          material: CREEPER_SPAWN_EGG
           item_id: 383
           item_data: 50
           name: 'Creeper Egg'
@@ -2861,6 +3040,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 289
+                material: GUNPOWDER
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -2873,6 +3053,7 @@ materials:
               - "ttt"
 
         - id: 'mat_creeper_egg_2'
+          material: CREEPER_SPAWN_EGG
           item_id: 383
           item_data: 50
           name: 'Creeper Egg 2'
@@ -2896,6 +3077,7 @@ materials:
               - " c "
 
         - id: 'mat_creeper_egg_3'
+          material: CREEPER_SPAWN_EGG
           item_id: 383
           item_data: 50
           name: 'Creeper Egg 3'
@@ -2919,6 +3101,7 @@ materials:
               - " c "
 
         - id: 'mat_creeper_egg_4'
+          material: CREEPER_SPAWN_EGG
           item_id: 383
           item_data: 50
           name: 'Creeper Egg 4'
@@ -2942,6 +3125,7 @@ materials:
               - " c "
 
         - id: 'mat_skeleton_egg'
+          material: SKELETON_SPAWN_EGG
           item_id: 383
           item_data: 51
           name: 'Skeleton Egg'
@@ -2952,6 +3136,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 352
+                material: BONE
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -2964,6 +3149,7 @@ materials:
               - "ttt"
 
         - id: 'mat_skeleton_egg_2'
+          material: SKELETON_SPAWN_EGG
           item_id: 383
           item_data: 51
           name: 'Skeleton Egg 2'
@@ -2987,6 +3173,7 @@ materials:
               - " c "
 
         - id: 'mat_skeleton_egg_3'
+          material: SKELETON_SPAWN_EGG
           item_id: 383
           item_data: 51
           name: 'Skeleton Egg 3'
@@ -3010,6 +3197,7 @@ materials:
               - " c "
 
         - id: 'mat_skeleton_egg_4'
+          material: SKELETON_SPAWN_EGG
           item_id: 383
           item_data: 51
           name: 'Skeleton Egg 4'
@@ -3033,6 +3221,7 @@ materials:
               - " c "
 
         - id: 'mat_spider_egg'
+          material: SPIDER_SPAWN_EGG
           item_id: 383
           item_data: 52
           name: 'Spider Egg'
@@ -3043,6 +3232,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 375
+                material: SPIDER_EYE
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3055,6 +3245,7 @@ materials:
               - "ttt"
 
         - id: 'mat_spider_egg_2'
+          material: SPIDER_SPAWN_EGG
           item_id: 383
           item_data: 52
           name: 'Spider Egg 2'
@@ -3078,6 +3269,7 @@ materials:
               - " c "
 
         - id: 'mat_spider_egg_3'
+          material: SPIDER_SPAWN_EGG
           item_id: 383
           item_data: 52
           name: 'Spider Egg 3'
@@ -3101,6 +3293,7 @@ materials:
               - " c "
 
         - id: 'mat_spider_egg_4'
+          material: SPIDER_SPAWN_EGG
           item_id: 383
           item_data: 52
           name: 'Spider Egg 4'
@@ -3124,6 +3317,7 @@ materials:
               - " c "
 
         - id: 'mat_zombie_egg'
+          material: ZOMBIE_SPAWN_EGG
           item_id: 383
           item_data: 54
           name: 'Zombie Egg'
@@ -3134,6 +3328,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 367
+                material: ROTTEN_FLESH
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3146,6 +3341,7 @@ materials:
               - "ttt"
 
         - id: 'mat_zombie_egg_2'
+          material: ZOMBIE_SPAWN_EGG
           item_id: 383
           item_data: 54
           name: 'Zombie Egg 2'
@@ -3169,6 +3365,7 @@ materials:
               - " c "
 
         - id: 'mat_zombie_egg_3'
+          material: ZOMBIE_SPAWN_EGG
           item_id: 383
           item_data: 54
           name: 'Zombie Egg 3'
@@ -3192,6 +3389,7 @@ materials:
               - " c "
 
         - id: 'mat_zombie_egg_4'
+          material: ZOMBIE_SPAWN_EGG
           item_id: 383
           item_data: 54
           name: 'Zombie Egg 4'
@@ -3215,6 +3413,7 @@ materials:
               - " c "
 
         - id: 'mat_slime_egg'
+          material: SLIME_SPAWN_EGG
           item_id: 383
           item_data: 55
           name: 'Slime Egg'
@@ -3238,6 +3437,7 @@ materials:
               - "ttt"
 
         - id: 'mat_slime_egg_2'
+          material: SLIME_SPAWN_EGG
           item_id: 383
           item_data: 55
           name: 'Slime Egg 2'
@@ -3261,6 +3461,7 @@ materials:
               - " c "
 
         - id: 'mat_slime_egg_3'
+          material: SLIME_SPAWN_EGG
           item_id: 383
           item_data: 55
           name: 'Slime Egg 3'
@@ -3284,6 +3485,7 @@ materials:
               - " c "
 
         - id: 'mat_slime_egg_4'
+          material: SLIME_SPAWN_EGG
           item_id: 383
           item_data: 55
           name: 'Slime Egg 4'
@@ -3307,6 +3509,7 @@ materials:
               - " c "
 
         - id: 'mat_enderman_egg'
+          material: ENDERMAN_SPAWN_EGG
           item_id: 383
           item_data: 58
           name: 'Enderman Egg'
@@ -3330,6 +3533,7 @@ materials:
               - " t "
 
         - id: 'mat_enderman_egg_2'
+          material: ENDERMAN_SPAWN_EGG
           item_id: 383
           item_data: 58
           name: 'Enderman Egg 2'
@@ -3353,6 +3557,7 @@ materials:
               - " c "
 
         - id: 'mat_enderman_egg_3'
+          material: ENDERMAN_SPAWN_EGG
           item_id: 383
           item_data: 58
           name: 'Enderman Egg 3'
@@ -3376,6 +3581,7 @@ materials:
               - " c "
 
         - id: 'mat_enderman_egg_4'
+          material: ENDERMAN_SPAWN_EGG
           item_id: 383
           item_data: 58
           name: 'Enderman Egg 4'
@@ -3401,6 +3607,7 @@ materials:
 # Passive Mob Eggs (Ionic)
 
         - id: 'mat_pig_egg'
+          material: PIG_SPAWN_EGG
           item_id: 383
           item_data: 90
           name: 'Pig Egg'
@@ -3411,6 +3618,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 320
+                material: COOKED_PORKCHOP
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3423,6 +3631,7 @@ materials:
               - "ttt"
 
         - id: 'mat_pig_egg_2'
+          material: PIG_SPAWN_EGG
           item_id: 383
           item_data: 90
           name: 'Pig Egg 2'
@@ -3446,6 +3655,7 @@ materials:
               - " c "
 
         - id: 'mat_pig_egg_3'
+          material: PIG_SPAWN_EGG
           item_id: 383
           item_data: 90
           name: 'Pig Egg 3'
@@ -3469,6 +3679,7 @@ materials:
               - " c "
 
         - id: 'mat_pig_egg_4'
+          material: PIG_SPAWN_EGG
           item_id: 383
           item_data: 90
           name: 'Pig Egg 4'
@@ -3492,6 +3703,7 @@ materials:
               - " c "
 
         - id: 'mat_cow_egg'
+          material: COW_SPAWN_EGG
           item_id: 383
           item_data: 92
           name: 'Cow Egg'
@@ -3502,6 +3714,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 364
+                material: COOKED_BEEF
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3514,6 +3727,7 @@ materials:
               - "ttt"
 
         - id: 'mat_cow_egg_2'
+          material: COW_SPAWN_EGG
           item_id: 383
           item_data: 92
           name: 'Cow Egg 2'
@@ -3537,6 +3751,7 @@ materials:
               - " c "
 
         - id: 'mat_cow_egg_3'
+          material: COW_SPAWN_EGG
           item_id: 383
           item_data: 92
           name: 'Cow Egg 3'
@@ -3560,6 +3775,7 @@ materials:
               - " c "
 
         - id: 'mat_cow_egg_4'
+          material: COW_SPAWN_EGG
           item_id: 383
           item_data: 92
           name: 'Cow Egg 4'
@@ -3583,6 +3799,7 @@ materials:
               - " c "
 
         - id: 'mat_sheep_egg'
+          material: SHEEP_SPAWN_EGG
           item_id: 383
           item_data: 91
           name: 'Sheep Egg'
@@ -3593,6 +3810,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 424
+                material: COOKED_MUTTON
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3605,6 +3823,7 @@ materials:
               - "ttt"
 
         - id: 'mat_sheep_egg_2'
+          material: SHEEP_SPAWN_EGG
           item_id: 383
           item_data: 91
           name: 'Sheep Egg 2'
@@ -3628,6 +3847,7 @@ materials:
               - " c "
 
         - id: 'mat_sheep_egg_3'
+          material: SHEEP_SPAWN_EGG
           item_id: 383
           item_data: 91
           name: 'Sheep Egg 3'
@@ -3651,6 +3871,7 @@ materials:
               - " c "
 
         - id: 'mat_sheep_egg_4'
+          material: SHEEP_SPAWN_EGG
           item_id: 383
           item_data: 91
           name: 'Sheep Egg 4'
@@ -3674,6 +3895,7 @@ materials:
               - " c "
 
         - id: 'mat_chicken_egg'
+          material: CHICKEN_SPAWN_EGG
           item_id: 383
           item_data: 93
           name: 'Chicken Egg'
@@ -3684,6 +3906,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 366
+                material: COOKED_CHICKEN
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3696,6 +3919,7 @@ materials:
               - "ttt"
 
         - id: 'mat_chicken_egg_2'
+          material: CHICKEN_SPAWN_EGG
           item_id: 383
           item_data: 93
           name: 'Chicken Egg 2'
@@ -3719,6 +3943,7 @@ materials:
               - " c "
 
         - id: 'mat_chicken_egg_3'
+          material: CHICKEN_SPAWN_EGG
           item_id: 383
           item_data: 93
           name: 'Chicken Egg 3'
@@ -3742,6 +3967,7 @@ materials:
               - " c "
 
         - id: 'mat_chicken_egg_4'
+          material: CHICKEN_SPAWN_EGG
           item_id: 383
           item_data: 93
           name: 'Chicken Egg 4'
@@ -3765,6 +3991,7 @@ materials:
               - " c "
 
         - id: 'mat_rabbit_egg'
+          material: RABBIT_SPAWN_EGG
           item_id: 383
           item_data: 101
           name: 'Rabbit Egg'
@@ -3775,6 +4002,7 @@ materials:
           category: '<lightgreen>Eggs Tier 1'
           ingredients:
               - type_id: 412
+                material: COOKED_RABBIT
                 data: 0
                 letter: 't'
               - type_id: 0
@@ -3787,6 +4015,7 @@ materials:
               - "ttt"
 
         - id: 'mat_rabbit_egg_2'
+          material: RABBIT_SPAWN_EGG
           item_id: 383
           item_data: 101
           name: 'Rabbit Egg 2'
@@ -3810,6 +4039,7 @@ materials:
               - " c "
 
         - id: 'mat_rabbit_egg_3'
+          material: RABBIT_SPAWN_EGG
           item_id: 383
           item_data: 101
           name: 'Rabbit Egg 3'
@@ -3833,6 +4063,7 @@ materials:
               - " c "
 
         - id: 'mat_rabbit_egg_4'
+          material: RABBIT_SPAWN_EGG
           item_id: 383
           item_data: 101
           name: 'Rabbit Egg 4'
@@ -3881,6 +4112,7 @@ materials:
 #                amount: '4'
 
         - id: 'mat_mercury'
+          material: MELON_SEEDS
           item_id: 362
           item_data: 0
           name: 'Mercury'
@@ -3889,13 +4121,16 @@ materials:
           category: '<lightgreen>Tier 1 Materials'
           ingredients:
               - type_id: 41
+                material: GOLD_BLOCK
                 data: 0
                 count: 1
               - type_id: 42
+                material: IRON_BLOCK
                 data: 0
                 count: 1
 
         - id: 'mat_mercury_bath'
+          material: ENDER_PEARL
           item_id: 368
           item_data: 0
           name: 'T2 Mercury Bath'
@@ -3911,6 +4146,7 @@ materials:
                 count: 9
 
         - id: 'mat_industrial_diamond'
+          material: DIAMOND
           item_id: 264
           item_data: 0
           name: 'T2 Industrial Diamond'
@@ -3921,11 +4157,13 @@ materials:
               - name: 'NoRightClick'
           ingredients:
               - type_id: 57
+                material: DIAMOND_BLOCK
                 data: 0
                 count: 3
 
 # --======================= Catalysts ====================================
         - id: 'mat_common_attack_catalyst'
+          material: BOOK
           item_id: 340
           item_data: 0
           name: 'Common Attack Catalyst'
@@ -3945,6 +4183,7 @@ materials:
                 custom_id: 'mat_metallic_crystal_1'
                 letter: 'c'
               - type_id: 57
+                material: DIAMOND_BLOCK
                 data: 0
                 letter: 'd'
               - type_id: 0
@@ -3957,6 +4196,7 @@ materials:
               - "mmm"
         
         - id: 'mat_common_defense_catalyst'
+          material: BOOK
           item_id: 340
           item_data: 0
           name: 'Common Defense Catalyst'
@@ -3976,6 +4216,7 @@ materials:
                 custom_id: 'mat_ionic_crystal_1'
                 letter: 'c'
               - type_id: 57
+                material: DIAMOND_BLOCK
                 data: 0
                 letter: 'd'
               - type_id: 0
@@ -3990,6 +4231,7 @@ materials:
 #  Uncommon Defense and Attack catalysts
 
         - id: 'mat_uncommon_attack_catalyst'
+          material: WRITTEN_BOOK
           item_id: 387
           item_data: 0
           name: 'Uncommon Attack Catalyst'
@@ -4022,6 +4264,7 @@ materials:
               - "mmm"
 
         - id: 'mat_uncommon_defense_catalyst'
+          material: WRITTEN_BOOK
           item_id: 387
           item_data: 0
           name: 'Uncommon Defense Catalyst'
@@ -4057,6 +4300,7 @@ materials:
 
 
         - id: 'mat_rare_attack_catalyst'
+          material: WRITTEN_BOOK
           item_id: 387
           item_data: 0
           name: 'Rare Attack Catalyst'
@@ -4089,6 +4333,7 @@ materials:
               - "mmm"
 
         - id: 'mat_rare_defense_catalyst'
+          material: WRITTEN_BOOK
           item_id: 387
           item_data: 0
           name: 'Rare Defense Catalyst'
@@ -4123,6 +4368,7 @@ materials:
 # Legendary Defense and Attack Catalysts
 
         - id: 'mat_legendary_attack_catalyst'
+          material: BLAZE_ROD
           item_id: 369
           item_data: 0
           name: 'Legendary Attack Catalyst'
@@ -4155,6 +4401,7 @@ materials:
               - "mmm"
 
         - id: 'mat_legendary_defense_catalyst'
+          material: BLAZE_ROD
           item_id: 369
           item_data: 0
           name: 'Legendary Defense Catalyst'
@@ -4189,6 +4436,7 @@ materials:
 #  Special Item Recipes -------------------------------------------------
         
         - id: 'mat_tutorial_book'
+          material: BOOK
           item_id: 340
           item_data: 0
           name: 'CivCraft Info'
@@ -4198,6 +4446,7 @@ materials:
               - name: 'TutorialBook'
 
         - id: 'mat_vanilla_hopper'
+          material: HOPPER
           item_id: 154
           item_data: 0
           name: 'Hopper'
@@ -4213,6 +4462,7 @@ materials:
                 data: 0
                 letter: 's'
               - type_id: 54
+                material: CHEST
                 data: 0
                 letter: 'c'
           shape:
@@ -4221,6 +4471,7 @@ materials:
               - " s "
 
         - id: 'mat_ender_pearl'
+          material: ENDER_PEARL
           item_id: 368
           item_data: 0
           name: 'Ender Pearl'
@@ -4236,6 +4487,7 @@ materials:
                 count: 9
         
         - id: 'mat_vanilla_slime'
+          material: SLIME_BALL
           item_id: 341
           item_data: 0
           name: 'T1 SlimeBall'
@@ -4248,10 +4500,12 @@ materials:
                 data: 0
                 count: 3
               - type_id: 352
+                material: BONE
                 data: 0
                 count: 2
         
         - id: 'mat_vanilla_sticky_piston'
+          material: STICKY_PISTON
           item_id: 29
           item_data: 0
           name: 'Sticky Piston'
@@ -4264,6 +4518,7 @@ materials:
                 data: 0
                 letter: 's'
               - type_id: 33
+                material: PISTON
                 data: 0
                 letter: 'p'
           shape:
@@ -4272,6 +4527,7 @@ materials:
               - " p "
         
         - id: 'mat_vanilla_magma_cream'
+          material: MAGMA_CREAM
           item_id: 378
           item_data: 0
           name: 'Magma Cream'
@@ -4284,10 +4540,12 @@ materials:
                 data: 0
                 count: 1
               - type_id: 377
+                material: BLAZE_POWDER
                 data: 0
                 count: 1
         
         - id: 'mat_vanilla_lead'
+          material: LEAD
           item_id: 420
           item_data: 0
           name: 'Lead'
@@ -4301,6 +4559,7 @@ materials:
                 data: 0
                 letter: 'l'
               - type_id: 287
+                material: STRING
                 data: 0
                 letter: 's'
           shape:
@@ -4309,6 +4568,7 @@ materials:
               - "  s"
 
         - id: 'mat_vanilla_stone_pickaxe'
+          material: STONE_PICKAXE
           item_id: 274
           item_data: 0
           name: 'Stone Pickaxe'
@@ -4322,9 +4582,11 @@ materials:
                 value: '100.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 4
+                material: COBBLESTONE
                 data: 0
                 letter: 'm' 
           shape:
@@ -4333,6 +4595,7 @@ materials:
               - " s "
         
         - id: 'mat_vanilla_iron_pickaxe'
+          material: IRON_PICKAXE
           item_id: 257
           item_data: 0
           name: 'Iron Pickaxe'
@@ -4346,9 +4609,11 @@ materials:
                 value: '1000.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4357,6 +4622,7 @@ materials:
               - " s "
         
         - id: 'mat_vanilla_gold_pickaxe'
+          material: GOLDEN_PICKAXE
           item_id: 285
           item_data: 0
           name: 'Gold Pickaxe'
@@ -4370,9 +4636,11 @@ materials:
                 value: '500.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 266
+                material: GOLD_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4381,6 +4649,7 @@ materials:
               - " s "
 
         - id: 'mat_vanilla_diamond_pickaxe'
+          material: DIAMOND_PICKAXE
           item_id: 278
           item_data: 0
           name: 'Diamond Pickaxe'
@@ -4394,9 +4663,11 @@ materials:
                 value: '2000.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 264
+                material: DIAMOND
                 data: 0
                 letter: 'm' 
           shape:
@@ -4405,6 +4676,7 @@ materials:
               - " s "
               
         - id: 'mat_vanilla_iron_shovel'
+          material: IRON_SHOVEL
           item_id: 256
           item_data: 0
           name: 'Iron Shovel'
@@ -4418,9 +4690,11 @@ materials:
                 value: '200.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4429,6 +4703,7 @@ materials:
               - " s "
         
         - id: 'mat_vanilla_gold_shovel'
+          material: GOLDEN_SHOVEL
           item_id: 284
           item_data: 0
           name: 'Gold Shovel'
@@ -4442,9 +4717,11 @@ materials:
                 value: '100.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 266
+                material: GOLD_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4453,6 +4730,7 @@ materials:
               - " s "
 
         - id: 'mat_vanilla_diamond_shovel'
+          material: DIAMOND_SHOVEL
           item_id: 277
           item_data: 0
           name: 'Diamond Shovel'
@@ -4466,9 +4744,11 @@ materials:
                 value: '500.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 264
+                material: DIAMOND
                 data: 0
                 letter: 'm' 
           shape:
@@ -4476,6 +4756,7 @@ materials:
               - " s "
               - " s "
         - id: 'mat_vanilla_iron_axe'
+          material: IRON_AXE
           item_id: 258
           item_data: 0
           name: 'Iron Axe'
@@ -4489,9 +4770,11 @@ materials:
                 value: '400.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4500,6 +4783,7 @@ materials:
               - " s "
         
         - id: 'mat_vanilla_gold_axe'
+          material: GOLDEN_AXE
           item_id: 286
           item_data: 0
           name: 'Gold Axe'
@@ -4513,9 +4797,11 @@ materials:
                 value: '200.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 266
+                material: GOLD_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4524,6 +4810,7 @@ materials:
               - " s "
 
         - id: 'mat_vanilla_diamond_axe'
+          material: DIAMOND_AXE
           item_id: 279
           item_data: 0
           name: 'Diamond Axe'
@@ -4537,9 +4824,11 @@ materials:
                 value: '1000.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 264
+                material: DIAMOND
                 data: 0
                 letter: 'm' 
           shape:
@@ -4548,6 +4837,7 @@ materials:
               - " s "
 
         - id: 'mat_vanilla_iron_hoe'
+          material: IRON_HOE
           item_id: 292
           item_data: 0
           name: 'Iron Hoe'
@@ -4562,9 +4852,11 @@ materials:
                 value: '400.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 265
+                material: IRON_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4573,6 +4865,7 @@ materials:
               - " s "
         
         - id: 'mat_vanilla_gold_hoe'
+          material: GOLDEN_HOE
           item_id: 294
           item_data: 0
           name: 'Gold Hoe'
@@ -4587,9 +4880,11 @@ materials:
                 value: '200.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 266
+                material: GOLD_INGOT
                 data: 0
                 letter: 'm' 
           shape:
@@ -4598,6 +4893,7 @@ materials:
               - " s "
 
         - id: 'mat_vanilla_diamond_hoe'
+          material: DIAMOND_HOE
           item_id: 293
           item_data: 0
           name: 'Diamond Hoe'
@@ -4612,9 +4908,11 @@ materials:
                 value: '500.0'
           ingredients:
               - type_id: 280 #stick
+                material: STICK
                 data: 0
                 letter: 's'
               - type_id: 264
+                material: DIAMOND
                 data: 0
                 letter: 'm' 
           shape:
@@ -4623,6 +4921,7 @@ materials:
               - " s "
               
         - id: 'mat_vanilla_dispenser'
+          material: DISPENSER
           item_id: 23
           item_data: 0
           name: 'Dispenser'
@@ -4631,6 +4930,7 @@ materials:
           shaped: true
           ingredients:
               - type_id: 331 #redstone
+                material: REDSTONE
                 data: 0
                 letter: 'r'
               - type_id: 0
@@ -4638,6 +4938,7 @@ materials:
                 custom_id: 'mat_hunting_bow'
                 letter: 'b'
               - type_id: 4 #cobblestone
+                material: COBBLESTONE
                 data: 0
                 letter: 'c' 
           shape:
@@ -4646,6 +4947,7 @@ materials:
               - "crc"
               
         - id: 'mat_vanilla_TNT'
+          material: TNT
           item_id: 46
           item_data: 0
           name: 'TNT'
@@ -4667,6 +4969,7 @@ materials:
                 letter: 'g' 
 
         - id: 'mat_vanilla_ender_chest'
+          material: ENDER_CHEST
           item_id: 130
           item_data: 0
           name: 'Ender Chest'
@@ -4685,6 +4988,7 @@ materials:
                 data: 0
                 letter: 'l'
               - type_id: 54 #chest
+                material: CHEST
                 data: 0
                 letter: 'c'
           shape:
@@ -4694,6 +4998,7 @@ materials:
 
 #---- Fish (new for 1.75) ----
         - id: 'mat_pond_scum'
+          material: INK_SAC
           item_id: 351
           item_data: 2
           name: 'Pond Scum'
@@ -4707,6 +5012,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_tangled_string'
+          material: COBWEB
           item_id: 30
           item_data: 0
           name: 'Tangled String'
@@ -4720,6 +5026,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_seaweed'
+          material: TALL_GRASS
           item_id: 31
           item_data: 1
           name: 'Seaweed'
@@ -4733,6 +5040,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_minnows'
+          material: MELON_SEEDS
           item_id: 362
           item_data: 0
           name: 'Minnows'
@@ -4746,6 +5054,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_tadpole'
+          material: SPIDER_EYE
           item_id: 375
           item_data: 0
           name: 'Tadpole'
@@ -4759,6 +5068,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_brown_trout'
+          material: COD
           item_id: 349
           item_data: 0
           name: 'Brown Trout'
@@ -4772,6 +5082,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_brook_trout'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Brook Trout'
@@ -4785,6 +5096,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_cutthroat_trout'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Cutthroat Trout'
@@ -4798,6 +5110,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_rainbow_trout'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Rainbow Trout'
@@ -4811,6 +5124,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_atlantic_striped_bass'
+          material: COOKED_COD
           item_id: 350
           item_data: 0
           name: 'Atlantic Striped Bass'
@@ -4824,6 +5138,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_pacific_ocean_perch'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Pacific Ocean Perch'
@@ -4837,6 +5152,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_acadian_redfish'
+          material: TROPICAL_FISH
           item_id: 349
           item_data: 2
           name: 'Acadian Redfish'
@@ -4850,6 +5166,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_widow_rockfish'
+          material: COD
           item_id: 349
           item_data: 0
           name: 'Widow Rockfish'
@@ -4863,6 +5180,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_atlantic_surfclam'
+          material: SUGAR
           item_id: 353
           item_data: 0
           name: 'Atlantic Surf Clam'
@@ -4876,6 +5194,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_ocean_quahog'
+          material: GUNPOWDER
           item_id: 289
           item_data: 0
           name: 'Ocean Quahog'
@@ -4889,6 +5208,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_northern_quahog'
+          material: CLAY_BALL
           item_id: 337
           item_data: 0
           name: 'Northern Quahog'
@@ -4902,6 +5222,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_geoduck'
+          material: RABBIT_FOOT
           item_id: 414
           item_data: 0
           name: 'Geoduck'
@@ -4915,6 +5236,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_atlantic_cod'
+          material: COOKED_COD
           item_id: 350
           item_data: 0
           name: 'Atlantic Cod'
@@ -4928,6 +5250,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_pacific_cod'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Pacific Cod'
@@ -4941,6 +5264,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_lingcod'
+          material: COOKED_SALMON
           item_id: 350
           item_data: 1
           name: 'Lingcod'
@@ -4954,6 +5278,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_sablefish'
+          material: COD
           item_id: 349
           item_data: 0
           name: 'Sablefish'
@@ -4967,6 +5292,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_arrowtooth_flounder'
+          material: PUFFERFISH
           item_id: 349
           item_data: 3
           name: 'Arrowtooth Flounder'
@@ -4980,6 +5306,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_summer_flounder'
+          material: PUFFERFISH
           item_id: 349
           item_data: 3
           name: 'Summer Flounder'
@@ -4993,6 +5320,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_winter_flounder'
+          material: PUFFERFISH
           item_id: 349
           item_data: 3
           name: 'Winter Flounder'
@@ -5006,6 +5334,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_yellowtail_flounder'
+          material: PUFFERFISH
           item_id: 349
           item_data: 3
           name: 'Yellowtail Flounder'
@@ -5019,6 +5348,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_gag_grouper'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Gag Grouper'
@@ -5032,6 +5362,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_red_grouper'
+          material: TROPICAL_FISH
           item_id: 349
           item_data: 2
           name: 'Red Grouper'
@@ -5045,6 +5376,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_black_sea_bass'
+          material: COD
           item_id: 349
           item_data: 0
           name: 'Black Sea Bass'
@@ -5058,6 +5390,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_wreckfish'
+          material: COOKED_COD
           item_id: 350
           item_data: 0
           name: 'Wreckfish'
@@ -5071,6 +5404,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_fish'
+          material: COD
           item_id: 349
           item_data: 0
           name: 'Fish'
@@ -5084,6 +5418,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_salmon'
+          material: SALMON
           item_id: 349
           item_data: 1
           name: 'Salmon'
@@ -5097,6 +5432,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_clownfish'
+          material: TROPICAL_FISH
           item_id: 349
           item_data: 2
           name: 'Clownfish'
@@ -5110,6 +5446,7 @@ materials:
               - name: 'NoRightClick'
 
         - id: 'mat_fish_pufferfish'
+          material: PUFFERFISH
           item_id: 349
           item_data: 3
           name: 'Pufferfish'
@@ -5132,126 +5469,169 @@ removed_recipes:
 
     # iron sword
     - type_id: 267
+      material: IRON_SWORD
       data: 0 
     
     # wood sword
     - type_id: 268
+      material: WOODEN_SWORD
       data: 0
  
     # stone sword
     - type_id: 272
+      material: STONE_SWORD
       data: 0
 
     # Diamond sword
     - type_id: 276
+      material: DIAMOND_SWORD
       data: 0
 
     # gold sword
     - type_id: 283
+      material: GOLDEN_SWORD
       data: 0
 
     # iron chestplate
     - type_id: 307
+      material: IRON_CHESTPLATE
       data: 0
 
     # enchantment table
     - type_id: 116
+      material: ENCHANTING_TABLE
       data: 0
     
     # bow
     - type_id: 261
+      material: BOW
       data: 0
 
     # Leather armor default
     - type_id: 298
+      material: LEATHER_HELMET
       data: 0
     - type_id: 299
+      material: LEATHER_CHESTPLATE
       data: 0
     - type_id: 300
+      material: LEATHER_LEGGINGS
       data: 0
     - type_id: 301
+      material: LEATHER_BOOTS
       data: 0
     
     # iron armor default
     - type_id: 306
+      material: IRON_HELMET
       data: 0
     - type_id: 307
+      material: IRON_CHESTPLATE
       data: 0
     - type_id: 308
+      material: IRON_LEGGINGS
       data: 0
     - type_id: 309
+      material: IRON_BOOTS
       data: 0
     
     # chain armor default
     - type_id: 302
+      material: CHAINMAIL_HELMET
       data: 0
     - type_id: 303
+      material: CHAINMAIL_CHESTPLATE
       data: 0
     - type_id: 304
+      material: CHAINMAIL_LEGGINGS
       data: 0
     - type_id: 305
+      material: CHAINMAIL_BOOTS
       data: 0
     
     # gold armor default
     - type_id: 314
+      material: GOLDEN_HELMET
       data: 0
     - type_id: 315
+      material: GOLDEN_CHESTPLATE
       data: 0
     - type_id: 316
+      material: GOLDEN_LEGGINGS
       data: 0
     - type_id: 317
+      material: GOLDEN_BOOTS
       data: 0
 
     # diamond default
     - type_id: 310
+      material: DIAMOND_HELMET
       data: 0
     - type_id: 311
+      material: DIAMOND_CHESTPLATE
       data: 0
     - type_id: 312
+      material: DIAMOND_LEGGINGS
       data: 0
     - type_id: 313
+      material: DIAMOND_BOOTS
       data: 0
 
     # Eye of ender
     - type_id: 381
+      material: ENDER_EYE
       data: 0
     
     # Beacon
     - type_id: 138
+      material: BEACON
       data: 0
     
     # Hopper
     - type_id: 154
+      material: HOPPER
       data: 0
 
     # Golden apples
     - type_id: 322
+      material: GOLDEN_APPLE
       data: 0
+    - material: ENCHANTED_GOLDEN_APPLE
 
     # Pickaxes
     - type_id: 257
+      material: IRON_PICKAXE
       data: 0
     - type_id: 274
+      material: STONE_PICKAXE
       data: 0
     - type_id: 278
+      material: WOODEN_PICKAXE
       data: 0
     - type_id: 285
+      material: GOLDEN_PICKAXE
       data: 0
     
     # Shovels
     - type_id: 256
+      material: IRON_SHOVEL
       data: 0
     - type_id: 284
+      material: GOLDEN_SHOVEL
       data: 0
     - type_id: 277
+      material: DIAMOND_SHOVEL
       data: 0
 
     # Axes
     - type_id: 258
+      material: IRON_AXE
       data: 0
     - type_id: 286
+      material: GOLDEN_AXE
       data: 0
     - type_id: 279
+      material: DIAMOND_AXE
       data: 0
       
     # Hoe
@@ -5264,25 +5644,30 @@ removed_recipes:
         
     # TNT
     - type_id: 46
+      material: TNT
       data: 0
 
     # Ender Chest
     - type_id: 130
+      material: ENDER_CHEST
       data: 0
     # Slime Block
     - type_id: 165
+      material: SLIME_BLOCK
       data: 0
 
     # Armor stand
     - type_id: 416
+      material: ARMOR_STAND
       data: 0
       
     #Nether Wart Block
     - type_id: 214
+      material: NETHER_WART_BLOCK
       data: 0
 
       
 # Amount of tungston to drop
-tungsten_min_drop: 0
-tungsten_max_drop: 1
-tungsten_max_drop_with_fortune: 3
+tungsten_min_drop: 1
+tungsten_max_drop: 3
+tungsten_max_drop_with_fortune: 6

@@ -29,7 +29,12 @@ public class ShowRecipe implements GuiAction {
 		String message;
 		ItemStack entryStack;
 		if (ingred.custom_id == null) {
-			name = ItemManager.getMaterialData(ingred.type_id, ingred.data).toString();
+			ItemStack tmp = ItemManager.createItemStack(ingred.type_id, 1, (short) ingred.data);
+			if (tmp != null && tmp.getType() != null) {
+				name = tmp.getType().name();
+			} else {
+				name = "mc_" + ingred.type_id + ":" + ingred.data;
+			}
 			message = "Vanilla Item";
 			entryStack = LoreGuiItem.build(name, ingred.type_id, ingred.data, message);
 		} else {

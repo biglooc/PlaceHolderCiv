@@ -119,24 +119,37 @@ public class ItemFrameStorage {
 	public UUID getUUID() {
 		return this.getFrameID();
 	}
-	
+
 	public void setFacingDirection(BlockFace blockface) {
 	//	ItemFrame frame = getItemFrame();
 	//	frame.setFacingDirection(blockface);
 	}
-	
+
 	public void setItem(ItemStack stack) {
 
 		ItemFrame frame = getItemFrame();
 		if (frame != null) {
-			ItemStack newStack = new ItemStack(stack.getType(), 1, stack.getDurability());
-			newStack.setData(stack.getData());
-			newStack.setItemMeta(stack.getItemMeta());
-			frame.setItem(newStack);
-		} else {
-			CivLog.warning("Frame:"+this.frameID+" was null when trying to set to "+stack.getType().name());
+			ItemStack newStack = new ItemStack(stack.getType(), 1);
+			if (stack.hasItemMeta()) {
+				org.bukkit.inventory.meta.ItemMeta meta = stack.getItemMeta();
+				if (stack.hasItemMeta()) {
+					org.bukkit.inventory.meta.ItemMeta clone = stack.getItemMeta();
+					if (meta != null) {
+						newStack.setItemMeta(meta.clone());
+						if (meta instanceof org.bukkit.inventory.meta.Damageable dmgMeta) {
+							if (meta instanceof org.bukkit.inventory.meta.Damageable dmg
+									&& clone instanceof org.bukkit.inventory.meta.Damageable c) {
+								c.setDamage(dmgMeta.getDamage());
+							}
+						}
+						newStack.setItemMeta(clone);
+					}
+					frame.setItem(newStack);
+				}
+			} else {
+				CivLog.warning("Frame:" + this.frameID + " was null when trying to set to " + stack.getType().name());
+			}
 		}
-		
 	}
 	
 	public void clearItem() {

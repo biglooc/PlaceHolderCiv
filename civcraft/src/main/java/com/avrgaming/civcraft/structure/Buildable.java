@@ -767,14 +767,18 @@ public abstract class Buildable extends SQLObject {
 		}
 		
 		if (this.getConfigId().equals("s_shipyard") || this.getConfigId().equals("s_arrowship") || this.getConfigId().equals("s_scoutship") || this.getConfigId().equals("s_cannonship") || this.getConfigId().equals("ti_tradeship") || this.getConfigId().equals("w_grand_ship_ingermanland")) {
- 		if (!centerBlock.getBiome().equals(Biome.OCEAN) && 
+ 		if (!centerBlock.getBiome().equals(Biome.OCEAN) &&
+				!centerBlock.getBiome().equals(Biome.DEEP_LUKEWARM_OCEAN) &&
+				!centerBlock.getBiome().equals(Biome.WARM_OCEAN) &&
 				!centerBlock.getBiome().equals(Biome.BEACH) &&
 				!centerBlock.getBiome().equals(Biome.STONY_SHORE) &&
 				!centerBlock.getBiome().equals(Biome.SNOWY_BEACH) &&
 				!centerBlock.getBiome().equals(Biome.DEEP_OCEAN) &&
 				!centerBlock.getBiome().equals(Biome.RIVER) &&
 				!centerBlock.getBiome().equals(Biome.FROZEN_OCEAN) &&
-				!centerBlock.getBiome().equals(Biome.FROZEN_RIVER)) {
+				!centerBlock.getBiome().equals(Biome.COLD_OCEAN) &&
+				!centerBlock.getBiome().equals(Biome.DEEP_FROZEN_OCEAN) &&
+				!centerBlock.getBiome().equals(Biome.FROZEN_RIVER)){
 				throw new CivException(CivSettings.localize.localizedString("var_buildable_notEnoughWater",this.getDisplayName()));
 			}
 		}

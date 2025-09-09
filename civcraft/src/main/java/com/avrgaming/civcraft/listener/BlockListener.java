@@ -952,7 +952,7 @@ public class BlockListener implements Listener {
 				}
 			}
 
-			if (event.getItem().getType().equals(Material.BONE_MEAL)) {
+			if (event.getItem().getType().equals(Material.INK_SAC)) {
 				//if (event.getItem().getDurability() == 15) { 
 					event.setCancelled(true);
 					return;
@@ -1724,11 +1724,7 @@ public class BlockListener implements Listener {
 						if (loc.getWorld() == null) return;
 						for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius, ent -> ent instanceof Player)) {
 							Player target = (Player) e;
-							EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(attacker, target, DamageCause.ENTITY_ATTACK, damage);
-							Bukkit.getServer().getPluginManager().callEvent(event);
-							if (!event.isCancelled()) {
-								target.damage(event.getDamage(), attacker);
-							}
+							target.damage(damage, attacker);
 						}
 					}
 					

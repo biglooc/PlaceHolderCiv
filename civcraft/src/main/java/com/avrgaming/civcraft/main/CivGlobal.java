@@ -39,6 +39,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.avrgaming.civcraft.object.*;
 import net.milkbowl.vault.economy.Economy;
@@ -163,8 +164,8 @@ public class CivGlobal {
 	public static HashSet<String> banWords = new HashSet<String>();
 			
 	//public static Scoreboard globalBoard;
-	
-	public static Integer maxPlayers = -1;
+
+	public static final AtomicInteger maxPlayers = new AtomicInteger(-1);
 	public static HashSet<String> betaPlayers = new HashSet<String>();
 	public static String fullMessage = "";
 	public static Boolean betaOnly = false;
@@ -1640,6 +1641,15 @@ public class CivGlobal {
   if (org.bukkit.Tag.SMALL_FLOWERS.isTagged(type) || org.bukkit.Tag.TALL_FLOWERS.isTagged(type) || org.bukkit.Tag.SAPLINGS.isTagged(type)) return true;
 		// Redstone and utilities
 		switch (type) {
+			case TNT:
+			case FLOWER_POT:
+			case GLASS:
+			case BEETROOT:
+			case POTATO:
+			case CARROT:
+			case WHEAT:
+			case BROWN_MUSHROOM:
+			case BLACK_BED, BLUE_BED, BROWN_BED,LIGHT_BLUE_BED, CYAN_BED,GRAY_BED,GREEN_BED,LIGHT_GRAY_BED,LIME_BED,MAGENTA_BED,YELLOW_BED,ORANGE_BED,PINK_BED,PURPLE_BED,RED_BED,WHITE_BED:
 			case REDSTONE_WIRE:
 			case REDSTONE_TORCH:
 			case REDSTONE_WALL_TORCH:

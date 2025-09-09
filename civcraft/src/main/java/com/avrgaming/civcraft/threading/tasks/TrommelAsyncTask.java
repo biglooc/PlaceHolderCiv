@@ -185,10 +185,11 @@ public class TrommelAsyncTask extends CivAsyncTask {
 				}
 				if (ItemManager.getId(stack) == CivData.STONE) {
 
-					if (this.trommel.getLevel() >= 2 && ItemManager.getData(stack) == 
-							ItemManager.getData(ItemManager.getMaterialData(CivData.STONE, CivData.GRANITE))) {
+					if ((this.trommel.getLevel() >= 2)
+							&& (stack.getType() == ItemManager.fromLegacyId(CivData.STONE, CivData.GRANITE))) {
 						try {
-							this.updateInventory(Action.REMOVE, source_inv, ItemManager.createItemStack(CivData.STONE, 1, (short) CivData.GRANITE));
+							this.updateInventory(Action.REMOVE, source_inv,
+									ItemManager.createItemStack(CivData.STONE, 1, (short) CivData.GRANITE));
 						} catch (InterruptedException e) {
 							return;
 						}
@@ -262,10 +263,11 @@ public class TrommelAsyncTask extends CivAsyncTask {
 						}
 						break;
 					}
-					if (this.trommel.getLevel() >= 3 && ItemManager.getData(stack) == 
-							ItemManager.getData(ItemManager.getMaterialData(CivData.STONE, CivData.DIORITE))) {
+					if ((this.trommel.getLevel() >= 3)
+							&& (stack.getType() == ItemManager.fromLegacyId(CivData.STONE, CivData.DIORITE))) {
 						try {
-							this.updateInventory(Action.REMOVE, source_inv, ItemManager.createItemStack(CivData.STONE, 1, (short) CivData.DIORITE));
+							this.updateInventory(Action.REMOVE, source_inv,
+									ItemManager.createItemStack(CivData.STONE, 1, (short) CivData.DIORITE));
 						} catch (InterruptedException e) {
 							return;
 						}
@@ -338,10 +340,11 @@ public class TrommelAsyncTask extends CivAsyncTask {
 						}
 						break;
 					}
-					if (this.trommel.getLevel() >= 4 && ItemManager.getData(stack) == 
-							ItemManager.getData(ItemManager.getMaterialData(CivData.STONE, CivData.ANDESITE))) {
+					if ((this.trommel.getLevel() >= 4)
+							&& (stack.getType() == ItemManager.fromLegacyId(CivData.STONE, CivData.ANDESITE))) {
 						try {
-							this.updateInventory(Action.REMOVE, source_inv, ItemManager.createItemStack(CivData.STONE, 1, (short) CivData.ANDESITE));
+							this.updateInventory(Action.REMOVE, source_inv,
+									ItemManager.createItemStack(CivData.STONE, 1, (short) CivData.ANDESITE));
 						} catch (InterruptedException e) {
 							return;
 						}

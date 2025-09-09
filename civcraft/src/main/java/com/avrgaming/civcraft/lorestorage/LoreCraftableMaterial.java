@@ -290,19 +290,18 @@ public class LoreCraftableMaterial extends LoreMaterial {
 					ItemStack ingredStack = null;
 
 					if (ingred.custom_id == null) {
-						org.bukkit.material.MaterialData md = ItemManager.getMaterialData(ingred.type_id, ingred.data);
-						Material mat = md.getItemType();
+						Material mat = ItemManager.fromLegacyId(ingred.type_id, ingred.data);
 						if (mat == null || mat == Material.AIR) {
-							CivLog.warning("Skipping AIR/null shaped ingredient "+ingred.type_id+":"+ingred.data+" for material:"+configMaterial.id);
+							CivLog.warning("Skipping AIR/null shaped ingredient " + ingred.type_id + ":" + ingred.data + " for material:" + configMaterial.id);
 							continue;
 						}
-						recipe.setIngredient(ingred.letter.charAt(0), md);
+						recipe.setIngredient(ingred.letter.charAt(0), mat);
 						provided.add(ingred.letter.charAt(0));
-						ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
-						if (ingredStack == null || ingredStack.getType() == Material.AIR) {
+						ingredStack = new ItemStack(mat, 1);
+						if (ingredStack.getType() == Material.AIR) {
 							ingredStack = null;
 						}
-					} else{
+					} else {
 						LoreCraftableMaterial customLoreMat = materials.get(ingred.custom_id);
 						if (customLoreMat == null) {
 							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
@@ -311,13 +310,12 @@ public class LoreCraftableMaterial extends LoreMaterial {
 						
 						ConfigMaterial customMat = customLoreMat.configMaterial;
 						if (customMat != null) {
-							org.bukkit.material.MaterialData md = ItemManager.getMaterialData(customMat.item_id, customMat.item_data);
-							Material mat = md.getItemType();
+							Material mat = ItemManager.fromLegacyId(ingred.type_id, ingred.data);
 							if (mat == null || mat == Material.AIR) {
 								CivLog.warning("Skipping AIR/null shaped custom ingredient "+ingred.custom_id+" for material:"+configMaterial.id);
 								continue;
 							}
-							recipe.setIngredient(ingred.letter.charAt(0), md);
+							recipe.setIngredient(ingred.letter.charAt(0), mat);
 						} else {
 							CivLog.warning("Couldn't find custom material id:"+ingred.custom_id);
 							continue;
@@ -379,14 +377,13 @@ public class LoreCraftableMaterial extends LoreMaterial {
 					
 					try {
 					if (ingred.custom_id == null) {
-						org.bukkit.material.MaterialData md = ItemManager.getMaterialData(ingred.type_id, ingred.data);
-						Material mat = md.getItemType();
+						Material mat = ItemManager.fromLegacyId(ingred.type_id, ingred.data);
 						if (mat == null || mat == Material.AIR) {
 							CivLog.warning("Skipping AIR/null ingredient "+ingred.type_id+":"+ingred.data+" for material:"+configMaterial.id);
 							continue;
 						}
-						recipe.addIngredient(ingred.count, md);
-						ingredStack = ItemManager.createItemStack(ingred.type_id, 1, (short)ingred.data);
+						recipe.addIngredient(ingred.count, mat);
+						ingredStack = new ItemStack(mat, 1);
 						if (ingredStack == null || ingredStack.getType() == Material.AIR) {
 							ingredStack = null; // ensure no AIR entries in matrix/items
 						}
@@ -398,13 +395,12 @@ public class LoreCraftableMaterial extends LoreMaterial {
 						}
 						ConfigMaterial customMat = customLoreMat.configMaterial;
 						if (customMat != null) {
-							org.bukkit.material.MaterialData md = ItemManager.getMaterialData(customMat.item_id, customMat.item_data);
-							Material mat = md.getItemType();
+							Material mat = ItemManager.fromLegacyId(ingred.type_id, ingred.data);
 							if (mat == null || mat == Material.AIR) {
 								CivLog.warning("Skipping AIR/null custom ingredient "+ingred.custom_id+" for material:"+configMaterial.id);
 								continue;
 							}
-							recipe.addIngredient(ingred.count, md);
+							recipe.addIngredient(ingred.count, mat);
 							ingredStack = LoreMaterial.spawn(customLoreMat);
 							if (ingredStack == null || ingredStack.getType() == Material.AIR) {
 								ingredStack = null;

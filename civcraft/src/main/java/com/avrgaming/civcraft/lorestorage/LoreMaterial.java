@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -199,13 +201,22 @@ public abstract class LoreMaterial {
 		return newStack;
 	}
 	
-	public static void addGlow(ItemStack stack)
-    {
-        ItemMeta meta = stack.getItemMeta();
-        meta.addEnchant( Enchantment.LURE, 1, false );
-        meta.addItemFlags( ItemFlag.HIDE_ENCHANTS );
-        stack.setItemMeta( meta );
-    }
+	public static void addGlow(ItemStack stack) {
+		if (stack == null) return;
+		if (stack.getType() == Material.AIR) return;
+
+		ItemMeta meta = stack.getItemMeta();
+		if (meta == null) {
+			meta = Bukkit.getItemFactory().getItemMeta(stack.getType());
+		}
+		if (meta == null) return;
+		try {
+			meta.addEnchant(Enchantment.LURE,1, true);
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			stack.setItemMeta(meta);
+		} catch (Throwable ignored) {}
+
+	}
 	
 	public int getTypeID() {
 		return typeID;

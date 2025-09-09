@@ -5,25 +5,37 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.avrgaming.civcraft.main.CivGlobal;
 import com.avrgaming.civcraft.main.CivLog;
-import com.avrgaming.civcraft.object.Resident;
 import com.avrgaming.civcraft.util.CivColor;
 
+/**
+ * ConfigMaterial met support voor modern Bukkit Material via YAML key "material".
+ * Backwards-compatible met legacy item_id / item_data.
+ */
 public class ConfigMaterial {
 
-	/* Required */
+	/* Required (legacy pad) */
 	public String id;
 	public int item_id;
 	public int item_data;
 	public String name;
-	public String category = CivSettings.localize.localizedString("config_material_misc");
-	public String categoryCivColortripped = category;
+
+	/* Categorie & tier */
+	public String category = /* default uit localization */ com.avrgaming.civcraft.config.CivSettings.localize.localizedString("config_material_misc");
+	public String categoryCivColortripped = CivColor.stripTags(category);
 	public int tier;
-	
+
+	/* Modern pad (result item via Bukkit Material) */
+	/** YAML: "material": bv. "DIAMOND", "ACACIA_STAIRS" */
+	public String material_name = null;
+	/** Geresolveerde Bukkit enum (indien material_name is gezet en geldig) */
+	public Material material = null;
+
 	/* Optional */
 	public String[] lore = null;
 	public boolean craftable = false;
@@ -37,191 +49,220 @@ public class ConfigMaterial {
 	public boolean vanilla = false;
 	public int amount = 1;
 	public double tradeValue = 0;
-	
+
 	@SuppressWarnings("unchecked")
-	public static void loadConfig(FileConfiguration cfg, Map<String, ConfigMaterial> materials){
+	public static void loadConfig(FileConfiguration cfg, Map<String, ConfigMaterial> materials) {
 		materials.clear();
 		List<Map<?, ?>> configMaterials = cfg.getMapList("materials");
 		for (Map<?, ?> b : configMaterials) {
 			ConfigMaterial mat = new ConfigMaterial();
-			
-			/* Mandatory Settings */
-			mat.id = (String)b.get("id");
-			mat.item_id = (Integer)b.get("item_id");
-			mat.item_data = (Integer)b.get("item_data");
-			mat.name = (String)b.get("name");
-			mat.name = CivColor.colorize(mat.name);
-			
-			
-			String category = (String)b.get("category");
+
+			/* Mandatory / identifiers */
+			mat.id = asString(b.get("id"));
+			if (mat.id == null || mat.id.isEmpty()) {
+				CivLog.warning("Skipping material with missing 'id'.");
+				continue;
+			}
+
+			/* Result item: modern eerst (material), daarna legacy (item_id/item_data) */
+			mat.material_name = asString(b.get("material"));
+			if (mat.material_name != null) {
+				Material m = Material.matchMaterial(mat.material_name);
+				if (m == null) {
+					CivLog.warning("Unknown Bukkit material '" + mat.material_name + "' for id:" + mat.id + ". Falling back to item_id.");
+				} else {
+					mat.material = m;
+				}
+			}
+
+			Integer legacyItemId = asInteger(b.get("item_id"));
+			if (legacyItemId != null) mat.item_id = legacyItemId;
+			Integer legacyItemData = asInteger(b.get("item_data"));
+			if (legacyItemData != null) mat.item_data = legacyItemData;
+
+			if (mat.material != null && legacyItemId != null) {
+				CivLog.warning("Both 'material' and 'item_id' provided for id:" + mat.id + ". Modern 'material' will be preferred by downstream code; legacy kept for compatibility.");
+			}
+
+			/* Name (met kleurcodes) */
+			mat.name = CivColor.colorize(asString(b.get("name")));
+
+			/* Category & tier */
+			String category = asString(b.get("category"));
 			if (category != null) {
 				mat.category = CivColor.colorize(category);
 				mat.categoryCivColortripped = CivColor.stripTags(category);
-				
-				if (mat.category.toLowerCase().contains("tier 1")) {
+
+				String lower = mat.category.toLowerCase();
+				if (lower.contains("tier 1") || lower.contains("tier i")) {
 					mat.tier = 1;
-				} else if (mat.category.toLowerCase().contains("tier 2")) {
+				} else if (lower.contains("tier 2") || lower.contains("tier ii")) {
 					mat.tier = 2;
-				} else if (mat.category.toLowerCase().contains("tier 3")) {
+				} else if (lower.contains("tier 3") || lower.contains("tier iii")) {
 					mat.tier = 3;
-				} else if (mat.category.toLowerCase().contains("tier 4")) {
+				} else if (lower.contains("tier 4") || lower.contains("tier iv")) {
 					mat.tier = 4;
 				} else {
 					mat.tier = 0;
 				}
-				
 			}
-			
-			/* Optional Lore */
-			List<?> configLore = (List<?>)b.get("lore");
+
+			/* Lore */
+			List<?> configLore = (List<?>) b.get("lore");
 			if (configLore != null) {
 				String[] lore = new String[configLore.size()];
-				
 				int i = 0;
 				for (Object obj : configLore) {
 					if (obj instanceof String) {
-						lore[i] = (String)obj;
-						i++;
+						lore[i++] = (String) obj;
 					}
 				}
-			}
-			
-			Boolean craftable = (Boolean)b.get("craftable");
-			if (craftable != null) {
-				mat.craftable = craftable;
-			}
-			
-			Boolean shaped = (Boolean)b.get("shaped");
-			if (shaped != null) {
-				mat.shaped = shaped;
+				mat.lore = lore; // fix: daadwerkelijk op veld zetten
 			}
 
-			Boolean isShiny = (Boolean)b.get("shiny");
-			if (isShiny != null) {
+			/* Flags */
+			mat.craftable = asBoolean(b.get("craftable"), false);
+			mat.shaped    = asBoolean(b.get("shaped"), false);
+			mat.shiny     = asBoolean(b.get("shiny"), false);
+			mat.tradeable = asBoolean(b.get("tradeable"), false);
+			mat.vanilla   = asBoolean(b.get("vanilla"), false);
 
-				mat.shiny = isShiny;
-			}
-			
-			Boolean isTradeable = (Boolean)b.get("tradeable");
-			if (isTradeable != null) {
+			/* Waarden */
+			Integer amount = asInteger(b.get("amount"));
+			if (amount != null) mat.amount = amount;
 
-				mat.tradeable = isTradeable;
-			}
-			
-			Double tValue = (Double)b.get("tradeValue");
-			if (tValue != null)
-			{
-				mat.tradeValue = tValue;
-			}
-			
-			Boolean vanilla = (Boolean)b.get("vanilla");
-			if (vanilla != null) {
-				mat.vanilla = vanilla;
-			}
-			
-			Integer amount = (Integer)b.get("amount");
-			if (amount != null) {
-				mat.amount = amount;
-			}
-			
-			String required_tech = (String)b.get("required_techs");
+			Double tValue = asDouble(b.get("tradeValue"));
+			if (tValue != null) mat.tradeValue = tValue;
+
+			/* Tech vereisten (let op: sleutel heet 'required_techs' in jullie YAML) */
+			String required_tech = asString(b.get("required_techs"));
 			if (required_tech != null) {
 				mat.required_tech = required_tech;
 			}
-			
-			List<Map<?,?>> comps = (List<Map<?,?>>)b.get("components");
+
+			/* Componenten */
+			List<Map<?, ?>> comps = (List<Map<?, ?>>) b.get("components");
 			if (comps != null) {
 				for (Map<?, ?> compObj : comps) {
-					
 					HashMap<String, String> compMap = new HashMap<String, String>();
 					for (Object key : compObj.keySet()) {
-						compMap.put((String)key, (String)compObj.get(key));
+						compMap.put(String.valueOf(key), asString(compObj.get(key)));
 					}
-					mat.components.add(compMap);	
+					mat.components.add(compMap);
 				}
 			}
-			
-			List<Map<?, ?>> configIngredients = (List<Map<?,?>>)b.get("ingredients");
+
+			/* Ingrediënten (N.B. nog legacy pad: type_id/data of custom_id) */
+			List<Map<?, ?>> configIngredients = (List<Map<?, ?>>) b.get("ingredients");
 			if (configIngredients != null) {
 				mat.ingredients = new HashMap<String, ConfigIngredient>();
-				
+
 				for (Map<?, ?> ingred : configIngredients) {
 					ConfigIngredient ingredient = new ConfigIngredient();
-					ingredient.type_id = (Integer)ingred.get("type_id");
-					ingredient.data = (Integer)ingred.get("data");
-					String key = null;
-					
-					String custom_id = (String)ingred.get("custom_id");
+
+					ingredient.type_id = asIntDefault(ingred.get("type_id"), 0);
+					ingredient.data    = asIntDefault(ingred.get("data"), 0);
+
+					String key;
+					String custom_id = asString(ingred.get("custom_id"));
 					if (custom_id != null) {
 						ingredient.custom_id = custom_id;
 						key = custom_id;
 					} else {
 						ingredient.custom_id = null;
-						key = "mc_"+ingredient.type_id;
+						key = "mc_" + ingredient.type_id;
 					}
-					
-					Boolean ignore_data = (Boolean)ingred.get("ignore_data");
-					if (ignore_data == null || ignore_data == false) {
-						ingredient.ignore_data = false;
-					} else {
-						ingredient.ignore_data = true;
-					}
-					
-					Integer count = (Integer)ingred.get("count");
-					if (count != null) {
-						ingredient.count = count;
-					}
-					
-					String letter = (String)ingred.get("letter");
-					if (letter != null) {
-						ingredient.letter = letter;
-					}
-					
-					
-					
+
+					ingredient.ignore_data = asBoolean(ingred.get("ignore_data"), false);
+					Integer count = asInteger(ingred.get("count"));
+					if (count != null) ingredient.count = count;
+
+					String letter = asString(ingred.get("letter"));
+					if (letter != null) ingredient.letter = letter;
+
 					mat.ingredients.put(key, ingredient);
-					//ConfigIngredient.ingredientMap.put(ingredient.custom_id, ingredient);
 				}
 			}
-			
-			if (shaped) {
-				/* Optional shape argument. */
-				List<?> configShape = (List<?>)b.get("shape");
-				
+
+			/* Shaped recept: optionele shape */
+			if (mat.shaped) {
+				List<?> configShape = (List<?>) b.get("shape");
 				if (configShape != null) {
 					String[] shape = new String[configShape.size()];
-					
 					int i = 0;
 					for (Object obj : configShape) {
 						if (obj instanceof String) {
-							shape[i] = (String)obj;
-							i++;
+							shape[i++] = (String) obj;
 						}
 					}
 					mat.shape = shape;
 				}
 			}
-			
 
-			/* Add to category map. */
+			/* Categoriseren & opslaan */
 			ConfigMaterialCategory.addMaterial(mat);
 			materials.put(mat.id, mat);
 		}
-		
-		CivLog.info("Loaded "+materials.size()+" Materials.");
-	}	
-	
+
+		CivLog.info("Loaded " + materials.size() + " Materials.");
+	}
+
+	/* =========================
+	 *  Helpers (null-safe casts)
+	 * ========================= */
+	private static String asString(Object o) {
+		return (o == null) ? null : String.valueOf(o);
+	}
+
+	private static Integer asInteger(Object o) {
+		if (o == null) return null;
+		if (o instanceof Integer) return (Integer) o;
+		if (o instanceof Number) return ((Number) o).intValue();
+		try {
+			return Integer.valueOf(String.valueOf(o));
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
+	private static int asIntDefault(Object o, int def) {
+		Integer i = asInteger(o);
+		return (i == null) ? def : i;
+	}
+
+	private static boolean asBoolean(Object o, boolean def) {
+		if (o == null) return def;
+		if (o instanceof Boolean) return (Boolean) o;
+		if (o instanceof String) return Boolean.parseBoolean((String) o);
+		return def;
+	}
+
+	private static Double asDouble(Object o) {
+		if (o == null) return null;
+		if (o instanceof Double) return (Double) o;
+		if (o instanceof Number) return ((Number) o).doubleValue();
+		try {
+			return Double.valueOf(String.valueOf(o));
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+
+	/* =========================
+	 *  Bestaande API
+	 * ========================= */
+
 	public boolean playerHasTechnology(Player player) {
 		if (this.required_tech == null) {
 			return true;
 		}
-		
-		Resident resident = CivGlobal.getResident(player);
+
+		com.avrgaming.civcraft.object.Resident resident = CivGlobal.getResident(player);
 		if (resident == null || !resident.hasTown()) {
 			return false;
 		}
-		
-		/* Parse technoloies */
+
+		/* Parse technologies */
 		String[] split = this.required_tech.split(",");
 		for (String tech : split) {
 			tech = tech.replace(" ", "");
@@ -229,27 +270,27 @@ public class ConfigMaterial {
 				return false;
 			}
 		}
-		
-		return true;	
+
+		return true;
 	}
-	
+
 	public String getRequireString() {
 		String out = "";
 		if (this.required_tech == null) {
 			return out;
 		}
-				
-		/* Parse technoloies */
+
+		/* Parse technologies */
 		String[] split = this.required_tech.split(",");
 		for (String tech : split) {
 			tech = tech.replace(" ", "");
 			ConfigTech technology = CivSettings.techs.get(tech);
 			if (technology != null) {
-				out += technology.name+", ";
+				out += technology.name + ", ";
 			}
 		}
-		
+
 		return out;
 	}
-	
 }
+

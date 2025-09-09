@@ -185,7 +185,7 @@ public class AdminCommand extends CommandBase {
      identifier = ItemManager.getId(Material.IRON_SHOVEL);
 				}
 				else if (cat.name.contains("Eggs")) {
-    identifier = ItemManager.getId(Material.VILLAGER_SPAWN_EGG);
+    identifier = ItemManager.getId(Material.EGG);
 				}
 				else {
 					identifier = ItemManager.getId(Material.WRITTEN_BOOK);
@@ -337,9 +337,7 @@ public class AdminCommand extends CommandBase {
 			return;
 		}
 		
-		synchronized(CivGlobal.maxPlayers) {
-			CivGlobal.fullMessage = args[1];
-		}
+		CivGlobal.fullMessage = args[1];
 		
 		CivMessage.sendSuccess(sender, CivSettings.localize.localizedString("SetTo")+args[1]);
 		

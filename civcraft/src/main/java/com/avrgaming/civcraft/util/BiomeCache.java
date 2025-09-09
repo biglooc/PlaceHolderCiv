@@ -128,7 +128,7 @@ public class BiomeCache {
 			}
 			
 				TaskMaster.syncTask(new SyncTask(cc));
-				return Biome.PLAINS;
+				return Biome.NETHER_WASTES;
 		}
 	}
 	

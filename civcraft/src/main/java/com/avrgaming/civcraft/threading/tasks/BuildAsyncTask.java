@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.block.Block;
 
@@ -57,7 +58,7 @@ public class BuildAsyncTask extends CivAsyncTask {
 	private int extra_blocks;
 	private int percent_complete;
 	private Queue<SimpleBlock> sbs; //Blocks to add to main sync task queue;
-	public Boolean aborted = false;
+	private final AtomicBoolean aborted = new AtomicBoolean(false);
 	public Date lastSave; 
 	
 	private final int SAVE_INTERVAL = 5*1000; /* once every 5 sec. */
@@ -91,10 +92,8 @@ public class BuildAsyncTask extends CivAsyncTask {
 			speed = buildable.getBuildSpeed();
 			blocks_per_tick = buildable.getBlocksPerTick();
 		
-			synchronized(aborted) {
-				if (aborted) {
-					return aborted;
-				}
+			if (aborted.get()) {
+				return true;
 			}
 			
 			if (buildable.isComplete()) {
@@ -146,11 +145,11 @@ public class BuildAsyncTask extends CivAsyncTask {
 			count = 0; //reset count, this tick is over.
 			// Add all of the blocks from this tick to the sync task.
 			synchronized (this.aborted) {
-				if (!this.aborted) {
+				if (aborted.get()) {
 					this.updateBlocksQueue(sbs);
 					sbs.clear();
 				} else {
-					return aborted;
+					return true;
 				}
 			}
 			
@@ -273,7 +272,7 @@ public class BuildAsyncTask extends CivAsyncTask {
 		// synchronous stuff is now going to be handled later. Perform the reset
 		// of the build task async.
 		synchronized (this.aborted) {
-			if (!this.aborted) {
+			if (aborted.get()) {
 				if (sb.getType() == CivData.WOOD_DOOR || 
 					sb.getType() == CivData.IRON_DOOR || 
 					sb.getType() == CivData.SPRUCE_DOOR || 
@@ -379,7 +378,7 @@ public class BuildAsyncTask extends CivAsyncTask {
 
 	public void abort() {
 		synchronized(aborted) {
-			aborted = true;
+			aborted.set(true);
 		}
 	}
 

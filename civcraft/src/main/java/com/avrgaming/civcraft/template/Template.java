@@ -152,6 +152,7 @@ public class Template {
 		attachableTypes.add(ItemManager.getId(Material.COMPARATOR));
 		attachableTypes.add(ItemManager.getId(Material.DAYLIGHT_DETECTOR));
 		attachableTypes.add(ItemManager.getId(Material.ACTIVATOR_RAIL));
+		attachableTypes.add(ItemManager.getId(Material.ROSE_BUSH));
 	}
 	
 	public static boolean isAttachable(int blockID)

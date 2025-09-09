@@ -46,6 +46,9 @@ public class TradeInventoryListener implements Listener {
 	public static final int OTHER_COIN_OFFER = 7;
 	
 	public static String getTradeInventoryKey(Resident resident) {
+		if (resident == null) {
+			return null;
+		}
 		return resident.getName()+":inventroy";
 	}
 		
@@ -269,7 +272,14 @@ public class TradeInventoryListener implements Listener {
 		}
 		Player player = (Player)event.getWhoClicked();
 		Resident resident = CivGlobal.getResident(player);
-		TradeInventoryPair pair = tradeInventories.get(getTradeInventoryKey(resident));
+		if (resident == null) {
+			return;
+		}
+		String key = getTradeInventoryKey(resident);
+		if (key == null) {
+			return;
+		}
+		TradeInventoryPair pair = tradeInventories.get(key);
 		if (pair == null) {
 			return;
 		}
@@ -515,7 +525,14 @@ public class TradeInventoryListener implements Listener {
 		}
 		Player player = (Player)event.getWhoClicked();
 		Resident resident = CivGlobal.getResident(player);
-		TradeInventoryPair pair = tradeInventories.get(getTradeInventoryKey(resident));
+		if (resident == null) {
+			return;
+		}
+		String key = getTradeInventoryKey(resident);
+		if (key == null) {
+			return;
+		}
+		TradeInventoryPair pair = tradeInventories.get(key);
 		if (pair == null) {
 			return;
 		}
@@ -544,13 +561,15 @@ public class TradeInventoryListener implements Listener {
 		}
 		Player player = (Player)event.getPlayer();
 		Resident resident = CivGlobal.getResident(player);
-		
 		if (resident == null) {
-			CivLog.error("Got InvCloseEvent with player name:"+player.getName()+" but could not find resident object?");
+			// Player may have disconnected or resident cache not initialized; just ignore.
 			return;
 		}
-		
-		TradeInventoryPair pair = tradeInventories.get(getTradeInventoryKey(resident));
+		String key = getTradeInventoryKey(resident);
+		if (key == null) {
+			return;
+		}
+		TradeInventoryPair pair = tradeInventories.get(key);
 		if (pair == null) {
 			return;
 		}

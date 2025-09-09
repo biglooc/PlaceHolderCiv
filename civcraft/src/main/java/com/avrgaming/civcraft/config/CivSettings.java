@@ -553,6 +553,9 @@ public class CivSettings {
 		restrictedUndoBlocks.add(Material.OAK_SAPLING);
 		restrictedUndoBlocks.add(Material.PUMPKIN_STEM);
 		restrictedUndoBlocks.add(Material.MELON_STEM);
+		restrictedUndoBlocks.add(Material.WATER);
+		restrictedUndoBlocks.add(Material.LAVA);
+		restrictedUndoBlocks.add(Material.BEETROOT_SEEDS);
 	}
 
 	private static void initPlayerEntityWeapons() {
