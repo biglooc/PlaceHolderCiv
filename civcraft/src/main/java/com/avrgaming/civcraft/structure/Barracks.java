@@ -56,6 +56,8 @@ import com.avrgaming.civcraft.util.BlockCoord;
 import com.avrgaming.civcraft.util.CivColor;
 import com.avrgaming.civcraft.util.ItemManager;
 import com.avrgaming.civcraft.util.SimpleBlock;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class Barracks extends Structure {
 
@@ -229,8 +231,8 @@ public class Barracks extends Structure {
 			if (inHand.getType().getMaxDurability() == 0) {
 				throw new CivException(CivSettings.localize.localizedString("barracks_repair_invalidItem"));
 			}
-			
-			if (inHand.getDurability() == 0) {
+			ItemMeta _meta = inHand.getItemMeta();
+			if (_meta instanceof Damageable _dmg && _dmg.getDamage() == 0) {
 				throw new CivException(CivSettings.localize.localizedString("barracks_repair_atFull"));
 			}
 			
@@ -294,7 +296,11 @@ public class Barracks extends Structure {
 		}
 		
 		resident.getTreasury().withdraw(cost);
-		player.getInventory().getItemInMainHand().setDurability((short)0);
+		ItemMeta meta = player.getInventory().getItemInMainHand().getItemMeta();
+		if (meta instanceof Damageable dmg) {
+			dmg.setDamage(0);
+			player.getInventory().getItemInMainHand().setItemMeta(meta);
+		}
 		
 		CivMessage.sendSuccess(player, CivSettings.localize.localizedString("var_barracks_repair_Success",craftMat.getName(),cost,CivSettings.CURRENCY_NAME));
 		

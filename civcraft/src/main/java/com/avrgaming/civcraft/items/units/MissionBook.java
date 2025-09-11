@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.avrgaming.civcraft.util.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -59,10 +60,6 @@ import com.avrgaming.civcraft.structure.Structure;
 import com.avrgaming.civcraft.structure.TownHall;
 import com.avrgaming.civcraft.structure.TradeOutpost;
 import com.avrgaming.civcraft.structure.wonders.Wonder;
-import com.avrgaming.civcraft.util.BookUtil;
-import com.avrgaming.civcraft.util.ChunkCoord;
-import com.avrgaming.civcraft.util.CivColor;
-import com.avrgaming.civcraft.util.ItemManager;
 import com.avrgaming.civcraft.war.War;
 
 public class MissionBook extends UnitItemMaterial {
@@ -572,9 +569,9 @@ public class MissionBook extends UnitItemMaterial {
 				e.printStackTrace();
 				throw new CivException(CivSettings.localize.localizedString("internalException"));
 			}
-			
-			
-			meta.setLore(lore);
+
+
+			Text.setLore(meta, lore);
 			book.setItemMeta(meta);
 			
 			HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(book);

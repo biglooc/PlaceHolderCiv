@@ -7,6 +7,7 @@ import java.util.Random;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.avrgaming.civcraft.exception.CivTaskAbortException;
@@ -150,11 +151,9 @@ public class QuarryAsyncTask extends CivAsyncTask {
 				
 				if (ItemManager.getId(stack) == CivData.WOOD_PICKAXE) {
 					try {
-						short damage = ItemManager.getData(stack);
 						this.updateInventory(Action.REMOVE, source_inv, stack);
-						damage+= modifier;
-						stack.setDurability(damage);
-						if (damage < 59 && stack.getAmount() == 1) {
+						boolean exists = applyToolDamage(stack, modifier);
+						if (exists && stack.getAmount() == 1) {
 							this.updateInventory(Action.ADD, source_inv, stack);
 						}
 					} catch (InterruptedException e) {
@@ -188,11 +187,9 @@ public class QuarryAsyncTask extends CivAsyncTask {
 				}
 				if (this.quarry.getLevel() >= 2 && ItemManager.getId(stack) == CivData.STONE_PICKAXE) {
 					try {
-						short damage = ItemManager.getData(stack);
 						this.updateInventory(Action.REMOVE, source_inv, stack);
-						damage+= modifier;
-						stack.setDurability(damage);
-						if (damage < 131 && stack.getAmount() == 1) {
+						boolean exists = applyToolDamage(stack, modifier);
+						if (exists && stack.getAmount() == 1) {
 							this.updateInventory(Action.ADD, source_inv, stack);
 						}
 					} catch (InterruptedException e) {
@@ -230,11 +227,9 @@ public class QuarryAsyncTask extends CivAsyncTask {
 				}
 				if (this.quarry.getLevel() >= 3 && ItemManager.getId(stack) == CivData.IRON_PICKAXE) {
 					try {
-						short damage = ItemManager.getData(stack);
 						this.updateInventory(Action.REMOVE, source_inv, stack);
-						damage+= modifier;
-						stack.setDurability(damage);
-						if (damage < 250 && stack.getAmount() == 1) {
+						boolean exists = applyToolDamage(stack, modifier);
+						if (exists && stack.getAmount() == 1) {
 							this.updateInventory(Action.ADD, source_inv, stack);
 						}
 					} catch (InterruptedException e) {
@@ -279,11 +274,9 @@ public class QuarryAsyncTask extends CivAsyncTask {
 				}
 				if (ItemManager.getId(stack) == CivData.GOLD_PICKAXE) {
 					try {
-						short damage = ItemManager.getData(stack);
 						this.updateInventory(Action.REMOVE, source_inv, stack);
-						damage+= modifier;
-						stack.setDurability(damage);
-						if (damage < 32 && stack.getAmount() == 1) {
+						boolean exists = applyToolDamage(stack, modifier);
+						if (exists && stack.getAmount() == 1) {
 							this.updateInventory(Action.ADD, source_inv, stack);
 						}
 					} catch (InterruptedException e) {
@@ -315,11 +308,9 @@ public class QuarryAsyncTask extends CivAsyncTask {
 				}
 				if (this.quarry.getLevel() >= 4 && ItemManager.getId(stack) == CivData.DIAMOND_PICKAXE) {
 					try {
-						short damage = ItemManager.getData(stack);
 						this.updateInventory(Action.REMOVE, source_inv, stack);
-						damage+= modifier;
-						stack.setDurability(damage);
-						if (damage < 1561 && stack.getAmount() == 1) {
+						boolean exists = applyToolDamage(stack, modifier);
+						if (exists && stack.getAmount() == 1) {
 							this.updateInventory(Action.ADD, source_inv, stack);
 						}
 					} catch (InterruptedException e) {
@@ -421,6 +412,24 @@ public class QuarryAsyncTask extends CivAsyncTask {
 		} else {
 			debug(this.quarry, "Failed to get lock while trying to start task, aborting.");
 		}
+	}
+	private static boolean applyToolDamage(ItemStack stack, int delta) {
+		if (stack == null || stack.getType().isAir()) return false;
+		ItemMeta _m = stack.getItemMeta();
+		if (!(_m instanceof Damageable _d)) return false;
+
+		int _max = stack.getType().getMaxDurability(); // bv. 59 hout, 131 steen, etc.
+		int _cur = _d.getDamage();
+		if (_max <= 0) {
+			// Voor niet-slijtbare items; geen effect.
+			return false;
+		}
+		int _new = Math.min(_cur + delta, _max - 1); // nooit >= max (dan breekt ‘ie)
+		_d.setDamage(_new);
+		stack.setItemMeta(_m);
+
+		// true = item bestaat nog (niet “gebroken”)
+		return _new < _max;
 	}
 
 }

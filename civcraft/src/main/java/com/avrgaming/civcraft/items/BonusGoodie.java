@@ -24,9 +24,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import com.avrgaming.civcraft.util.*;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,12 +57,6 @@ import com.avrgaming.civcraft.object.TradeGood;
 import com.avrgaming.civcraft.structure.Structure;
 import com.avrgaming.civcraft.structure.TradeOutpost;
 import com.avrgaming.civcraft.threading.TaskMaster;
-import com.avrgaming.civcraft.util.BlockCoord;
-import com.avrgaming.civcraft.util.CivColor;
-import com.avrgaming.civcraft.util.EntityUtil;
-import com.avrgaming.civcraft.util.InventoryHolderStorage;
-import com.avrgaming.civcraft.util.ItemFrameStorage;
-import com.avrgaming.civcraft.util.ItemManager;
 
 public class BonusGoodie extends LoreItem {
 	/*
@@ -187,7 +184,17 @@ public class BonusGoodie extends LoreItem {
 		this.setDisplayName(stack, good.getInfo().name);
 
 	}
-	
+	public void setDisplayName(ItemStack stack, String name) {
+		ItemMeta meta = stack.getItemMeta();
+		Text.setDisplayName(meta, name);
+		stack.setItemMeta(meta);
+	}
+	public void setLore(ItemStack stack, List<String> lore) {
+		ItemMeta meta = stack.getItemMeta();
+		Text.setLore(meta, lore);
+		stack.setItemMeta(meta);
+	}
+
 	/*
 	 * Tries to find a goodie's itemstack
 	 */

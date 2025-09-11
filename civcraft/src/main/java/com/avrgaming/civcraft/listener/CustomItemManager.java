@@ -83,6 +83,7 @@ import com.avrgaming.civcraft.util.ItemManager;
 
 import gpl.AttributeUtil;
 import gpl.HorseModifier;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("deprecation")
@@ -232,7 +233,8 @@ public class CustomItemManager implements Listener {
 			return null;
 		}
 		
-		return stack.getItemMeta().getDisplayName();
+		ItemMeta meta = stack.getItemMeta();
+		return com.avrgaming.civcraft.util.Text.getDisplayName(meta);
 	}
 	
 	/*

@@ -24,6 +24,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.avrgaming.civcraft.lorestorage.ItemChangeResult;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class DurabilityOnDeath extends ItemComponent {
 
@@ -46,14 +48,23 @@ public class DurabilityOnDeath extends ItemComponent {
 		
 		double percent = this.getDouble("value");
 		
-		int reduction = (int)(result.stack.getType().getMaxDurability()*percent);
-		int durabilityLeft = result.stack.getType().getMaxDurability() - result.stack.getDurability();
-		
+		int max = result.stack.getType().getMaxDurability();
+		int reduction = (int) (max * percent);
+
+		ItemMeta meta = result.stack.getItemMeta();
+		if (!(meta instanceof Damageable dmg)) {
+			return result;
+		}
+
+		int damage = dmg.getDamage();
+		int durabilityLeft = max - damage;
+
 		if (durabilityLeft > reduction) {
-			result.stack.setDurability((short)(result.stack.getDurability() + reduction));
-		} else {
+			dmg.setDamage(damage + reduction);
+			result.stack.setItemMeta(meta);
+		}else {
 			result.destroyItem = true;
-		}		
+		}
 		
 		return result;
 	}

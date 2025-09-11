@@ -56,6 +56,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -95,8 +96,10 @@ public class PlayerListener implements Listener {
 			String name;
 			boolean rare = false;
 			ItemStack item = event.getItem().getItemStack();
-			if (item.getItemMeta().hasDisplayName()) {
-				name = item.getItemMeta().getDisplayName();
+			ItemMeta _m = item.getItemMeta();
+			String _dn = com.avrgaming.civcraft.util.Text.getDisplayName(_m);
+			if (_dn != null && _dn.isEmpty()) {
+				name = _dn;
 				rare = true;
 			} else {
 				name = item.getType().name().replace("_", " ").toLowerCase();

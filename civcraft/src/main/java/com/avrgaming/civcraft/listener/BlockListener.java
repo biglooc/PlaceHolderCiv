@@ -81,8 +81,10 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import com.avrgaming.civcraft.cache.ArrowFiredCache;
@@ -922,31 +924,34 @@ public class BlockListener implements Listener {
 		ItemStack stack = event.getItem();
 
 		/* Disable notch apples */
-		if (ItemManager.getId(event.getItem()) == ItemManager.getId(Material.GOLDEN_APPLE)) {
-			if (event.getItem().getDurability() == (short)0x1) {
-				CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorGoldenApple"));
-				event.setCancelled(true);
-				return;
-			}
-		}	
+		if (stack.getType().equals(Material.GOLDEN_APPLE)) {
+			CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorNotchApple"));
+			event.setCancelled(true);
+			return;
+		}
+		if (stack.getType().equals(Material.ENCHANTED_GOLDEN_APPLE)) {
+			CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorEnchantedGoldenApple"));
+			event.setCancelled(true);
+			return;
+		}
 
-		if (stack.getType().equals(Material.POTION)) {
-			int effect = event.getItem().getDurability() & 0x000F;			
-			if (effect == 0xE) {
-				event.setCancelled(true);
-				CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorInvisPotion"));
-				return;
+		Material t = stack.getType();
+		if (t == Material.POTION || t == Material.SPLASH_POTION || t == Material.LINGERING_POTION) {
+			if (isInvisibilityPotion(stack)) {
+					event.setCancelled(true);
+					CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorPotion"));
+					return;
+				}
 			}
 		}
-	}
 
 	@EventHandler(priority = EventPriority.NORMAL) 
 	public void onBlockDispenseEvent(BlockDispenseEvent event) {
 		ItemStack stack = event.getItem();
 		if (stack != null) {
-			if (event.getItem().getType().equals(Material.POTION)) {
-				int effect = event.getItem().getDurability() & 0x000F;			
-				if (effect == 0xE) { 
+			Material t = stack.getType();
+			if(t == Material.POTION || t == Material.SPLASH_POTION || t == Material.LINGERING_POTION) {
+				if (isInvisibilityPotion(stack)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -984,11 +989,12 @@ public class BlockListener implements Listener {
 
 		if (event.hasItem()) {
 
-			if (event.getItem().getType().equals(Material.POTION)) {
-				int effect = event.getItem().getDurability() & 0x000F;			
-				if (effect == 0xE) {
+			ItemStack it = event.getItem();
+			Material t = it.getType();
+			if (t == Material.POTION || t == Material.SPLASH_POTION || t == Material.LINGERING_POTION) {
+				if(isInvisibilityPotion(it)) {
 					event.setCancelled(true);
-					CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorInvisPotion"));
+					CivMessage.sendError(event.getPlayer(), CivSettings.localize.localizedString("itemUse_errorPotion"));
 					return;
 				}
 			}
@@ -1928,6 +1934,22 @@ public class BlockListener implements Listener {
 		}
 
 		return reason;
+	}
+	private static boolean isInvisibilityPotion(ItemStack stack) {
+		if (stack == null) return false;
+		if (!(stack.getItemMeta() instanceof PotionMeta pm)) return false;
+
+		// 1) Base potion type (1.21): kan null zijn
+		PotionType base = pm.getBasePotionType(); // @Nullable
+		if (base == PotionType.INVISIBILITY) return true;
+
+		// 2) Fallback: custom potion effects
+		for (PotionEffect eff : pm.getCustomEffects()) {
+			if (eff.getType() == PotionEffectType.INVISIBILITY) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 

@@ -4,15 +4,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.avrgaming.civcraft.util.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.avrgaming.civcraft.lorestorage.LoreCraftableMaterial;
 import com.avrgaming.civcraft.util.ItemManager;
+
+import static InventorySerializer.getSerializedItemStack;
 
 /*
  * Original serializer by Phil2812 (https://forums.bukkit.org/threads/serialize-inventory-to-single-string-and-vice-versa.92094/)
@@ -21,15 +27,19 @@ import com.avrgaming.civcraft.util.ItemManager;
 public class InventorySerializer {
 	
 	private static String getSerializedItemStack(ItemStack is) {
+        ItemMeta m = is.getItemMeta();
         String serializedItemStack = new String();
+        String dn = Text.getDisplayName(m);
+        if (dn != null && !dn.isEmpty()) {
+            serializedItemStack += "&D@" + dn;
+        }
         
         String isType = String.valueOf(ItemManager.getId(is.getType()));
         serializedItemStack += "t@" + isType;
        
-        if (is.getDurability() != 0)
-        {
-            String isDurability = String.valueOf(is.getDurability());
-            serializedItemStack += "&d@" + isDurability;
+        ItemMeta meta1 = is.getItemMeta();
+        if (meta1 instanceof Damageable dmg1 && dmg1.getDamage() != 0) {
+            serializedItemStack += "&d@" + dmg1.getDamage();
         }
        
         if (is.getAmount() != 1)
@@ -49,12 +59,13 @@ public class InventorySerializer {
        
         ItemMeta meta = is.getItemMeta();
         if (meta != null && meta.hasLore()) {
-        	for (String lore : meta.getLore()) {
-        		char[] encode = Base64Coder.encode(lore.getBytes());
+        	for (List<String> lore = Text.getLore(m);
+        		char[] encode = Base64Coder.encode(Text.getBytes());
         		String encodedString = new String(encode);
         		serializedItemStack += "&l@" + encodedString;
         	}
-        }
+        return serializedItemStack;
+
         
         if (meta != null) {
         	if (meta.getDisplayName() != null) {
@@ -96,7 +107,23 @@ public class InventorySerializer {
             }
             else if (itemAttribute[0].equals("d") && createdItemStack)
             {
-                is.setDurability(Short.valueOf(itemAttribute[1]));
+                ItemMeta meta = is.getItemMeta();
+                if (meta instanceof Damageable dmg) {
+                    int _max = is.getType().getMaxDurability();
+                    int _val;
+                    try {
+                        _val = Integer.parseInt(itemAttribute[1]);
+                    } catch (NumberFormatException e) {
+                        _val = 0;
+                    }
+                    if (_max > 0) {
+                        _val = Math.max(0, Math.min(_val, _max - 1));
+                    } else {
+                        _val = Math.max(0, _val);
+                    }
+                    dmg.setDamage(_val);
+                    is.setItemMeta(meta);
+                }
             }
             else if (itemAttribute[0].equals("a") && createdItemStack)
             {
@@ -115,7 +142,7 @@ public class InventorySerializer {
             else if (itemAttribute[0].equals("D") && createdItemStack) {
             	ItemMeta meta = is.getItemMeta();
             	if (meta != null) {
-            		meta.setDisplayName(itemAttribute[1]);
+            		setDisplayName(meta, String.valueOf(lore));
             	}
             	is.setItemMeta(meta);
             } else if (itemAttribute[0].equals("C")) {
@@ -156,7 +183,7 @@ public class InventorySerializer {
             ItemStack is = invInventory.getItem(i);
             if (is != null)
             {
-            	String serializedItemStack = getSerializedItemStack(is);
+            	String serializedItemStack = InventorySerializer.getSerializedItemStack(is);
                 serialization += i + "#" + serializedItemStack + ";";
             }
         }
@@ -167,7 +194,7 @@ public class InventorySerializer {
         	
         	for (ItemStack stack : pInv.getArmorContents()) {
         		if (stack != null) {
-        			serialization += getSerializedItemStack(stack) + ";";
+        			serialization += InventorySerializer.getSerializedItemStack(stack) + ";";
         		}
         	}
         }
@@ -221,5 +248,31 @@ public class InventorySerializer {
        
         return;
     }
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+
+    public static void setDisplayName(ItemMeta meta, String name) {
+        meta.displayName(name == null ? null : LEGACY.deserialize(name));
+    }
+
+    public static String getDisplayName(ItemMeta meta) {
+        Component c = meta.displayName();
+        return (c == null) ? null : LEGACY.serialize(c);
+    }
+
+    public static void setLore(ItemMeta meta, java.util.List<String> lines) {
+        if (lines == null) { meta.lore(null); return; }
+        java.util.List<Component> comps = new java.util.ArrayList<>(lines.size());
+        for (String s : lines) comps.add(LEGACY.deserialize(s == null ? "" : s));
+        meta.lore(comps);
+    }
+
+    public static java.util.List<String> getLore(ItemMeta meta) {
+        java.util.List<Component> comps = meta.lore();
+        if (comps == null) return java.util.Collections.emptyList();
+        java.util.List<String> out = new java.util.ArrayList<>(comps.size());
+        for (Component c : comps) out.add(LEGACY.serialize(c));
+        return out;
+    }
 	
 }
+

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.avrgaming.civcraft.util.Text;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -35,13 +36,13 @@ public class LoreStoreage {
 		
 		List<String> lore;
 		if (meta.hasLore()) {
-			lore = meta.getLore();
+			lore = Text.getLore(meta);
 		} else {
 			lore = new ArrayList<String>();
 		}
 		
 		lore.set(0, CivColor.Black+"MID:"+id);
-		meta.setLore(lore);
+		Text.setLore(meta, lore);
 		stack.setItemMeta(meta);
 	}
 	
@@ -49,7 +50,7 @@ public class LoreStoreage {
 	
 	public static void setItemName(String name ,ItemStack stack) {
 		ItemMeta meta = stack.getItemMeta();
-		meta.setDisplayName(name);
+		Text.setDisplayName(meta, CivColor.Black+name);
 		stack.setItemMeta(meta);
 	}
 	
@@ -65,7 +66,7 @@ public class LoreStoreage {
 			lore.add(CivColor.Gray+key+":"+value);
 		}
 		
-		meta.setLore(lore);
+		Text.setLore(meta, lore);
 		stack.setItemMeta(meta);
 	}
 	
@@ -74,7 +75,7 @@ public class LoreStoreage {
 		ItemMeta meta = stack.getItemMeta();
 		
 		if (meta.hasLore()) {
-			List<String> lore = meta.getLore();
+			List<String> lore = Text.getLore(meta);
 			return lore.get(0);
 		} else {
 			return "none";
@@ -86,7 +87,7 @@ public class LoreStoreage {
 		
 		ItemMeta meta = stack.getItemMeta();
 		if (meta.hasLore()) {
-			List<String> lore = meta.getLore();
+			List<String> lore = Text.getLore(meta);
 			for (String str : lore) {
 				String[] split = str.split(":");
 				if (split.length > 2) {

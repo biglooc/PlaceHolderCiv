@@ -1,5 +1,6 @@
 package gpl;
 
+import com.avrgaming.civcraft.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
@@ -49,35 +50,35 @@ public class AttributeUtil {
     public void setName(String name) {
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(name);
+            Text.setDisplayName(meta, name);
             stack.setItemMeta(meta);
         }
     }
     public String getName() {
         ItemMeta meta = stack.getItemMeta();
-        return meta != null ? meta.getDisplayName() : null;
+        return meta != null ? Text.getDisplayName(meta) : null;
     }
 
     public void addLore(String str) {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) return;
-        List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
+        List<String> lore = meta.hasLore() ? new ArrayList<>(Text.getLore(meta)) : new ArrayList<>();
         lore.add(str);
-        meta.setLore(lore);
+        Text.setLore(meta, lore);
         stack.setItemMeta(meta);
     }
     public void addLore(String[] lore) { if (lore != null) for (String s : lore) addLore(s); }
     public String[] getLore() {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null || !meta.hasLore()) return null;
-        List<String> lore = meta.getLore();
-        return lore == null ? null : lore.toArray(new String[0]);
+        List<String> lore = Text.getLore(meta);
+        return lore.toArray(new String[0]);
     }
     public void setLore(String string) { setLore(new String[]{string}); }
     public void setLore(String[] strings) {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) return;
-        meta.setLore(strings == null ? null : Arrays.asList(strings));
+        Text.setLore(meta, strings == null ? null : Arrays.asList(strings) );
         stack.setItemMeta(meta);
     }
     public void setLore(java.util.LinkedList<String> strings) { setLore(strings == null ? null : strings.toArray(new String[0])); }

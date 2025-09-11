@@ -20,6 +20,7 @@ package com.avrgaming.civcraft.items;
 
 import java.util.List;
 
+import com.avrgaming.civcraft.util.Text;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -40,25 +41,16 @@ public abstract class LoreItem extends SQLObject {
 	public abstract void load();	
 	
 	public LoreItem() {}
-
-	public void setLore(ItemStack stack, List<String> lore) {
-		ItemMeta meta = stack.getItemMeta();
-		meta.setLore(lore);
-		stack.setItemMeta(meta);
-	}
 	
 	public List<String> getLore(ItemStack stack) {
-		return stack.getItemMeta().getLore();
-	}
-	
-	public void setDisplayName(ItemStack stack, String name) {
 		ItemMeta meta = stack.getItemMeta();
-		meta.setDisplayName(name);
-		stack.setItemMeta(meta);
+		return Text.getLore(meta);
 	}
 	
 	public String getDisplayName(ItemStack stack) {
-		return stack.getItemMeta().getDisplayName();
+		ItemMeta meta = stack.getItemMeta();
+		return Text.getDisplayName(meta);
+
 	}
 
 	public Type getType() {

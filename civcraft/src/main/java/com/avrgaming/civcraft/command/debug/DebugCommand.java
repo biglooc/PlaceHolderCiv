@@ -52,6 +52,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.avrgaming.civcraft.command.CommandBase;
@@ -680,21 +681,49 @@ public class DebugCommand extends CommandBase {
 	public void getdura_cmd() throws CivException {
 		Player player = getPlayer();
 		ItemStack inHand = player.getInventory().getItemInMainHand();
-		CivMessage.send(player, "Durability:"+inHand.getDurability());
-		CivMessage.send(player, "MaxDura:"+inHand.getType().getMaxDurability());
-		
+		if (inHand == null || inHand.getType().isAir()) {
+			throw new CivException("You need an item in your hand.");
+		}
+
+		ItemMeta meta = inHand.getItemMeta();
+		int damage = 0;
+		if (meta instanceof Damageable dmg) {
+			damage = dmg.getDamage();
+		}
+
+		int max = inHand.getType().getMaxDurability();
+		CivMessage.send(player, "Durability:" + damage);      // zelfde label als vroeger
+		CivMessage.send(player, "MaxDura:" + max);
 	}
-	
+
 	public void setdura_cmd() throws CivException {
 		Player player = getPlayer();
-		Integer dura = getNamedInteger(1);
-		
+		Integer dura = getNamedInteger(1); // gewenste 'damage' waarde
+
 		ItemStack inHand = player.getInventory().getItemInMainHand();
-		inHand.setDurability((short)dura.shortValue());
-		
-		CivMessage.send(player, "Set Durability:"+inHand.getDurability());
-		CivMessage.send(player, "MaxDura:"+inHand.getType().getMaxDurability());
-		
+		if (inHand == null || inHand.getType().isAir()) {
+			throw new CivException("You need an item in your hand.");
+		}
+
+		ItemMeta meta = inHand.getItemMeta();
+		if (meta instanceof Damageable dmg) {
+			int max = inHand.getType().getMaxDurability();
+			int newDamage = dura;
+			if (max > 0) {
+				// clamp tussen 0 en max-1 (Bukkit breekt item bij >= max)
+				newDamage = Math.max(0, Math.min(dura, max - 1));
+			} else {
+				newDamage = Math.max(0, dura);
+			}
+			dmg.setDamage(newDamage);
+			inHand.setItemMeta(meta);
+		}
+
+		// Feedback zoals voorheen
+		ItemMeta meta2 = inHand.getItemMeta();
+		int damage2 = (meta2 instanceof Damageable d2) ? d2.getDamage() : 0;
+		CivMessage.send(player, "Set Durability:" + damage2);
+		CivMessage.send(player, "MaxDura:" + inHand.getType().getMaxDurability());
 	}
 	
 	public void getmid_cmd() throws CivException {
